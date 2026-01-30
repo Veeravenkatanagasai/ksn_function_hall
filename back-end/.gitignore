@@ -4,5 +4,8 @@ npm-debug.log*
 yarn-error.log*
 dist/
 .env.*
-uploads/
 .sql
+uploads/
+*.log
+utility/finalpdf/
+utility/receipts/

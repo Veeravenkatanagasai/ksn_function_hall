@@ -68,10 +68,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, 
     httpOnly: true,
-    sameSite: "none",
-    maxAge: 1000 * 60 * 60 // 1 hour
+    secure: process.env.NODE_ENV === "production", // only HTTPS in prod
+    sameSite: "none", // cross-site cookies
+    maxAge: 1000 * 60 * 60
   }
 }));
 app.use(bodyParser.json());

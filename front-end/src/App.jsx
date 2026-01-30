@@ -9,6 +9,7 @@ import PriceMaster from "./Pages/Dashboard/HallPricing/PriceMaster";
 import ShowBookings from "./Pages/Dashboard/Booking/showbookings";
 import EmployeeLogin from "./Pages/Employee/EmployeeLogin";
 import EmployeeDashboard from "./Pages/Employee/EmployeeDashboard";
+import EmployeeProtectedRoute from "./Components/ProtectedRoutes/EmployeeProtectedRoute";
 import Employees from "./Pages/Employee/Employee";
 import SaveContact from "./Pages/Dashboard/Contacts/SaveContacts";
 import Staff from "./Pages/Dashboard/Contacts/Staff";
@@ -53,7 +54,16 @@ function App() {
         <Route path="/bookings" element={<ShowBookings />} />
         {/* Employee Routes */}
         <Route path="/employee-login" element={<EmployeeLogin />} />
-        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+      <Route
+        path="/employee-dashboard"
+        element={
+          <EmployeeProtectedRoute>
+            <EmployeeDashboard />
+          </EmployeeProtectedRoute>
+        }
+      />
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/employee-login" replace />} />
         <Route path="/employees" element={<Employees />} />
         <Route path="/save-contact" element={<SaveContact />} />
         <Route path="/staff" element={<Staff />}/>

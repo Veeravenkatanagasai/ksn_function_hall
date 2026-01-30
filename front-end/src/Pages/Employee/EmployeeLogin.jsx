@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import api from "../../services/api";
+import { employeeLogin } from "../../services/employeeAuth";
 import "./EmployeeLogin.css";
 
 const EmployeeLogin = () => {
@@ -17,20 +17,13 @@ const EmployeeLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", { emp_email, password });
-      
-      // Success feedback
-      toast.success("Identity Verified. Welcome back!");
-      
-      localStorage.setItem("emp_role", res.data.employee.emp_role);
-      
-      // Delay navigation slightly to let the user see the success toast
-      setTimeout(() => {
-        navigate("/employee-dashboard");
-      }, 1500);
+      await employeeLogin(emp_email, password);
+      toast.success("Welcome back!");
+      setTimeout(() => navigate("/employee-dashboard"), 1000);
     } catch (err) {
+      toast.error(err.message || "Invalid credentials");
+    } finally {
       setLoading(false);
-      toast.error(err.response?.data?.message || "Invalid Credentials. Access Denied.");
     }
   };
 
@@ -81,7 +74,6 @@ const EmployeeLogin = () => {
                     placeholder="name@company.com"
                     value={emp_email}
                     onChange={(e) => setEmpEmail(e.target.value)}
-                    autoComplete="off"
                     required
                   />
                 </div>
