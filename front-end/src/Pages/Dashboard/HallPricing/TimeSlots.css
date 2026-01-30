@@ -1,0 +1,66 @@
+:root {
+  --slot-primary: #20c997;
+  --slot-bg: #ecfdf9;
+  --slot-danger: #dc3545;
+}
+
+.ts-page {
+  padding: 30px;
+  background: var(--slot-bg);
+}
+
+.ts-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.08);
+}
+
+.ts-header {
+  padding: 22px;
+  background: linear-gradient(135deg, var(--slot-primary), #148f77);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ts-btn {
+  border-radius: 10px;
+  padding: 10px 18px;
+  border: none;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+
+.ts-btn-primary {
+  background: #fff;
+  color: var(--slot-primary);
+  font-weight: bold;
+}
+
+.ts-btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.ts-table td {
+  padding: 14px;
+  border-top: 1px solid #eee;
+}
+
+.ts-table tr:hover {
+  background: #e6fcf5;
+}
+
+.ts-action {
+  border: none;
+  background: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ts-edit { color: var(--slot-primary); }
+.ts-delete { color: var(--slot-danger); }
+
+.ts-form .ts-input {
+  border-radius: 10px;
+  padding: 12px;
+}

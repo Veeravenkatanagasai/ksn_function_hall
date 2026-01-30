@@ -1,0 +1,191 @@
+/* ===============================
+   BASIC THEME VARIABLES
+================================ */
+:root {
+  --primary: #6c5ce7;
+  --primary-dark: #5649c0;
+  --bg: #f5f6fb;
+  --white: #ffffff;
+  --border: #e5e7eb;
+  --danger: #e63946;
+  --text: #1f2937;
+  --muted: #6b7280;
+}
+
+/* ===============================
+   PAGE LAYOUT
+================================ */
+.cat-container {
+  padding: 24px;
+  background-color: var(--bg);
+}
+
+.cat-card {
+  background-color: var(--white);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+/* ===============================
+   HEADER
+================================ */
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cat-title h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cat-icon {
+  width: 16px;
+  height: 16px;
+  background-color: var(--primary);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 4h18v2H3V4m0 6h18v2H3v-2m0 6h18v2H3v-2z'/%3E%3C/svg%3E") no-repeat center;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+.cat-btn-primary {
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  background-color: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.cat-btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.cat-btn-light {
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: #f9fafb;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ===============================
+   TABLE
+================================ */
+.cat-table-wrapper {
+  padding: 16px;
+}
+
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cat-table th {
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-table td {
+  padding: 12px;
+  font-size: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.cat-table tr:last-child td {
+  border-bottom: none;
+}
+
+.center {
+  text-align: center;
+}
+
+.cat-name {
+  font-weight: 500;
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+.cat-actions {
+  display: flex;
+  justify-content: left;
+  gap: 10px;
+}
+
+.cat-btn-edit,
+.cat-btn-delete {
+  font-size: 13px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.cat-btn-edit {
+  color: var(--primary);
+}
+
+.cat-btn-delete {
+  color: var(--danger);
+}
+
+/* ===============================
+   MODAL FORM
+================================ */
+.cat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cat-form label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.cat-form input {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.cat-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.cat-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ===============================
+   MODAL FOOTER
+================================ */
+.cat-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}

@@ -1,0 +1,90 @@
+/* Container Spacing */
+.header-modern {
+  padding-top: 1rem;
+}
+
+/* Typography */
+.welcome-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #3b71ca; /* High-end Blue */
+  letter-spacing: -0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.admin-highlight {
+  color: #212529;
+  text-transform: capitalize;
+}
+
+.last-login-tag {
+  font-size: 0.9rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+
+/* Filter Card - The Glassmorphism Look */
+.filter-card {
+  background: #ffffff;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Vertical Labels and Inputs */
+.vertical-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.modern-input {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-input:focus {
+  background-color: #fff;
+  border-color: #3b71ca;
+  box-shadow: 0 0 0 3px rgba(59, 113, 202, 0.1);
+  outline: none;
+}
+
+/* Modern Buttons */
+.modern-btn {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary.modern-btn {
+  background-color: #3b71ca;
+  border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+}

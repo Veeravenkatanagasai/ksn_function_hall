@@ -1,0 +1,125 @@
+/* ================= GENERAL ================= */
+.finance-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  background-color: #1976D2;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #1565C0;
+}
+
+.subtitle {
+  margin: 10px 0 20px;
+  color: #555;
+}
+
+/* ================= FILTERS ================= */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.filters input,
+.filters select,
+.filters button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.booking-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.status-badge.closed {
+  background-color: #4CAF50;
+}
+
+.status-badge.cancelled {
+  background-color: #F44336;
+}
+
+/* ================= CHARTS LAYOUT ================= */
+.charts-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Side by side for inflow and outflow */
+.charts-row > .pie-chart-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 45%; /* ensure they stay side by side */
+}
+
+/* Net revenue below */
+.net-revenue-container {
+  margin-top: 30px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pie titles and totals */
+.pie-title {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.pie-total {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Net revenue labels */
+.net-revenue-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.inflow-label {
+  color: #4CAF50;
+}
+
+.outflow-label {
+  color: #F44336;
+}
+
+.total-net-revenue {
+  text-align: center;
+  margin-top: 30px;
+  color: #000;
+  font-weight: bold;
+  font-size: 18px;
+}

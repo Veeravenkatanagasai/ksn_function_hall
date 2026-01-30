@@ -1,0 +1,88 @@
+.add-btn {
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 6px;
+}
+
+.icon-btn.edit {
+  color: #0d6efd;
+}
+
+.icon-btn.delete {
+  color: #dc3545;
+}
+
+.icon-btn:hover {
+  transform: scale(1.15);
+}
+
+/* CUSTOM MODAL */
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.custom-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 95%;
+  max-height: 90vh; /* never taller than viewport */
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+  overflow: hidden;
+}
+
+.custom-modal h5 {
+  margin-bottom: 16px;
+  flex-shrink: 0; /* header does not shrink */
+}
+
+.custom-modal .form-control {
+  width: 100%;
+}
+
+/* Make modal body scrollable */
+.custom-modal-body {
+  overflow-y: auto;
+  padding-right: 8px; /* optional: for scrollbar spacing */
+  flex-grow: 1; /* take remaining space between header & footer */
+  margin-bottom: 16px;
+}
+
+/* Footer buttons stay fixed */
+.custom-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0; /* footer stays visible */
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

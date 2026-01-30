@@ -1,0 +1,111 @@
+/* Sidebar Outer Container */
+.sidebar-container {
+  width: 300px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* The dark floating card based on photo */
+.dark-floating-sidebar {
+  background: #041731; /* Dark blue from your image */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem 0; 
+  overflow: hidden;
+}
+
+/* Brand Section */
+.sidebar-top {
+  padding: 10px 20px 30px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Menu Items */
+.sidebar-menu {
+  flex-grow: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  color: #1e6fa5; /* Grayish text */
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menu-icon {
+  font-size: 1.2rem;
+  margin-right: 15px;
+}
+
+/* Active State - Matches the orange bar in your photo */
+.active-link {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.active-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 4px;
+  background-color: #f39c12; /* Orange indicator bar from photo */
+  border-radius: 0 4px 4px 0;
+}
+
+.menu-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Red Logout Button from Photo */
+
+
+.logout-btn-red {
+  background: #e74c3c; /* Red color from image */
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.logout-btn-red:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* Hide scrollbar for clean look */
+.sidebar-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: #ffffffe8;
+  border-radius: 10px;
+}

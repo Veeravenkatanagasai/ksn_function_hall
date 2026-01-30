@@ -1,0 +1,237 @@
+/* Header container */
+.eb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Back button */
+.eb-back-btn {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.eb-back-btn:hover {
+  background-color: #0056b3;
+}
+
+
+/* ================= BOOKING CARDS ================= */
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.booking-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.booking-card h3 {
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+
+.booking-card p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ================= MODAL BACKDROP ================= */
+
+.eb-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* make sure it’s on top */
+}
+
+.eb-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 90%;
+  overflow-y: auto;
+  z-index: 10000;
+}
+
+
+/* ================= MODAL CONTENT ================= */
+
+.eb-modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  width: 420px;
+  max-width: 95%;
+  text-align: center;
+}
+
+.eb-modal-content.large {
+  width: 900px;
+  max-width: 95%;
+}
+
+/* ================= ADD BUTTON ================= */
+
+.eb-add-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 15px 0;
+}
+
+.eb-add-btn:hover {
+  background: #2563eb;
+}
+
+/* ================= BILL CARDS ================= */
+
+.bill-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.bill-card {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.bill-card h4 {
+  color: #1e40af;
+  margin-bottom: 6px;
+}
+
+.bill-card p {
+  margin: 4px 0;
+  color: #374151;
+}
+
+.bill-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* ================= BILL CARD ACTIONS ================= */
+
+.bill-card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.bill-card-actions button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 13px;
+}
+
+.bill-card-actions button:first-child {
+  background: #f59e0b;
+}
+
+.bill-card-actions button:last-child {
+  background: #ef4444;
+}
+
+/* ================= FORM ================= */
+
+.eb-modal-content form select,
+.eb-modal-content form input {
+  width: 100%;
+  padding: 9px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.eb-modal-content form button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin: 6px;
+}
+
+.eb-modal-content form button[type="submit"] {
+  background: #10b981;
+  color: white;
+}
+
+.eb-cancel-btn {
+  background: #ef4444;
+  color: white;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+  .bill-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  gap: 6px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.page-btn.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}

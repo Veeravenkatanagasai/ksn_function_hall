@@ -1,0 +1,62 @@
+/* ReferralPayments.css */
+.referral-payments-container {
+  padding: 20px;
+  position: relative;
+}
+
+.top-right-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.referral-table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.referral-table thead th {
+  background-color: #0b3b68;
+  color: #fff;
+  text-align: center;
+}
+
+.referral-table tbody td {
+  text-align: center;
+}
+
+.btn {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.custom-modal .modal-content {
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.custom-modal-header {
+  background-color: #0b3b68;
+  color: #fff;
+  border-bottom: none;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.custom-modal-body {
+  font-size: 15px;
+}
+
+.custom-modal-footer {
+  border-top: none;
+  justify-content: space-between;
+}

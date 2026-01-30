@@ -1,0 +1,150 @@
+/* Variables for Consistency */
+:root {
+  --primary: #4f46e5;
+  --bg: #f8fafc;
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --glass: rgba(255, 255, 255, 0.9);
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --radius: 16px;
+}
+
+.admin-page-container {
+  background-color: var(--bg);
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Header Styling */
+.admin-top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.title-section h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.title-section p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+/* Fixed Right Side Back Button */
+.back-to-dash {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: var(--text-dark);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.back-to-dash:hover {
+  background: var(--primary);
+  transform: translateX(-5px);
+}
+
+/* Vertical Stack Layout */
+.modules-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+/* Glassmorphism Module Cards */
+.module-card {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Staggered Animations */
+.anim-1 { animation: slideIn 0.5s ease forwards 0.1s; }
+.anim-2 { animation: slideIn 0.5s ease forwards 0.2s; }
+.anim-3 { animation: slideIn 0.5s ease forwards 0.3s; }
+.anim-4 { animation: slideIn 0.5s ease forwards 0.4s; }
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Advanced Table Styling (Inside components) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f1f5f9;
+  color: var(--text-light);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+.data-table tr:hover {
+  background: #f8fafc;
+}
+
+/* Add Button Styling */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .back-to-dash {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+}

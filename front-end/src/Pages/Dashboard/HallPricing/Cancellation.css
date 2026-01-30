@@ -1,0 +1,143 @@
+/* HEADER */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* ACTION ICONS */
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 6px;
+  transition: transform 0.2s ease;
+}
+
+.icon-btn.edit {
+  color: #0d6efd;
+}
+
+.icon-btn.delete {
+  color: #dc3545;
+}
+
+.icon-btn:hover {
+  transform: scale(1.2);
+}
+
+/* BADGES */
+.badge {
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.active {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.badge.inactive {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* ================= MODAL ================= */
+
+/* Overlay (blocks background scroll) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Modal box */
+.modal-box {
+  background: #fff;
+  width: 420px;
+  max-width: 95%;
+  max-height: 90vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+  overflow: hidden;
+}
+
+/* Small delete modal */
+.modal-box.small {
+  width: 350px;
+}
+
+/* Modal header */
+.modal-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Modal body (scrollable area) */
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Modal footer */
+.modal-footer {
+  padding: 14px 16px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Inputs inside modal */
+.modal-body input,
+.modal-body select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Close button */
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #555;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

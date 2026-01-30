@@ -1,0 +1,80 @@
+/* Full page layout */
+.home-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  font-family: "Roboto", sans-serif;
+  position: relative;
+  background: #f0f4f8;
+  padding: 20px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80") center/cover no-repeat;
+  opacity: 0.15;
+  pointer-events: none; 
+}
+
+/* Heading */
+.main-title {
+  font-size: 3rem;
+  margin-bottom: 50px;
+  color: #0b2545;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+/* Split container for admin and employee cards */
+.split-container {
+  display: flex;
+  gap: 50px;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
+}
+
+/* Cards styling */
+.role-card {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 60px 30px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.role-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific colors */
+.role-card.admin {
+  border-top: 5px solid #00b4d8;
+}
+
+.role-card.employee {
+border-top: 5px solid #0077b6;}
+
+/* Card content */
+.role-card h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #0b2545;
+}
+
+.role-card p {
+  font-size: 1rem;
+  color: #555;
+}

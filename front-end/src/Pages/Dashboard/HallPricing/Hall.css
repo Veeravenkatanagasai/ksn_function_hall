@@ -1,0 +1,143 @@
+/* ====== Layout ====== */
+.admin-section {
+  padding: 24px;
+}
+
+.admin-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* ====== Header ====== */
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  font-size: 22px;
+}
+
+.admin-card-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ====== Buttons ====== */
+.primary-btn {
+  background: #0b2545;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.primary-btn:hover {
+  background: #081c34;
+}
+
+.secondary-btn {
+  background: #f1f3f5;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ====== Table ====== */
+.table-wrapper {
+  padding: 16px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.admin-table th {
+  text-align: left;
+  font-weight: 600;
+  background: #f8f9fa;
+}
+
+.center {
+  text-align: center;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.muted {
+  color: #6c757d;
+}
+
+/* ====== Actions ====== */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.icon-btn.edit {
+  color: #0d6efd;
+}
+
+.icon-btn.delete {
+  color: #dc3545;
+}
+
+/* ====== Form ====== */
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-layout label {
+  font-weight: 500;
+}
+
+.form-layout input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}

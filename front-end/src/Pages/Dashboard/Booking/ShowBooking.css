@@ -1,0 +1,294 @@
+/* ================== GLOBAL THEME ================== */
+:root {
+  --primary: #6366f1;
+  --secondary: #22c55e;
+  --pink: #ec4899;
+  --orange: #f97316;
+  --danger: #ef4444;
+  --dark: #020617;
+  --glass: rgba(255, 255, 255, 0.15);
+  --blur: blur(18px);
+}
+
+/* ================== PAGE BACKGROUND ================== */
+.admin-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(
+    270deg,
+    #020617,
+    #1e293b,
+    #312e81,
+    #1e3a8a
+  );
+  background-size: 400% 400%;
+  animation: bgFlow 18s ease infinite;
+  color: #fff;
+}
+
+@keyframes bgFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ================== FIXED BACK BUTTON ================== */
+.back-fixed-btn {
+  border-radius: 40px;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, #6366f1, #22c55e);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  z-index: 1200;
+  transition: all 0.35s ease;
+}
+
+.back-fixed-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* ================== GLASS CARD ================== */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  border-radius: 20px;
+  padding: 22px;
+  cursor: pointer;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+  transition: all 0.4s ease;
+  animation: fadeUp 0.7s ease forwards;
+}
+
+.glass-card:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
+
+/* ================== CARD CONTENT ================== */
+.badge-id {
+  display: inline-block;
+  background: linear-gradient(135deg, #ec4899, #f97316);
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.customer-name-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.glass-card p {
+  opacity: 0.9;
+  margin-bottom: 6px;
+}
+
+/* ================== PAGINATION ================== */
+.pagination .page-link {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  margin: 0 4px;
+  transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+  background: var(--primary);
+}
+
+.pagination .active .page-link {
+  background: linear-gradient(135deg, #6366f1, #22c55e);
+  border-color: transparent;
+}
+
+/* ================== MODAL OVERLAY ================== */
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ================== MODAL CONTAINER ================== */
+.custom-modal-container {
+  width: 92%;
+  max-width: 1150px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 40px 90px rgba(0,0,0,0.7);
+  animation: zoomIn 0.45s ease;
+  color: #020617;
+}
+
+/* ================== MODAL HEADER ================== */
+.modal-header-line {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+/* ================== SCROLL AREA ================== */
+.modal-scroll-area {
+  max-height: 72vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* ================== INFO BLOCK ================== */
+.info-block {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.section-title {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* ================== TABLES ================== */
+.table {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f1f5f9;
+}
+
+/* ================== NET SUMMARY ================== */
+.net-summary-box {
+  background: linear-gradient(135deg, #ecfeff, #eef2ff);
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.net-total-row {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+/* ================== DOCUMENTS ================== */
+.doc-thumb img {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  object-fit: cover;
+  transition: all 0.35s ease;
+}
+
+.doc-thumb img:hover {
+  transform: scale(1.12) rotate(1deg);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+}
+
+/* ================== ANIMATIONS ================== */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ================== SCROLLBAR ================== */
+.modal-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366f1, #22c55e);
+  border-radius: 10px;
+}
+
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-modal-container {
+  background: #fff;
+  width: 700px;
+  max-width: 95%;
+  max-height: 90vh;   /* modal never exceeds screen */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.gallery-delete-icon {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 0, 0, 0.9);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 22px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.gallery-delete-icon:hover {
+  background: red;
+  transform: scale(1.1);
+}
+
+
+/* 🔥 THIS ENABLES SCROLL */
+.custom-modal-body {
+  overflow-y: auto;
+  max-height: calc(90vh - 40px);
+  padding-right: 10px;
+}
+

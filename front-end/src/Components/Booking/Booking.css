@@ -1,0 +1,121 @@
+/* Page background */
+body {
+  background: #f6f7fb;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* Main booking card */
+.booking-container {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Labels */
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+/* Inputs & dropdowns */
+.form-control {
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  padding: 10px 14px;
+  color: #111827;
+  background-color: #fff;
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #facc15;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
+}
+
+/* Readonly inputs */
+.form-control[readonly] {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+}
+
+/* Row spacing */
+.row.g-4 {
+  row-gap: 22px;
+}
+
+/* Discount field */
+input[type="number"] {
+  text-align: left;
+}
+
+/* Buttons container */
+.booking-actions {
+  margin-top: 40px;
+}
+
+/* Back button */
+.btn-outline-secondary {
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: #f3f4f6;
+}
+
+/* Generate Invoice button */
+.btn-warning {
+  background: #fbbf24;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  box-shadow: 0 6px 18px rgba(251, 191, 36, 0.35);
+}
+
+.btn-warning:hover {
+  background: #f59e0b;
+  color: #111827;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .booking-container {
+    padding: 20px;
+  }
+
+  .btn-warning,
+  .btn-outline-secondary {
+    width: 100%;
+  }
+
+  .booking-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+.calendar-popup {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  margin-top: 5px;
+  border-radius: 8px;
+  padding: 5px;
+}
+
