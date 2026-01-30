@@ -1,16 +1,22 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import {
   findEmployeeByEmail,
   updateLoginInfo,
   updateLogoutInfo
 } from "../models/employeeauthModel.js";
 
+// ✅ LOGIN (JWT)
 export const login = async (req, res) => {
   const { emp_email, password } = req.body;
 
+  if (!emp_email || !password) {
+    return res.status(400).json({ message: "Email and password required" });
+  }
+
   const employee = await findEmployeeByEmail(emp_email);
   if (!employee) {
-    return res.status(404).json({ message: "Employee not found" });
+    return res.status(401).json({ message: "Invalid credentials" });
   }
 
   const match = await bcrypt.compare(password, employee.password_hash);
@@ -20,29 +26,35 @@ export const login = async (req, res) => {
 
   await updateLoginInfo(employee.emp_id);
 
-  // ✅ SESSION STORED
-  req.session.employee = {
-    emp_id: employee.emp_id,
-    emp_name: employee.emp_name,
-    emp_role: employee.emp_role,
-    emp_email: employee.emp_email,
-    last_login: employee.last_login,
-    last_logout: employee.last_logout 
-  };
+  // 🔐 JWT TOKEN
+  const token = jwt.sign(
+    {
+      emp_id: employee.emp_id,
+      emp_role: employee.emp_role,
+      emp_email: employee.emp_email,
+      emp_name: employee.emp_name
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  );
 
   res.json({
-    message: "Login successful",
-    employee: req.session.employee
+    token,
+    employee: {
+      emp_id: employee.emp_id,
+      emp_name: employee.emp_name,
+      emp_role: employee.emp_role,
+      emp_email: employee.emp_email
+    }
   });
 };
 
+// ✅ LOGOUT (stateless)
 export const logout = async (req, res) => {
-  if (req.session.employee) {
-    await updateLogoutInfo(req.session.employee.emp_id);
+  // purely optional DB logging
+  if (req.employee?.emp_id) {
+    await updateLogoutInfo(req.employee.emp_id);
   }
 
-  req.session.destroy(() => {
-    res.clearCookie("connect.sid");
-    res.json({ message: "Logged out successfully" });
-  });
+  res.json({ message: "Logged out successfully" });
 };

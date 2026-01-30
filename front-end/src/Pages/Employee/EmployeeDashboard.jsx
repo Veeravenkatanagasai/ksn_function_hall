@@ -14,7 +14,7 @@ const Dashboard = () => {
 useEffect(() => {
   api.get("/employees/profile")
     .then(res => setSelectedEmployee(res.data))
-    .catch(() => navigate("/login"));
+    .catch(() => navigate("/employee-login"));
 }, []);
 
 

@@ -1,8 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import bodyParser from "body-parser";
-import session from "express-session";
 import path from "path";
 
 
@@ -58,25 +56,13 @@ app.use(cors({
     }
     return callback(null, true);
   },
-  credentials: true
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // only HTTPS in prod
-    sameSite: "none", // cross-site cookies
-    maxAge: 1000 * 60 * 60
-  }
-}));
-app.use(bodyParser.json());
 // Serve uploaded files
 app.use("/uploads", express.static("uploads"));
+app.use("/receipts", express.static(path.join("utility", "receipts")));
 
 /* -------- API Routes -------- */
 app.use("/api/admin", adminRoutes);
@@ -101,7 +87,6 @@ app.use("/api/referral-payment",referralPaymentRoutes);
 app.use("/api/terms",termsconditionRoutes);
 app.use("/api/translate",translateRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/receipts", express.static(path.join("utility", "receipts")));
 app.use("/api/cancellation-rules",cancellationRuleRoutes);
 app.use("/api/cancellation",cancellaationRoutes);
 app.use("/api/electricity",electricityRoutes);

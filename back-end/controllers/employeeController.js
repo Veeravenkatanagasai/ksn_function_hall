@@ -6,7 +6,7 @@ import db from "../config/db.js";
 export const profile = async (req, res) => {
   const [rows] = await db.query(
     "SELECT emp_id, emp_name, emp_email, emp_role, emp_phone,username,last_login, login_count FROM ksn_function_hall_employee WHERE emp_id=?",
-    [req.session.employee.emp_id]
+    [req.employee.emp_id]
   );
 
   res.json(rows[0]);
