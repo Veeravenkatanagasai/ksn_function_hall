@@ -323,4 +323,8 @@ CREATE TABLE ksn_function_hall_maintenance_payments (
         REFERENCES ksn_function_hall_maintenance_bills(maintenance_bill_id)
 );
 
+after add cloudinary application
 
+ALTER TABLE ksn_function_hall_gallery ADD COLUMN cloudinary_id VARCHAR(255) AFTER image_path;
+
+ALTER TABLE ksn_function_hall_electricity_bills ADD COLUMN current_previous_public_id VARCHAR(255), ADD COLUMN current_after_public_id VARCHAR(255), ADD COLUMN generator_previous_public_id VARCHAR(255), ADD COLUMN generator_after_public_id VARCHAR(255);

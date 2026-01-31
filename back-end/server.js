@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 
 
 //Routes
@@ -60,9 +59,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Serve uploaded files
-app.use("/uploads", express.static("uploads"));
-app.use("/receipts", express.static(path.join("utility", "receipts")));
 
 /* -------- API Routes -------- */
 app.use("/api/admin", adminRoutes);

@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "./BillsUpload.css";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
 const EmployeeBills = () => {
   const [bookings, setBookings] = useState([]);
   const [bills, setBills] = useState([]);
@@ -204,9 +202,11 @@ const EmployeeBills = () => {
                   <p><strong>₹{b.bill_amount}</strong></p>
                   {b.bill_photo && (
                     <img
-                      src={`${BASE_URL}/uploads/Bills/${b.bill_photo}`}
+                      src={b.bill_photo}
                       alt="bill"
                       width="120"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => window.open(b.bill_photo, "_blank")}
                     />
                   )}
 
@@ -265,7 +265,7 @@ const EmployeeBills = () => {
 
               {modal.type === "edit" && form.existingPhoto && (
                 <img
-                  src={`${BASE_URL}/uploads/Bills/${form.existingPhoto}`}
+                  src={form.existingPhoto}
                   alt="Bill"
                   width="120"
                 />

@@ -55,19 +55,24 @@ export const addElectricityBill = async (req, res) => {
     // Insert into DB
     await createElectricityBill([
       booking_id,
-      files.current_previous?.[0]?.filename || null,
-      files.current_after?.[0]?.filename || null,
+      files.current_previous?.[0]?.path || null,
+      files.current_after?.[0]?.path || null,
       current_previous_units || 0,
       current_after_current_units || 0,
       current_per_unit_cost || 0,
       currentTotal,
-      files.generator_previous?.[0]?.filename || null,
-      files.generator_after?.[0]?.filename || null,
+      files.generator_previous?.[0]?.path || null,
+      files.generator_after?.[0]?.path || null,
       generator_previous_units || 0,
       generator_after_units || 0,
       generator_per_unit_cost || 0,
       generatorTotal,
-      grandTotal
+      grandTotal,
+
+      files.current_previous?.[0]?.filename || null,
+      files.current_after?.[0]?.filename || null,
+      files.generator_previous?.[0]?.filename || null,
+      files.generator_after?.[0]?.filename || null
     ]);
 
     res.json({ message: "Electricity bill created successfully" });

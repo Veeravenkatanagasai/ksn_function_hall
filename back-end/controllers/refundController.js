@@ -69,9 +69,14 @@ const proof_image =
   settlement_type === "SETTLED"
     ? null
     : req.file
-    ? `/uploads/settlements/${req.file.filename}`
+    ? req.file.path
     : null;
 
+    if (settlement_type !== "SETTLED" && !req.file) {
+  return res.status(400).json({
+    message: "Proof image is required for REFUND / COLLECT"
+  });
+}
 
 
     const [[booking]] = await db.query(

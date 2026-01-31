@@ -7,5 +7,3 @@ dist/
 .sql
 uploads/
 *.log
-utility/finalpdf/
-utility/receipts/

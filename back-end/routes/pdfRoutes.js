@@ -1,99 +1,120 @@
 import express from "express";
+import path from "path";
+import fs from "fs";
+
 import { generateFinalBookingPDF } from "../utility/finalpdf/generateFinalBookingpdf.js";
 import { generateCancellationPDF } from "../utility/cancellationpdf/cancellationpdf.js";
 import { generateReferralPDF } from "../utility/referralpdf/referralpdf.js";
 import { generatePDFReceipt } from "../utility/receipts/pdf.js";
 
-import path from "path";
-import fs from "fs";
-
 const router = express.Router();
 
-// ================= FINAL BOOKING PDF =================
+/* ---------- helper: wait until file exists ---------- */
+const waitForFile = async (filePath, timeout = 5000) => {
+  const start = Date.now();
+
+  while (!fs.existsSync(filePath)) {
+    if (Date.now() - start > timeout) {
+      throw new Error("PDF generation timeout");
+    }
+    await new Promise(res => setTimeout(res, 100));
+  }
+};
+
+/* ================= FINAL BOOKING PDF ================= */
 router.get("/final/:bookingId", async (req, res) => {
   try {
     const { bookingId } = req.params;
 
-    await generateFinalBookingPDF(bookingId);
-
-    const filePath = path.join(
-      process.cwd(),
+    const filePath = path.resolve(
       "utility",
       "finalpdf",
       `invoice_${bookingId}.pdf`
     );
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send("PDF not found");
-    }
+    await generateFinalBookingPDF(bookingId);
+    await waitForFile(filePath);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
 
     res.sendFile(filePath);
   } catch (err) {
-    console.error("PDF Route Error:", err);
+    console.error("Final PDF error:", err);
     res.status(500).send("Failed to generate PDF");
   }
 });
 
-// ================= CANCELLATION PDF =================
+/* ================= CANCELLATION PDF ================= */
 router.get("/cancellation/:bookingId", async (req, res) => {
   try {
     const { bookingId } = req.params;
 
-    await generateCancellationPDF(bookingId);
-
-    const filePath = path.join(
-      process.cwd(),
+    const filePath = path.resolve(
       "utility",
       "cancellationpdf",
       `cancellation_${bookingId}.pdf`
     );
 
+    await generateCancellationPDF(bookingId);
+    await waitForFile(filePath);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+
     res.sendFile(filePath);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("PDF generation failed");
+    console.error("Cancellation PDF error:", err);
+    res.status(500).send("Failed to generate PDF");
   }
 });
 
-// ================= REFERRAL PDF =================
+/* ================= REFERRAL PDF ================= */
 router.get("/referral/:bookingId", async (req, res) => {
   try {
     const { bookingId } = req.params;
 
-    await generateReferralPDF(bookingId);
-
-    const filePath = path.join(
-      process.cwd(),
+    const filePath = path.resolve(
       "utility",
       "referralpdf",
       `referral_${bookingId}.pdf`
     );
 
+    await generateReferralPDF(bookingId);
+    await waitForFile(filePath);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+
     res.sendFile(filePath);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("PDF generation failed");
+    console.error("Referral PDF error:", err);
+    res.status(500).send("Failed to generate PDF");
   }
 });
 
+/* ================= PAYMENT RECEIPT PDF ================= */
 router.get("/booking/:bookingId", async (req, res) => {
   try {
     const { bookingId } = req.params;
 
-    await generatePDFReceipt(bookingId);
-
-    const filePath = path.join(
+    const filePath = path.resolve(
       "utility",
       "receipts",
       `receipt_${bookingId}.pdf`
     );
 
-    res.sendFile(path.resolve(filePath));
+    await generatePDFReceipt(bookingId);
+    await waitForFile(filePath);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+
+    res.sendFile(filePath);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to generate booking PDF" });
+    console.error("Receipt PDF error:", err);
+    res.status(500).send("Failed to generate PDF");
   }
 });
-
 
 export default router;

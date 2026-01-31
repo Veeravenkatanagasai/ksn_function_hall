@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "./Gallery.css";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
 const GalleryUpload = () => {
 
   const [bookingId, setBookingId] = useState("");
@@ -97,16 +95,10 @@ const GalleryUpload = () => {
                   <div key={img.gallery_id} className="gallery-item">
 
                     <img
-                     src={`${BASE_URL}/uploads/gallery/${img.image_path}`}
-                      alt={stageKey}
-                      onClick={() =>
-                        window.open(
-                        `${BASE_URL}/uploads/gallery/${img.image_path}`,
-                        "_blank"
-                      )
-                      }
-                    />
-
+                    src={img.image_path}
+                    alt={stageKey}
+                    onClick={() => window.open(img.image_path, "_blank")}
+                  />
                   </div>
                 ))}
               </div>

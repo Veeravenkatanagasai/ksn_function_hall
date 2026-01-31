@@ -53,11 +53,32 @@
 }
 
 .header-content {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   margin-bottom: 30px;
 }
+
+.header-left {
+  justify-self: start;
+  text-align: left;
+}
+
+.center-brand {
+  justify-self: center;
+  text-align: center;
+}
+
+.header-right {
+  justify-self: end;
+}
+
+.back-btn {
+  padding: 6px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
 
 /* Logo Styling */
 .app-logo {

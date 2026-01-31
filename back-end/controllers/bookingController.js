@@ -13,10 +13,11 @@ export const confirmBooking = async (req, res) => {
 
     const customer = {
       ...req.body,
-      aadharCustomer: files.aadharCustomer?.[0]?.filename ?? null,
-      aadharBride: files.aadharBride?.[0]?.filename ?? null,
-      aadharGroom: files.aadharGroom?.[0]?.filename ?? null,
-      weddingCard: files.weddingCard?.[0]?.filename ?? null,
+      aadharCustomer: files.aadharCustomer?.[0]?.path ?? null,
+      aadharBride: files.aadharBride?.[0]?.path ?? null,
+      aadharGroom: files.aadharGroom?.[0]?.path ?? null,
+      weddingCard: files.weddingCard?.[0]?.path ?? null,
+
     };
 
     await conn.beginTransaction();

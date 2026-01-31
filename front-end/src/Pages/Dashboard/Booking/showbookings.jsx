@@ -50,15 +50,7 @@ const [selectedBill, setSelectedBill] = useState(null);
 const [paymentAmount, setPaymentAmount] = useState("");
 const [paymentType, setPaymentType] = useState("CASH");
 
-
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-  const IMAGE_BASE = `${BASE_URL}/uploads/bookings/`;
-  const IMAGE_BASE1 = `${BASE_URL}/uploads/gallery/`;
-  const ELECTRICITY_BASE = `${BASE_URL}/uploads/electricity-bills/`;
-  const BILLS_BASE = `${BASE_URL}/uploads/bills/`;
-
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -224,9 +216,14 @@ const confirmFinalSettlement = async () => {
     }
 
     await api.post(
-      `/refund/confirm/${selectedBooking.booking_id}`,
-      formData
-    );
+  `/refund/confirm/${selectedBooking.booking_id}`,
+  formData,
+  {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  }
+);
 
     alert("Final settlement completed");
 
@@ -386,7 +383,7 @@ const BookingPDFButton = ({ bookingId }) => (
     className="btn btn-outline-primary"
     onClick={() =>
       window.open(
-        `${BASE_URL}/api/pdf/booking/${bookingId}`,
+        `${BASE_URL}/pdf/booking/${bookingId}`,
         "_blank"
       )
     }
@@ -611,10 +608,10 @@ const BookingPDFButton = ({ bookingId }) => (
                         selectedBooking[key] && (
                           <div key={key} className="doc-thumb text-center">
                             <img
-                              src={`${IMAGE_BASE}${selectedBooking[key]}`}
+                              src={selectedBooking[key]}
                               alt={key}
-                              onClick={() => openImage(selectedBooking[key])}
                               style={{ cursor: "pointer" }}
+                              onClick={() => window.open(selectedBooking[key], "_blank")}
                             />
                             <span className="small d-block mt-1">{key.replace(/_/g, " ")}</span>
                           </div>
@@ -759,33 +756,31 @@ const BookingPDFButton = ({ bookingId }) => (
     <div className="data-row mt-2">
       <span>Previous Reading Image</span>
       <img
-        src={`${ELECTRICITY_BASE}${electricityData.current_previous_reading_image}`}
-        alt="Current Previous"
-        width={120}
-        style={{ cursor: "pointer" }}
-        onClick={() =>
-          window.open(
-            `${ELECTRICITY_BASE}${electricityData.current_previous_reading_image}`,
-            "_blank"
-          )
-        }
-      />
+  src={electricityData.current_previous_reading_image}
+  alt="Current Previous"
+  width={120}
+  style={{ cursor: "pointer" }}
+  onClick={() =>
+    window.open(
+      electricityData.current_previous_reading_image,
+      "_blank"
+    )
+  }
+/>
     </div>
 
     <div className="data-row mt-2">
       <span>After Reading Image</span>
       <img
-        src={`${ELECTRICITY_BASE}${electricityData.current_after_reading_image}`}
-        alt="Current After"
-        width={120}
-        style={{ cursor: "pointer" }}
-        onClick={() =>
-          window.open(
-            `${ELECTRICITY_BASE}${electricityData.current_after_reading_image}`,
-            "_blank"
-          )
-        }
-      />
+  src={electricityData.current_after_reading_image}
+  width={120}
+  onClick={() =>
+    window.open(
+      electricityData.current_after_reading_image,
+      "_blank"
+    )
+  }
+/>
     </div>
 
     {/* GENERATOR */}
@@ -810,33 +805,30 @@ const BookingPDFButton = ({ bookingId }) => (
     <div className="data-row mt-2">
       <span>Previous Reading Image</span>
       <img
-        src={`${ELECTRICITY_BASE}${electricityData.generator_previous_reading_image}`}
-        alt="Generator Previous"
-        width={120}
-        style={{ cursor: "pointer" }}
-        onClick={() =>
-          window.open(
-            `${ELECTRICITY_BASE}${electricityData.generator_previous_reading_image}`,
-            "_blank"
-          )
-        }
-      />
+  src={electricityData.generator_previous_reading_image}
+  width={120}
+  onClick={() =>
+    window.open(
+      electricityData.generator_previous_reading_image,
+      "_blank"
+    )
+  }
+/>
     </div>
 
     <div className="data-row mt-2">
       <span>After Reading Image</span>
       <img
-        src={`${ELECTRICITY_BASE}${electricityData.generator_after_reading_image}`}
-        alt="Generator After"
-        width={120}
-        style={{ cursor: "pointer" }}
-        onClick={() =>
-          window.open(
-            `${ELECTRICITY_BASE}${electricityData.generator_after_reading_image}`,
-            "_blank"
-          )
-        }
-      />
+  src={electricityData.generator_after_reading_image}
+  width={120}
+  onClick={() =>
+    window.open(
+      electricityData.generator_after_reading_image,
+      "_blank"
+    )
+  }
+/>
+
     </div>
 
     <hr />
@@ -948,16 +940,13 @@ const BookingPDFButton = ({ bookingId }) => (
                             <span className="fw-semibold">Proof</span>
                             <br />
                             <img
-                              src={`${BASE_URL}${refundDetails.proof_image}`}
+                              src={refundDetails.proof_image}
                               alt="Settlement Proof"
                               width="120"
                               className="rounded shadow mt-1"
                               style={{ cursor: "pointer" }}
                               onClick={() =>
-                                window.open(
-                                  `${BASE_URL}${refundDetails.proof_image}`,
-                                  "_blank"
-                                )
+                                window.open(refundDetails.proof_image, "_blank")
                               }
                             />
                           </div>
@@ -1028,7 +1017,7 @@ const BookingPDFButton = ({ bookingId }) => (
         className="btn btn-outline-primary"
         onClick={() =>
           window.open(
-            `${BASE_URL}/api/pdf/final/${selectedBooking.booking_id}`,
+            `${BASE_URL}/pdf/final/${selectedBooking.booking_id}`,
             "_blank"
           )
         }
@@ -1062,7 +1051,7 @@ const BookingPDFButton = ({ bookingId }) => (
         className="btn btn-outline-danger"
         onClick={() =>
           window.open(
-            `${BASE_URL}/api/pdf/cancellation/${selectedBooking.booking_id}`,
+            `${BASE_URL}/pdf/cancellation/${selectedBooking.booking_id}`,
             "_blank"
           )
         }
@@ -1465,17 +1454,12 @@ const BookingPDFButton = ({ bookingId }) => (
     style={{ width: "120px" }}
   >
     <img
-      src={`${IMAGE_BASE1}${img.image_path}`}
+      src={img.image_path}
       alt={stage}
       width={120}
       className="rounded shadow"
       style={{ cursor: "pointer" }}
-      onClick={() =>
-        window.open(
-          `${IMAGE_BASE1}${img.image_path}`,
-          "_blank"
-        )
-      }
+       onClick={() => window.open(img.image_path, "_blank")}
     />
     <span
       className="gallery-delete-icon"
@@ -1524,9 +1508,7 @@ const BookingPDFButton = ({ bookingId }) => (
                   {bill.bill_photo ? (
                     <button
                       className="btn btn-sm btn-primary"
-                      onClick={() =>
-                        window.open(`${BILLS_BASE}${bill.bill_photo}`, "_blank")
-                      }
+                      onClick={() => window.open(bill.bill_photo, "_blank")}
                     >
                       View
                     </button>

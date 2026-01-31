@@ -5,9 +5,9 @@ export const GalleryModel = {
   insertImage: async (bookingId, stage, imagePath) => {
     await db.query(
       `INSERT INTO ksn_function_hall_gallery 
-       (booking_id, stage, image_path)
-       VALUES (?, ?, ?)`,
-      [bookingId, stage, imagePath]
+       (booking_id, stage, image_path, cloudinary_id)
+       VALUES (?, ?, ?, ?)`,
+      [bookingId, stage, imagePath,cloudinaryId]
     );
   },
 
@@ -24,8 +24,7 @@ export const GalleryModel = {
 
   getImageById: async (galleryId) => {
     const [[row]] = await db.query(
-      `SELECT image_path FROM ksn_function_hall_gallery WHERE gallery_id = ?`,
-      [galleryId]
+      `SELECT image_path, cloudinary_id FROM ksn_function_hall_gallery WHERE gallery_id = ?`,      [galleryId]
     );
     return row;
   },

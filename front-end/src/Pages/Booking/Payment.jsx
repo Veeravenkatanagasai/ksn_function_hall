@@ -192,7 +192,7 @@ const MakePayment = () => {
     className="btn btn-primary download-btn"
     onClick={() =>
       window.open(
-        `${BASE_URL}/receipts/receipt_${bookingId}.pdf`,
+        `${BASE_URL}/pdf/booking/${bookingId}`,
         "_blank"
       )
     }
@@ -200,6 +200,7 @@ const MakePayment = () => {
     📄 Download PDF Receipt
   </button>
 )}
+
 
   </div>
 </div>

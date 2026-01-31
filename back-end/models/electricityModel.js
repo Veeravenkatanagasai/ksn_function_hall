@@ -31,22 +31,28 @@ export const getUtilityCostsByCategory = async (categoryName) => {
 
 // Create electricity bill
 export const createElectricityBill = async (data) => {
-  const sql = `INSERT INTO ksn_function_hall_electricity_bills
-  (booking_id,
-    current_previous_reading_image,
-    current_after_reading_image,
-    current_previous_units,
-    current_after_current_units,
-    current_per_unit_cost,
-    currnet_total_amount,
-    generator_previous_reading_image,
-    generator_after_reading_image,
-    generator_previous_units,
-    generator_after_units,
-    generator_per_unit_cost,
-    generator_total_amount,
-    grand_total
-  ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  const sql = `
+    INSERT INTO ksn_function_hall_electricity_bills (
+      booking_id,
+      current_previous_reading_image,
+      current_after_reading_image,
+      current_previous_units,
+      current_after_current_units,
+      current_per_unit_cost,
+      currnet_total_amount,
+      generator_previous_reading_image,
+      generator_after_reading_image,
+      generator_previous_units,
+      generator_after_units,
+      generator_per_unit_cost,
+      generator_total_amount,
+      grand_total,
+      current_previous_public_id,
+      current_after_public_id,
+      generator_previous_public_id,
+      generator_after_public_id
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  `;
 
   await db.query(sql, data);
 };

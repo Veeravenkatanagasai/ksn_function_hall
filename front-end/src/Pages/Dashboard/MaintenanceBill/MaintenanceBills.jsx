@@ -72,7 +72,7 @@ const MaintenanceBills = () => {
       description: bill.maintenance_bill_description,
       photo: null,
     });
-    setPreview(`${BASE_URL}/uploads/Maintenance-Bills/${bill.maintenance_bill_photo}`);
+    setPreview(bill.maintenance_bill_photo);
     setShowModal(true);
   };
 
@@ -166,17 +166,18 @@ const MaintenanceBills = () => {
         <td>₹{bill.maintenance_bill_amount}</td>
         <td>{bill.maintenance_bill_description}</td>
         <td>
-  <a
-    href={`${BASE_URL}/uploads/Maintenance-Bills/${bill.maintenance_bill_photo}`}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <img
-      src={`${BASE_URL}/uploads/Maintenance-Bills/${bill.maintenance_bill_photo}`}
-      alt={bill.maintenance_bill_name}
-      className="mb-bill-img"
-      style={{ cursor: "pointer" }}
-    />
+          <a
+          href={bill.maintenance_bill_photo}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+        <img
+          src={bill.maintenance_bill_photo}
+          alt={bill.maintenance_bill_name}
+          className="mb-bill-img"
+          style={{ cursor: "pointer" }}
+        />
   </a>
 </td>
 
@@ -241,7 +242,7 @@ const MaintenanceBills = () => {
             <label>Photo</label>
             <input type="file" name="photo" onChange={handleChange} />
             {preview ? <img src={preview} width="120" /> :
-             currentBill?.maintenance_bill_photo && <img src={`${BASE_URL}/uploads/Maintenance-Bills/${currentBill.maintenance_bill_photo}`} width="120" />}
+             currentBill?.maintenance_bill_photo &&  (<img src={currentBill.maintenance_bill_photo} width="120" />)}
             <div className="mb-modal-buttons">
               <button type="submit">{currentBill ? "Update" : "Add"}</button>
               <button type="button" onClick={() => setShowModal(false)}>Cancel</button>

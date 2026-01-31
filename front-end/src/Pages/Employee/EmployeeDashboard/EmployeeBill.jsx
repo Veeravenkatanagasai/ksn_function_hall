@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
 const EmployeeBills = () => {
   const [bookings, setBookings] = useState([]);
   const [bills, setBills] = useState([]);
@@ -170,9 +168,11 @@ const EmployeeBills = () => {
 
                   {b.bill_photo && (
                     <img
-                      src={`${BASE_URL}/uploads/Bills/${b.bill_photo}`}
-                      alt="Bill"
+                      src={b.bill_photo}
+                      alt="bill"
                       width="120"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => window.open(b.bill_photo, "_blank")}
                     />
                   )}
                 </div>

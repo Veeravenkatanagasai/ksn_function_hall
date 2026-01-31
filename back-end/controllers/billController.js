@@ -23,7 +23,7 @@ export const BillController = {
         bill_amount
       } = req.body;
 
-      const bill_photo = req.file ? req.file.filename : null;
+      const bill_photo = req.file ? req.file.path : null;
 
       const result = await BillModel.createBill({
         booking_id,

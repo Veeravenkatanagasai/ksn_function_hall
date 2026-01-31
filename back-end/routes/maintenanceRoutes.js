@@ -1,5 +1,5 @@
 import express from "express";
-import multer from "multer";
+import {upload} from "../middleware/maintenancebillupload.js";
 import {
   addBill,
   getAllBills,
@@ -11,16 +11,6 @@ import {
 } from "../controllers/maintenanceController.js";
 
 const router = express.Router();
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/Maintenance-Bills'),
-  filename: (req, file, cb) => {
-    const ext = file.originalname.split('.').pop();
-    cb(null, Date.now() + '.' + ext);
-  }
-});
-
-const upload = multer({ storage });
 
 router.post("/", upload.single("photo"), addBill);
 router.get("/", getAllBills);

@@ -55,13 +55,6 @@ const Booking = () => {
   return (
     <div className="main-viewport">
 
-      <button
-        className="btn btn-outline-dark position-fixed top-0 end-0 m-4 z-50"
-        onClick={() => window.history.back()}
-      >
-        ← Back to Dashboard
-      </button>
-
       <div className="bg-blob blob-1"></div>
       <div className="bg-blob blob-2"></div>
       <div className="bg-blob blob-3"></div>
@@ -70,27 +63,39 @@ const Booking = () => {
         {/* HEADER */}
         <header className="glass-header">
           <div className="header-content">
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="brand-section"
-            >
-              <div className="app-logo">
-                <span></span><span></span><span></span><span></span>
-              </div>
-              <div>
-                <h1>Booking </h1>
-                <p>KSN Function Hall</p>
-              </div>
-            </motion.div>
+  {/* LEFT – BACK BUTTON */}
+  <div className="header-left">
+    <button
+      className="btn btn-outline-dark back-btn"
+      onClick={() => navigate("/dashboard")}
+    >
+      ← Back to Dashboard
+    </button>
+  </div>
 
-            <div className="header-date">
-              <span className="label">Session</span><br />
-              <span className="value">
-                {new Date().toLocaleDateString("en-GB")}
-              </span>
-            </div>
-          </div>
+  {/* CENTER – LOGO + TITLE */}
+  <motion.div
+    initial={{ x: -20, opacity: 0 }}
+    animate={{ x: 0, opacity: 1 }}
+    className="brand-section center-brand"
+  >
+    <div className="app-logo">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div>
+      <h1>Booking</h1>
+      <p>KSN Function Hall</p>
+    </div>
+  </motion.div>
+
+  {/* RIGHT – SESSION */}
+  <div className="header-right">
+    <span className="label">Session</span><br />
+    <span className="value">
+      {new Date().toLocaleDateString("en-GB")}
+    </span>
+  </div>
+</div>
 
           {/* STEPPER */}
           <nav className="stepper-nav">

@@ -1,6 +1,5 @@
 import db from "../config/db.js";
-import fs from "fs";
-import path from "path";
+import cloudinary from "../config/cloudinary.js";
 import { GalleryModel } from "../models/galleryModel.js";
 
 /* ================= UPLOAD IMAGES ================= */
@@ -21,7 +20,8 @@ export const uploadGalleryImages = async (req, res) => {
       await GalleryModel.insertImage(
         bookingId,
         stage,
-        file.filename
+        file.path,
+        file.filename 
       );
     }
 
@@ -91,17 +91,9 @@ export const deleteGalleryImage = async (req, res) => {
     }
 
     // 2️⃣ Delete file from uploads
-    const filePath = path.join(
-      process.cwd(),
-      "uploads/gallery",
-      image.image_path
-    );
+    await cloudinary.uploader.destroy(image.cloudinary_id);
 
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // 3️⃣ Delete DB record
+    // Delete DB record
     await GalleryModel.deleteImageById(galleryId);
 
     res.json({ message: "Image deleted successfully" });

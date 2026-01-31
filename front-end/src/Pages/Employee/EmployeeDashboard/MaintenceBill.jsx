@@ -100,17 +100,17 @@ const MaintenanceBills = () => {
                 <td>{bill.maintenance_bill_description}</td>
                 <td>
                   {bill.maintenance_bill_photo && (
-                    <a
-                      href={`${BASE_URL}/uploads/Maintenance-Bills/${bill.maintenance_bill_photo}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={`${BASE_URL}/uploads/Maintenance-Bills/${bill.maintenance_bill_photo}`}
-                        alt={bill.maintenance_bill_name}
-                        className="mb-bill-img"
-                      />
-                    </a>
+                  <a
+                  href={bill.maintenance_bill_photo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >
+                  <img
+                    src={bill.maintenance_bill_photo}
+                    alt={bill.maintenance_bill_name}
+                    className="mb-bill-img"
+                    />
+                </a>
                   )}
                 </td>
                 

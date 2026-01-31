@@ -1,10 +1,11 @@
 import * as Bill from "../models/maintenanceModel.js";
+import db from "../config/db.js"; 
 
 // ===== ADD BILL =====
 export const addBill = async (req, res) => {
   try {
     const { name, amount, description } = req.body;
-    const photo = req.file ? req.file.filename : null;
+    const photo = req.file ? req.file.path : null;
 
     await Bill.createBill([name, photo, amount, description]);
     res.json({ message: "Bill added successfully" });
@@ -42,17 +43,13 @@ export const updateBill = async (req, res) => {
   try {
     const { name, amount, description } = req.body;
 
-    // 1️⃣ Get existing bill
-    const [existingRows] = await Bill.getBillById(req.params.id);
-    if (!existingRows[0]) {
-      return res.status(404).json({ message: "Bill not found" });
-    }
-    const existingBill = existingRows[0];
+    const [rows] = await Bill.getBillById(req.params.id);
+    if (!rows[0]) return res.status(404).json({ message: "Bill not found" });
 
-    // 2️⃣ Decide which photo to use
-    const photo = req.file ? req.file.filename : existingBill.maintenance_bill_photo;
-
-    // 3️⃣ Update bill in DB
+    const photo = req.file
+      ? req.file.path   
+      : rows[0].maintenance_bill_photo;
+  
     const updateData = [name, photo, amount, description, req.params.id];
     await Bill.updateBill(updateData);
 
@@ -66,13 +63,35 @@ export const updateBill = async (req, res) => {
 
 // ===== DELETE BILL =====
 export const deleteBill = async (req, res) => {
+  const billId = req.params.id;
+
   try {
-    await Bill.deleteBill(req.params.id);
-    res.json({ message: "Bill deleted successfully" });
+    // Check if bill exists
+    const [existingRows] = await Bill.getBillById(billId);
+    if (!existingRows[0]) return res.status(404).json({ message: "Bill not found" });
+
+    // Delete associated payments first
+    const deletePaymentsQuery = `
+      DELETE FROM ksn_function_hall_maintenance_payments
+      WHERE maintenance_bill_id = ?
+    `;
+    await db.query(deletePaymentsQuery, [billId]);
+    // Now delete the bill
+    const [deleteBillResult] = await Bill.deleteBill(billId);
+    if (deleteBillResult.affectedRows === 0) {
+      return res.status(500).json({ message: "Failed to delete bill" });
+    }
+    res.json({ message: "Bill and associated payments deleted successfully" });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to delete bill" });
-  }
+    if (err.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(400).json({
+        message: "Cannot delete bill due to existing references",
+        error: err.sqlMessage,
+      });
+    }
+    res.status(500).json({ message: "Internal server error while deleting bill", error: err.sqlMessage || err.message });
+  } 
 };
 
 // ===== PAYMENTS =====

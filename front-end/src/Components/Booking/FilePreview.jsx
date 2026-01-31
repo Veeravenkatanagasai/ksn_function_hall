@@ -8,6 +8,12 @@ const FilePreview = ({ file }) => {
   useEffect(() => {
     if (!file) return;
 
+    // ✅ CASE 1: Cloudinary URL (string)
+    if (typeof file === "string") {
+      setPreview(file);
+      return;
+    }
+
     if (file.type.startsWith("image/")) {
       const url = URL.createObjectURL(file);
       setPreview(url);

@@ -91,7 +91,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
                       variant="outline-primary"
                       onClick={() =>
                         window.open(
-                        `${BASE_URL}/api/pdf/referral/${row.booking_id}`,
+                        `${BASE_URL}/pdf/referral/${row.booking_id}`,
                         "_blank"
                       )
                       }
