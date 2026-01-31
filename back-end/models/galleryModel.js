@@ -2,14 +2,14 @@ import db from "../config/db.js";
 
 export const GalleryModel = {
 
-  insertImage: async (bookingId, stage, imagePath) => {
-    await db.query(
-      `INSERT INTO ksn_function_hall_gallery 
-       (booking_id, stage, image_path, cloudinary_id)
-       VALUES (?, ?, ?, ?)`,
-      [bookingId, stage, imagePath,cloudinaryId]
-    );
-  },
+  insertImage: async (bookingId, stage, imagePath, cloudinaryId) => {
+  await db.query(
+    `INSERT INTO ksn_function_hall_gallery 
+     (booking_id, stage, image_path, cloudinary_id)
+     VALUES (?, ?, ?, ?)`,
+    [bookingId, stage, imagePath, cloudinaryId]
+  );
+},
 
   getStageWiseGallery: async (bookingId) => {
     const [rows] = await db.query(
