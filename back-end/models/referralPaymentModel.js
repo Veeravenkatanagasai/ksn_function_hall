@@ -32,16 +32,22 @@ export const ReferralPaymentModel = {
 
     // 2️⃣ Update the latest refund row
     const [[refund]] = await db.query(`
-      SELECT refund_id, adjustable_amount
-      FROM ksn_function_hall_refunds
-      WHERE booking_id = ?
-      ORDER BY refunded_at DESC
-      LIMIT 1
-    `, [booking_id]);
+      SELECT refund_id,
+           adjustable_amount,
+           IFNULL(referral_amount, 0) AS existing_referral_amount,
+           IFNULL(total_bill_amount, 0) AS total_bill_amount
+    FROM ksn_function_hall_refunds
+    WHERE booking_id = ?
+    ORDER BY refunded_at DESC
+    LIMIT 1
+  `, [booking_id]);
 
     if (!refund) throw new Error("Refund record not found");
 
-    const final_amount = Number(refund.adjustable_amount) - Number(referral_amount);
+const final_amount =
+    Number(refund.adjustable_amount)
+    - Number(referral_amount)
+    - Number(refund.total_bill_amount);
 
     await db.query(`
       UPDATE ksn_function_hall_refunds

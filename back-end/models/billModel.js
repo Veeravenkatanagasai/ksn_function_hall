@@ -81,37 +81,43 @@ export const BillModel = {
   },
 
   async getBillsByBooking(booking_id) {
-    const [rows] = await db.query(
-      `SELECT b.*,
-              CASE WHEN p.payment_id IS NOT NULL THEN 'PAID' ELSE 'UNPAID' END AS bill_status
-       FROM ksn_function_hall_bills b
-       LEFT JOIN ksn_function_hall_bill_payments p
+  const [rows] = await db.query(
+    `SELECT 
+        b.bill_id,
+        b.booking_id,
+        b.bill_category,
+        b.bill_description,
+        b.bill_amount,
+        b.bill_photo,
+        p.payment_amount,
+        p.payment_method,
+        CASE 
+          WHEN p.payment_id IS NOT NULL THEN 'PAID'
+          ELSE 'UNPAID'
+        END AS payment_status
+     FROM ksn_function_hall_bills b
+     LEFT JOIN ksn_function_hall_bill_payments p
        ON b.bill_id = p.bill_id
-       WHERE b.booking_id = ?
-       ORDER BY b.created_at DESC`,
-      [booking_id]
-    );
-    return rows;
-  },
-
-  // ✅ Create bill
-  async createBill(data) {
-    const { booking_id, bill_category, bill_description, bill_photo, bill_amount } = data;
-    const [result] = await db.query(
-      `INSERT INTO ksn_function_hall_bills
-       (booking_id, bill_category, bill_description, bill_photo, bill_amount)
-       VALUES (?, ?, ?, ?, ?)`,
-      [booking_id, bill_category, bill_description, bill_photo, bill_amount]
-    );
-    return result;
-  },
+     WHERE b.booking_id = ?
+     ORDER BY b.created_at DESC`,
+    [booking_id]
+  );
+  return rows;
+},
 
 async payBill(bill_id, payment_amount, payment_method) {
 
+  const [[existingPayment]] = await db.query(
+    `SELECT * FROM ksn_function_hall_bill_payments WHERE bill_id = ?`,
+    [bill_id]
+  );
+
+  if (existingPayment) {
+    throw new Error("Bill is already paid");
+  }
+  
   // Normalize & validate
   const method = String(payment_method || "").trim().toUpperCase();
-  console.log("Normalized Payment Method:", method);
-
   if (!["CASH", "UPI"].includes(method)) {
     throw new Error("Invalid payment method: " + payment_method);
   }
@@ -152,13 +158,12 @@ async recalculateFinalAmount(booking_id) {
     [booking_id]
   );
 
-  const total_bill_amount = payment.total_paid_amount;
 
   // 3️⃣ Final calculation
   const final_amount =
-    refund.adjustable_amount
-    - refund.referral_amount
-    - total_bill_amount;
+      Number(refund.adjustable_amount)
+      - Number(refund.referral_amount)
+      - Number(payment.total_paid_amount);
 
   // 4️⃣ Update refunds table
   await db.query(
@@ -168,14 +173,14 @@ async recalculateFinalAmount(booking_id) {
    WHERE booking_id = ?`,
   [
     final_amount,
-    total_bill_amount,
+    payment.total_paid_amount,
     booking_id
   ]
 );
 
   return {
     final_amount,
-    total_bill_amount
+    total_bill_amount:payment.total_paid_amount
   };
 }
 

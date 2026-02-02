@@ -5,13 +5,25 @@ export const getAllBookingDetails = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
+    const status = req.query.status || "ALL";
     const offset = (page - 1) * limit;
+
+    let whereClause = "";
+    let whereparams = [];
+
+    if (status !== "ALL") {
+      whereClause = "WHERE b.booking_status = ?";
+      whereparams.push(status);
+    }
 
     // 🔹 COUNT TOTAL BOOKINGS
     const [[{ total }]] = await db.execute(`
       SELECT COUNT(*) AS total
-      FROM ksn_function_hall_bookings
-    `);
+      FROM ksn_function_hall_bookings b
+      ${whereClause}
+      `,
+      whereparams
+    );
 
     // 🔹 GET BOOKINGS (LIMIT/OFFSET inserted directly)
     const [bookings] = await db.execute(`
@@ -70,9 +82,13 @@ export const getAllBookingDetails = async (req, res) => {
        ON rp.booking_id = b.booking_id
        AND r.status = 'PAID'
       LEFT JOIN ksn_function_hall_payments p ON p.booking_id = b.booking_id
+      ${whereClause}
       ORDER BY b.booking_date DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `);
+     LIMIT ${limit} OFFSET ${offset}
+      `,
+      whereparams
+
+    );
 
     // 🔹 GET FIXED CHARGES AND UTILITIES PER BOOKING
     for (let booking of bookings) {

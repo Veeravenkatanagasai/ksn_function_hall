@@ -7,3 +7,5 @@ dist/
 .sql
 uploads/
 *.log
+# Generated PDFs
+utility/**/*.pdf

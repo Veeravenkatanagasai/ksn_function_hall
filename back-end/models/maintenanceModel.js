@@ -12,9 +12,24 @@ export const createBill = async (data) => {
 
 export const getBills = async () => {
   const sql = `
-    SELECT *
-    FROM ksn_function_hall_maintenance_bills
-    ORDER BY maintenance_bill_id DESC
+    SELECT 
+      b.maintenance_bill_id,
+      b.maintenance_bill_name,
+      b.maintenance_bill_photo,
+      b.maintenance_bill_amount,
+      b.maintenance_bill_description,
+
+      p.payment_amount,
+      p.payment_method,
+      CASE 
+        WHEN p.maintenance_payment_id IS NOT NULL THEN 'PAID'
+        ELSE 'UNPAID'
+      END AS payment_status
+
+    FROM ksn_function_hall_maintenance_bills b
+    LEFT JOIN ksn_function_hall_maintenance_payments p
+      ON b.maintenance_bill_id = p.maintenance_bill_id
+    ORDER BY b.maintenance_bill_id DESC
   `;
   return db.query(sql);
 };
