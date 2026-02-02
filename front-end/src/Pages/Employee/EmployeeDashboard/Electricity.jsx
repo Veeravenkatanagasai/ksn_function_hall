@@ -91,23 +91,33 @@ const ElectricityBill = ({ bookingId, category, onClose, onSaved }) => {
             <h6>Booking ID: <b>{bookingId}</b></h6>
 
             <h5>Electricity</h5>
+            <label className="eb-label"> Previous Units <span className="eb-required">*</span></label>
             <input type="number" className="form-control mb-2" placeholder="Previous Units" name="current_previous_units" value={form.current_previous_units} onChange={handleChange} required />
+            <label className="eb-label">Current Units <span className="eb-required">*</span></label>
             <input type="number" className="form-control mb-2" placeholder="Current Units" name="current_after_current_units" value={form.current_after_current_units} onChange={handleChange} required />
+            <label className="eb-label">Cost per Unit</label>
             <input type="number" className="form-control mb-2" value={form.current_per_unit_cost} readOnly />
 
+            <label className="eb-label">Previous Meter Photo <span className="eb-required">*</span></label>
             <input type="file" className="form-control mb-2" name="current_previous" onChange={handleFile} required />
             {previews.current_previous && <img src={previews.current_previous} className="eb-preview" />}
+            <label className="eb-label">Current Meter Photo <span className="eb-required">*</span></label>
             <input type="file" className="form-control mb-2" name="current_after" onChange={handleFile} required />
             {previews.current_after && <img src={previews.current_after} className="eb-preview" />}
 
             <small className="text-muted">Units Used: {totals.electricityUsed} | Total: ₹{totals.electricityTotal}</small>
 
             <h5 className="mt-4">Generator</h5>
+            <label className="eb-label">Previous Units <span className="eb-required">*</span></label>
             <input type="number" className="form-control mb-2" placeholder="Previous Units" name="generator_previous_units" value={form.generator_previous_units} onChange={handleChange} required />
+            <label className="eb-label">Current Units <span className="eb-required">*</span></label>
             <input type="number" className="form-control mb-2" placeholder="Current Units" name="generator_after_units" value={form.generator_after_units} onChange={handleChange} required />
+            <label className="eb-label">Cost per Unit</label>
             <input type="number" className="form-control mb-2" value={form.generator_per_unit_cost} readOnly />
+            <label className="eb-label">Previous Meter Photo <span className="eb-required">*</span></label>
             <input type="file" className="form-control mb-2" name="generator_previous" onChange={handleFile} required />
             {previews.generator_previous && <img src={previews.generator_previous} className="eb-preview" />}
+            <label className="eb-label">Current Meter Photo <span className="eb-required">*</span></label>
             <input type="file" className="form-control mb-2" name="generator_after" onChange={handleFile} required />
             {previews.generator_after && <img src={previews.generator_after} className="eb-preview" />}
 

@@ -1,4 +1,4 @@
-/* ReferralPayments.css */
+/* ================= PAGE LAYOUT ================= */
 .referral-payments-container {
   padding: 20px;
   position: relative;
@@ -14,6 +14,7 @@
   overflow-x: auto;
 }
 
+/* ================= TABLE ================= */
 .referral-table {
   width: 100%;
   border-radius: 8px;
@@ -30,33 +31,66 @@
   text-align: center;
 }
 
+/* ================= BUTTONS ================= */
 .btn {
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .btn:hover {
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
-.custom-modal .modal-content {
-  border-radius: 15px;
-  padding: 15px;
+/* ================= MODAL BACKDROP FIX ================= */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
-.custom-modal-header {
+.modal-backdrop.show {
+  opacity: 1 !important;
+}
+
+/* ================= MODAL Z-INDEX ================= */
+.modal {
+  z-index: 1055 !important;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+/* ================= CUSTOM REFERRAL MODAL ================= */
+.referral-modal .modal-content {
+  border-radius: 16px;
+  padding: 12px;
+  border: none;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+/* Modal Header */
+.referral-modal-header {
   background-color: #0b3b68;
-  color: #fff;
+  color: #ffffff;
   border-bottom: none;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  border-radius: 16px 16px 0 0;
 }
 
-.custom-modal-body {
+/* Modal Body */
+.referral-modal-body {
+  padding: 20px;
   font-size: 15px;
 }
 
+/* Modal Footer */
 .custom-modal-footer {
   border-top: none;
+  padding: 15px 20px;
+  display: flex;
   justify-content: space-between;
+}
+
+/* Footer Buttons */
+.custom-modal-footer .btn {
+  min-width: 100px;
+  border-radius: 8px;
 }

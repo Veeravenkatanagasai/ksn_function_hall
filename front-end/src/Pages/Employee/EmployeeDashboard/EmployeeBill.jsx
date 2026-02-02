@@ -23,7 +23,6 @@ const EmployeeBills = () => {
   /* ================= FETCH DATA ================= */
   useEffect(() => {
     fetchClosedBookings();
-    fetchAllBills();
   }, []);
 
   const fetchClosedBookings = async () => {
@@ -35,12 +34,12 @@ const EmployeeBills = () => {
     }
   };
 
-  const fetchAllBills = async () => {
+  const fetchBillsByBooking = async (booking_id) => {
     try {
-      const res = await api.get("/bills");
+      const res = await api.get(`/bills/${booking_id}`);
       setBills(res.data);
     } catch (err) {
-      console.error("Error fetching bills", err);
+      console.error("Error fetching booking bills:", err);
     }
   };
 
@@ -52,6 +51,7 @@ const EmployeeBills = () => {
 
   const openBookingModal = (bookingId) => {
     setSelectedBooking(bookingId);
+    fetchBillsByBooking(bookingId);
   };
 
   const closeBookingModal = () => {
@@ -87,7 +87,7 @@ const EmployeeBills = () => {
     headers: { "Content-Type": "multipart/form-data" },
   });
   alert("Bill added");
-      fetchAllBills();
+      fetchBillsByBooking(selectedBooking);
       closeBillModal();
     } catch (err) {
       console.error(err);
@@ -159,12 +159,12 @@ const EmployeeBills = () => {
             </button>
 
             <div className="bill-card-grid">
-              {billsForBooking.length === 0 && <p>No bills added</p>}
-              {billsForBooking.map((b) => (
+              {bills.length === 0 && <p>No bills added</p>}
+              {bills.map((b) => (
                 <div key={b.bill_id} className="bill-card">
                   <h4>{b.bill_category}</h4>
                   <p>{b.bill_description}</p>
-                  <strong>₹{b.bill_amount}</strong>
+                  <p><strong>₹{b.bill_amount}</strong></p>
 
                   {b.bill_photo && (
                     <img
@@ -174,6 +174,20 @@ const EmployeeBills = () => {
                       style={{ cursor: "pointer" }}
                       onClick={() => window.open(b.bill_photo, "_blank")}
                     />
+                  )}
+
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <span style={{ color: b.payment_status === "PAID" ? "green" : "red" }}>
+                      {b.payment_status}
+                    </span>
+                  </p>
+
+                  {b.payment_status === "PAID" && (
+                    <>
+                      <p><strong>Paid Amount:</strong> ₹{b.payment_amount}</p>
+                      <p><strong>Method:</strong> {b.payment_method}</p>
+                    </>
                   )}
                 </div>
               ))}
@@ -193,6 +207,9 @@ const EmployeeBills = () => {
             <h3>Add Bill</h3>
 
             <form onSubmit={handleSubmit}>
+              <label className="eb-label">
+          Category <span className="eb-required">*</span>
+        </label>
               <select
                 name="bill_category"
                 value={form.bill_category}
@@ -209,6 +226,10 @@ const EmployeeBills = () => {
                 )}
               </select>
 
+              <label className="eb-label">
+          Description <span className="eb-required">*</span>
+        </label>
+
               <input
                 name="bill_description"
                 placeholder="Description"
@@ -216,6 +237,9 @@ const EmployeeBills = () => {
                 onChange={handleChange}
                 required
               />
+               <label className="eb-label">
+          Amount <span className="eb-required">*</span>
+        </label>
 
               <input
                 type="number"
@@ -225,6 +249,10 @@ const EmployeeBills = () => {
                 onChange={handleChange}
                 required
               />
+
+              <label className="eb-label">
+          Bill Photo
+        </label>
 
               <input type="file" name="bill_photo" onChange={handleChange} />
 

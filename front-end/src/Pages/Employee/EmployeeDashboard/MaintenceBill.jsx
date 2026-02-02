@@ -90,6 +90,8 @@ const MaintenanceBills = () => {
               <th>Amount</th>
               <th>Description</th>
               <th>Photo</th>
+              <th>Status</th>
+              <th>Payment Info</th>
             </tr>
           </thead>
           <tbody>
@@ -113,6 +115,29 @@ const MaintenanceBills = () => {
                 </a>
                   )}
                 </td>
+                 <td>
+        <span
+          className={`badge ${
+            bill.payment_status === "PAID"
+              ? "bg-success"
+              : "bg-danger"
+          }`}
+        >
+          {bill.payment_status}
+        </span>
+      </td>
+
+      {/* ✅ PAYMENT DETAILS */}
+      <td>
+        {bill.payment_status === "PAID" ? (
+          <div className="small">
+            ₹ {bill.payment_amount} <br />
+            <strong>{bill.payment_method}</strong>
+          </div>
+        ) : (
+          <span className="text-muted">—</span>
+        )}
+      </td>
                 
               </tr>
             ))}

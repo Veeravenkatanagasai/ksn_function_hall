@@ -79,7 +79,7 @@ const CancellationRules = () => {
         <table className="table table-hover mb-0">
           <thead className="table-light">
             <tr>
-              <th>ID</th>
+            
               <th>Days</th>
               <th>Penalty %</th>
               <th>Status</th>
@@ -89,7 +89,6 @@ const CancellationRules = () => {
           <tbody>
             {rules.length ? rules.map((r) => (
               <tr key={r.rule_id}>
-                <td>{r.rule_id}</td>
                 <td>{r.days}</td>
                 <td>{r.penalty_percent}%</td>
                 <td>

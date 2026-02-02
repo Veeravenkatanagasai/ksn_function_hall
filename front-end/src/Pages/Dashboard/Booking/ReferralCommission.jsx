@@ -107,11 +107,12 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
         </table>
       </div>
 
-      <Modal show={show} onHide={() => setShow(false)} centered className="custom-modal">
-        <Modal.Header closeButton className="custom-modal-header">
-          <Modal.Title>Referral Payment</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="custom-modal-body">
+      <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" keyboard={false} dialogClassName="referral-modal">
+  <Modal.Header closeButton className="referral-modal-header">
+    <Modal.Title>Referral Payment</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body className="referral-modal-body">
           <Form>
             <Form.Group>
               <Form.Label>Referral Amount</Form.Label>

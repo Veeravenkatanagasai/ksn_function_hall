@@ -92,7 +92,6 @@ const AdminTerms = () => {
         <table className="table table-hover align-middle mb-0">
           <thead className="table-light">
             <tr>
-              <th>ID</th>
               <th>English</th>
               <th>Telugu</th>
               <th className="text-center">Actions</th>
@@ -101,7 +100,6 @@ const AdminTerms = () => {
           <tbody>
             {terms.map((t) => (
               <tr key={t.terms_id}>
-                <td>{t.terms_id}</td>
                 <td>{t.terms_text_en}</td>
                 <td>{t.terms_text_te}</td>
                 <td className="text-center">

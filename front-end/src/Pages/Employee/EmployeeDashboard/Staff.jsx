@@ -150,45 +150,66 @@ const Staff = () => {
                 <div className="modal-body row g-3">
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Name <span className="required">*</span>
+                    </label>
                     <input className="form-control" placeholder="Name *"
-                      value={form.name}
+                      value={form.name} required
                       onChange={(e) => setForm({ ...form, name: e.target.value })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Role <span className="required">*</span>
+                    </label>
                     <input className="form-control" placeholder="Role *"
-                      value={form.role}
+                      value={form.role} required
                       onChange={(e) => setForm({ ...form, role: e.target.value })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Email <span className="required">*</span>
+                    </label>
                     <input className="form-control" placeholder="Email *"
-                      value={form.email}
+                      value={form.email} required
                       onChange={(e) => setForm({ ...form, email: e.target.value })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Phone <span className="required">*</span>
+                    </label>
                     <input className="form-control" placeholder="Phone *"
                       maxLength="10"
-                      value={form.phone}
+                      value={form.phone} required
                       onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Join Date <span className="required">*</span>
+                    </label>
                     <input type="date" className="form-control"
-                      value={form.join_date}
+                      value={form.join_date} required
                       onChange={(e) => setForm({ ...form, join_date: e.target.value })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Salary <span className="required">*</span>
+                    </label>
                     <input className="form-control" placeholder="Salary *"
-                      value={form.salary}
+                      value={form.salary} required
                       onChange={(e) => setForm({ ...form, salary: e.target.value })} />
                   </div>
 
                   <div className="col-md-6">
+                    <label className="form-label">
+                      Status
+                    </label>
                     <select className="form-select"
-                      value={form.status}
+                      value={form.status} required
                       onChange={(e) => setForm({ ...form, status: e.target.value })}>
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>

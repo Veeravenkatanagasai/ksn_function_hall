@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Badge } from "react-bootstrap";
-import { FaUsers, FaFileInvoiceDollar, FaTruck, FaSignOutAlt, FaIdCard, FaThLarge } from "react-icons/fa";
+import { FaTools, FaFileInvoiceDollar, FaImages, FaSignOutAlt, FaIdCard, FaThLarge } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+
 import api from "../../services/api";
 import Sidebar from "../../Components/Employee/Sidebar";
 
@@ -107,9 +107,9 @@ useEffect(() => {
 
         <div className="row g-4">
           {[
-            { title: "Staff Management", icon: <FaUsers size={40} />, linkText: "View Staff", linkPath: "/employee-staff" },
-            { title: "Electricity", icon: <FaFileInvoiceDollar size={40} />, linkText: "View Bills", linkPath: "/employee-electricity" },
-            { title: "Vendors", icon: <FaTruck size={40} />, linkText: "View Vendors", linkPath: "/employee-vendors" },
+            { title: "Bills", icon: <FaFileInvoiceDollar size={40} />, linkText: "update Bills", linkPath: "/employeebill" },
+            { title: "Gallery", icon: < FaImages size={40} />, linkText: "update Gallery", linkPath: "/gallery" },
+            { title: "Maintenance-Bills", icon: <FaTools size={40} />, linkText: "update Bills", linkPath: "/employeemaintenancebill" },
           ].map((item, index) => (
             <div className="col-lg-4 col-md-6" key={index}>
               <Card className="text-center border-0 shadow-sm h-100 rounded-4 py-4 hover-shadow transition">

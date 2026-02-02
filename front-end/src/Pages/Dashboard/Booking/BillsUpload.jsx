@@ -24,7 +24,6 @@ const EmployeeBills = () => {
   /* ================= FETCH CLOSED BOOKINGS ================= */
   useEffect(() => {
     fetchClosedBookings();
-    fetchAllBills();
   }, []);
 
   const fetchClosedBookings = async () => {
@@ -36,12 +35,12 @@ const EmployeeBills = () => {
     }
   };
 
-  const fetchAllBills = async () => {
+  const fetchBillsByBooking = async (booking_id) => {
     try {
-      const res = await api.get("/bills");
+      const res = await api.get(`/bills/${booking_id}`);
       setBills(res.data);
     } catch (err) {
-      console.error("Error fetching bills:", err);
+      console.error("Error fetching booking bills:", err);
     }
   };
 
@@ -54,6 +53,7 @@ const EmployeeBills = () => {
   /* ================= OPEN / CLOSE MODAL ================= */
   const openBookingModal = (booking_id) => {
     setSelectedBooking(booking_id);
+    fetchBillsByBooking(booking_id);
     setModal({ show: false, type: "", bill: null });
   };
 
@@ -109,7 +109,7 @@ const EmployeeBills = () => {
   });
   alert("Bill updated");
 }
-      fetchAllBills();
+      fetchBillsByBooking(selectedBooking);
       closeBillModal();
     } catch (err) {
       console.error(err);
@@ -122,7 +122,7 @@ const EmployeeBills = () => {
     if (!window.confirm("Delete this bill?")) return;
     try {
       await api.delete(`/bills/${bill_id}`);
-      fetchAllBills();
+      fetchBillsByBooking(selectedBooking); 
     } catch (err) {
       console.error(err);
     }
@@ -194,12 +194,13 @@ const EmployeeBills = () => {
             </button>
 
             <div className="bill-card-grid">
-              {billsForSelectedBooking.length === 0 && <p>No bills added</p>}
-              {billsForSelectedBooking.map((b) => (
+              {bills.length === 0 && <p>No bills added</p>}
+              {bills.map((b) => (
                 <div key={b.bill_id} className="bill-card">
                   <h4>{b.bill_category}</h4>
                   <p>{b.bill_description}</p>
                   <p><strong>₹{b.bill_amount}</strong></p>
+
                   {b.bill_photo && (
                     <img
                       src={b.bill_photo}
@@ -208,6 +209,20 @@ const EmployeeBills = () => {
                       style={{ cursor: "pointer" }}
                       onClick={() => window.open(b.bill_photo, "_blank")}
                     />
+                  )}
+
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <span style={{ color: b.payment_status === "PAID" ? "green" : "red" }}>
+                      {b.payment_status}
+                    </span>
+                  </p>
+
+                  {b.payment_status === "PAID" && (
+                    <>
+                      <p><strong>Paid Amount:</strong> ₹{b.payment_amount}</p>
+                      <p><strong>Method:</strong> {b.payment_method}</p>
+                    </>
                   )}
 
                   <div className="bill-card-actions">

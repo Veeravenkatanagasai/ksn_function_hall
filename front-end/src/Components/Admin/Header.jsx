@@ -41,7 +41,7 @@ const Header = ({ filters, setFilters }) => {
                 {/* Vertical Filter Group */}
                 <div className="col-md-5">
                   <div className="vertical-input-group">
-                    <label className="filter-label">Filter Data From:</label>
+                    <label className="filter-label">From:</label>
                     <input
                       type="date"
                       className="form-control form-control-sm modern-input"

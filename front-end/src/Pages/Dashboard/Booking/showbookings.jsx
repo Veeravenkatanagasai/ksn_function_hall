@@ -10,6 +10,7 @@ const AdminShowDetails = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   // ===== Cancellation =====
   const [cancellationDetails, setCancellationDetails] = useState(null);
@@ -54,14 +55,14 @@ const [paymentType, setPaymentType] = useState("CASH");
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadBookings(page);
-  }, [page]);
+    loadBookings();
+  }, [page,statusFilter]);
 
-  const loadBookings = async (pageNo) => {
+  const loadBookings = async () => {
     try {
-      const res = await fetchBookings(pageNo);
+      const res = await fetchBookings(page,12,statusFilter);
       setBookings(Array.isArray(res.data) ? res.data : []);
-      setTotalPages(res.totalPages || 1);
+      setTotalPages(res.totalPages);
     } catch (err) {
       console.error("Failed to load bookings:", err);
       setBookings([]);
@@ -409,6 +410,35 @@ const BookingPDFButton = ({ bookingId }) => (
       <div className="container">
         <h2 className="mb-4 fw-bold">Booking Management</h2>
 
+        {/* ===== STATUS FILTER BUTTONS ===== */}
+<div className="d-flex flex-wrap gap-2 mb-4">
+  {[
+    { label: "ALL", value: "ALL" },
+    { label: "IN PROGRESS", value: "INPROGRESS" },
+    { label: "ON HOLD", value: "ONHOLD" },
+    { label: "ADVANCE", value: "ADVANCE" },
+    { label: "CANCELLED", value: "CANCELLED" },
+    { label: "CLOSED", value: "CLOSED" },
+  ].map((btn) => (
+    <button
+  key={btn.value}
+  className={`btn ${
+    statusFilter === btn.value
+      ? "btn-primary"
+      : "btn-outline-primary"
+  }`}
+  onClick={() => {
+    setStatusFilter(btn.value);
+    setPage(1); 
+  }}
+>
+  {btn.label}
+</button>
+
+  ))}
+</div>
+
+
         {/* BOOKING CARDS */}
         <div className="row g-4">
           {bookings.map((b) => (
@@ -448,7 +478,7 @@ const BookingPDFButton = ({ bookingId }) => (
               <button className="page-link" onClick={() => setPage(page - 1)}>Prev</button>
             </li>
             {[...Array(totalPages)].map((_, i) => (
-              <li key={`page-${i}`} className={`page-item ${page === i + 1 ? "active" : ""}`}>
+              <li key={i} className={`page-item ${page === i + 1 ? "active" : ""}`}>
                 <button className="page-link" onClick={() => setPage(i + 1)}>{i + 1}</button>
               </li>
             ))}
@@ -1005,6 +1035,12 @@ const BookingPDFButton = ({ bookingId }) => (
       >
         Final Settlement
       </button>
+      <button
+      className="btn btn-outline-danger"
+      onClick={openCancelPreview}
+    >
+      Cancel Booking
+    </button>
     </>
   )}
 
@@ -1178,18 +1214,17 @@ const BookingPDFButton = ({ bookingId }) => (
                       <h5 className="text-success mb-3">Pay Remaining Balance</h5>
 
                       <div className="data-row">
-                        <span>Total Amount</span>
-                        <strong>₹ {selectedBooking.total_amount}</strong>
+                         <span>Amount Paid</span>
+                          <strong>
+                            ₹ {Number(selectedBooking.paid_amount).toFixed(2)}
+                          </strong>
                       </div>
 
                       <div className="data-row">
-                        <span>Paid Amount</span>
-                        <strong className="text-success">₹ {selectedBooking.paid_amount}</strong>
-                      </div>
-
-                      <div className="data-row">
-                        <span>Balance Amount</span>
-                        <strong className="text-danger">₹ {selectedBooking.balance_amount}</strong>
+                        <span>Remaining Balance</span>
+                        <strong>
+                          ₹ {Number(selectedBooking.balance_amount).toFixed(2)}
+                        </strong>
                       </div>
 
                       <div className="d-flex justify-content-end gap-2 mt-4">
@@ -1515,17 +1550,34 @@ const BookingPDFButton = ({ bookingId }) => (
                   ) : "No Photo"}
                 </td>
                 <td>₹ {bill.bill_amount}</td>
-                <td>{bill.bill_status}</td>
+               <td>
+          <span
+            className={`badge ${
+              bill.payment_status === "PAID"
+                ? "bg-success"
+                : "bg-danger"
+            }`}
+          >
+            {bill.payment_status}
+          </span>
+
+          {bill.payment_status === "PAID" && (
+            <div className="small text-muted mt-1">
+              ₹ {bill.payment_amount} • {bill.payment_method}
+            </div>
+          )}</td>
                 <td>
-                  {bill.bill_status === "UNPAID" && (
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => openPayPopup(bill)}
-                    >
-                      Pay
-                    </button>
-                  )}
-                </td>
+          {bill.payment_status === "UNPAID" ? (
+            <button
+              className="btn btn-sm btn-success"
+              onClick={() => openPayPopup(bill)}
+            >
+              Pay
+            </button>
+          ) : (
+            <span className="text-success fw-semibold">Paid</span>
+          )}
+        </td>
               </tr>
             ))}
           </tbody>

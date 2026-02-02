@@ -140,46 +140,61 @@ const Vendors = () => {
 
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
+                  <label className="form-label">
+                    Vendor Name <span className="required">*</span>
+                  </label>
                   <input
                     className="form-control mb-2"
                     placeholder="Vendor Name"
-                    value={form.vendor_name}
+                    value={form.vendor_name} required
                     onChange={(e) =>
                       setForm({ ...form, vendor_name: e.target.value })
                     }
                   />
+                  <label className="form-label">
+                    Category <span className="required">*</span>
+                  </label>
 
                   <input
                     className="form-control mb-2"
                     placeholder="Category"
-                    value={form.vendor_category}
+                    value={form.vendor_category} required
                     onChange={(e) =>
                       setForm({ ...form, vendor_category: e.target.value })
                     }
                   />
+                  <label className="form-label">
+                    Address <span className="required">*</span>
+                  </label>
 
                   <input
                     className="form-control mb-2"
                     placeholder="Address"
-                    value={form.vendor_address}
+                    value={form.vendor_address} required
                     onChange={(e) =>
                       setForm({ ...form, vendor_address: e.target.value })
                     }
                   />
-
+                    <label className="form-label">
+                  Phone <span className="required">*</span>
+                </label>
                   <input
                     className="form-control mb-2"
                     placeholder="Phone"
                     value={form.phone}
+                    required
                     onChange={(e) =>
                       setForm({ ...form, phone: e.target.value })
                     }
                   />
-
+                <label className="form-label">
+                    Email <span className="required">*</span>
+                  </label>
                   <input
                     className="form-control mb-2"
                     placeholder="Email"
                     value={form.email}
+                    required
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value })
                     }

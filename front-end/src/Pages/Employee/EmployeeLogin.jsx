@@ -66,7 +66,9 @@ const EmployeeLogin = () => {
 
             <form onSubmit={handleLogin} className="mt-4 animate__animated animate__fadeInUp">
               <div className="input-field mb-4">
-                <label>Corporate Email</label>
+                <label htmlFor="emp_email">
+                Corporate Email <span className="text-danger">*</span>
+              </label>
                 <div className="input-wrapper">
                   <i className="bi bi-envelope-at"></i>
                   <input
@@ -80,7 +82,9 @@ const EmployeeLogin = () => {
               </div>
 
               <div className="input-field mb-4">
-                <label>Security Password</label>
+                <label htmlFor="password">
+                  Security Password <span className="text-danger">*</span>
+                </label>
                 <div className="input-wrapper">
                   <i className="bi bi-key"></i>
                   <input

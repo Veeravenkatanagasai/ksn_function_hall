@@ -177,24 +177,27 @@ const Services = () => {
 
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
+                  <label>
+                    Service Name <span className="text-danger">*</span>
+                  </label>
                   <input
                     className="form-control mb-2"
                     placeholder="Service Name"
-                    value={form.service_name}
+                    value={form.service_name} required
                     onChange={(e) => setForm({ ...form, service_name: e.target.value })}
                   />
-
+                  <label>Description <span className="text-danger">*</span></label>
                   <textarea
                     className="form-control mb-2"
                     placeholder="Description"
-                    value={form.service_description}
+                    value={form.service_description} required
                     onChange={(e) => setForm({ ...form, service_description: e.target.value })}
                   />
-
+                  <label>Vendors <span className="text-danger">*</span></label>
                   <select
                     className="form-select"
                     value={form.vendor_id}
-                    onChange={(e) => setForm({ ...form, vendor_id: e.target.value })}
+                    onChange={(e) => setForm({ ...form, vendor_id: e.target.value })} required
                   >
                     <option value="">-- Select Vendor --</option>
                     {vendors.map((v) => (

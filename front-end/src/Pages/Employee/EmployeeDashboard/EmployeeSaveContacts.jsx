@@ -145,37 +145,50 @@ const Contact = () => {
 
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
+                  <label className="form-label">
+                    Name <span className="required">*</span>
+                  </label>
                   <input
                     className="form-control mb-2"
                     placeholder="Name"
-                    value={form.name}
+                    value={form.name} required
                     onChange={(e) =>
                       setForm({ ...form, name: e.target.value })
                     }
                   />
+                  <label className="form-label">
+                    Email <span className="required">*</span>
+                  </label>
 
                   <input
                     className="form-control mb-2"
                     placeholder="Email"
-                    value={form.email}
+                    value={form.email} required
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value })
                     }
                   />
 
+                  <label className="form-label">
+                    Mobile <span className="required">*</span>
+                  </label>
+
                   <input
                     className="form-control mb-2"
                     placeholder="Mobile"
-                    value={form.mobile}
+                    value={form.mobile} required
                     onChange={(e) =>
                       setForm({ ...form, mobile: e.target.value })
                     }
                   />
+                  <label className="form-label">
+                    Subject
+                  </label>
 
                   <input
                     className="form-control"
                     placeholder="Subject"
-                    value={form.subject}
+                    value={form.subject} required
                     onChange={(e) =>
                       setForm({ ...form, subject: e.target.value })
                     }

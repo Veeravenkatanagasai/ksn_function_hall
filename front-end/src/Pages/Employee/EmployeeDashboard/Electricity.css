@@ -54,3 +54,20 @@
   border: 1px solid #ddd;
   border-radius: 6px;
 }
+
+.eb-label {
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.eb-required {
+  color: red;
+  margin-left: 4px;
+}
+
+.eb-preview {
+  max-width: 120px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
