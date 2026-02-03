@@ -48,19 +48,37 @@ const Employees = () => {
   };
 
   const openEditModal = (emp) => {
-    setSelectedEmployee(emp);
-    setEditForm({ ...emp, password: "" });
-    setShowEdit(true);
-  };
+  setSelectedEmployee(emp);
 
-  const handleUpdate = async () => {
-    try {
-      await updateEmployee(selectedEmployee.emp_id, editForm);
-      toast.success("Employee updated");
-      setShowEdit(false);
-      loadEmployees();
-    } catch (err) { toast.error("Update failed"); }
-  };
+  setEditForm({
+    emp_name: emp.emp_name,
+    emp_email: emp.emp_email,
+    emp_phone: emp.emp_phone,
+    emp_role: emp.emp_role,
+    username: emp.username,
+    password: "", 
+  });
+
+  setShowEdit(true);
+};
+
+
+ const handleUpdate = async () => {
+  try {
+    const payload = { ...editForm };
+
+    if (!payload.password) delete payload.password;
+
+    await updateEmployee(selectedEmployee.emp_id, payload);
+
+    toast.success("Employee updated");
+    setShowEdit(false);
+    loadEmployees();
+  } catch (err) {
+    toast.error("Update failed");
+  }
+};
+
 
   const confirmDelete = async () => {
     try {
@@ -196,26 +214,88 @@ const Employees = () => {
 
       {/* EDIT MODAL */}
       <Modal show={showEdit} onHide={() => setShowEdit(false)} centered>
-        <Modal.Header closeButton><Modal.Title>Update Profile</Modal.Title></Modal.Header>
-        <Modal.Body>
-          <Form>
-            {Object.keys(editForm).map((f) => (
-              <Form.Group className="mb-3" key={f}>
-                <Form.Label className="small fw-bold">{f.replace("_", " ").toUpperCase()}</Form.Label>
-                <Form.Control
-                  type={f === "password" ? "password" : "text"}
-                  value={editForm[f]}
-                  onChange={e => setEditForm({ ...editForm, [f]: e.target.value })}
-                />
-              </Form.Group>
-            ))}
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="light" onClick={() => setShowEdit(false)}>Close</Button>
-          <Button variant="warning" onClick={handleUpdate}>Update Details</Button>
-        </Modal.Footer>
-      </Modal>
+  <Modal.Header closeButton>
+    <Modal.Title>Update Profile</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+    <Form>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">EMP NAME</Form.Label>
+        <Form.Control
+          value={editForm.emp_name}
+          onChange={(e) =>
+            setEditForm({ ...editForm, emp_name: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">EMP EMAIL</Form.Label>
+        <Form.Control
+          value={editForm.emp_email}
+          onChange={(e) =>
+            setEditForm({ ...editForm, emp_email: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">EMP PHONE</Form.Label>
+        <Form.Control
+          value={editForm.emp_phone}
+          onChange={(e) =>
+            setEditForm({ ...editForm, emp_phone: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">EMP ROLE</Form.Label>
+        <Form.Control
+          value={editForm.emp_role}
+          onChange={(e) =>
+            setEditForm({ ...editForm, emp_role: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">USERNAME</Form.Label>
+        <Form.Control
+          value={editForm.username}
+          onChange={(e) =>
+            setEditForm({ ...editForm, username: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label className="small fw-bold">PASSWORD</Form.Label>
+        <Form.Control
+          type="password"
+          placeholder="Leave blank to keep current password"
+          value={editForm.password}
+          onChange={(e) =>
+            setEditForm({ ...editForm, password: e.target.value })
+          }
+        />
+      </Form.Group>
+
+    </Form>
+  </Modal.Body>
+
+  <Modal.Footer>
+    <Button variant="light" onClick={() => setShowEdit(false)}>
+      Close
+    </Button>
+    <Button variant="warning" onClick={handleUpdate}>
+      Update Details
+    </Button>
+  </Modal.Footer>
+</Modal>
+
 
       {/* DELETE MODAL */}
       <Modal show={showDelete} onHide={() => setShowDelete(false)} centered size="sm">
