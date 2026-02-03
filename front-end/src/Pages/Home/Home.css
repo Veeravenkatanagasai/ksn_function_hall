@@ -78,3 +78,74 @@ border-top: 5px solid #0077b6;}
   font-size: 1rem;
   color: #555;
 }
+
+/* =========================
+   TABLET VIEW
+========================= */
+@media (max-width: 900px) {
+  .main-title {
+    font-size: 2.4rem;
+    margin-bottom: 40px;
+  }
+
+  .split-container {
+    gap: 30px;
+    padding: 0 10px;
+  }
+
+  .role-card {
+    padding: 50px 24px;
+  }
+}
+
+/* =========================
+   MOBILE VIEW
+========================= */
+@media (max-width: 600px) {
+  .home-page {
+    padding: 30px 16px;
+  }
+
+  .main-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .split-container {
+    flex-direction: column;
+    gap: 20px;
+    max-width: 100%;
+  }
+
+  .role-card {
+    padding: 36px 22px;
+    border-radius: 14px;
+  }
+
+  /* Disable hover lift on touch */
+  .role-card:hover {
+    transform: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .role-card h2 {
+    font-size: 1.6rem;
+  }
+
+  .role-card p {
+    font-size: 0.95rem;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+@media (max-width: 400px) {
+  .main-title {
+    font-size: 1.7rem;
+  }
+
+  .role-card {
+    padding: 30px 18px;
+  }
+}

@@ -47,66 +47,94 @@ const GalleryUpload = () => {
   };
 
   return (
-    <div className="gallery-card">
+    <div className="gallery-wrapper">
 
-      {/* HEADER */}
-      <div className="gallery-header">
-        <h4>Function Gallery</h4>
-        <button className="back-btn" onClick={() => window.history.back()}>
-          ← Back to Dashboard
-        </button>
-      </div>
+      {/* FIXED BACK BUTTON */}
+      <button className="back-fixed" onClick={() => window.history.back()}>
+        ← Back to Dashboard
+      </button>
 
-      {/* CONTROLS */}
-      <select onChange={e => setBookingId(e.target.value)}>
-        <option value="">Select Closed Booking</option>
-        {bookings.map(b => (
-          <option key={b.booking_id} value={b.booking_id}>
-            Booking #{b.booking_id}
-          </option>
-        ))}
-      </select>
+      <div className="gallery-card">
+        <h4 className="page-title">Function Gallery</h4>
 
-      <select disabled={!bookingId} onChange={e => setStage(e.target.value)}>
-        <option value="">Select Stage</option>
-        <option value="PREFUNCTION">Pre Function</option>
-        <option value="FUNCTION">Function</option>
-        <option value="POSTFUNCTION">Post Function</option>
-      </select>
-
-      <input
-        type="file"
-        multiple
-        disabled={!stage}
-        onChange={e => setFiles(e.target.files)}
-      />
-
-      <button onClick={uploadImages}>Upload Images</button>
-
-      {/* GALLERY VIEW */}
-      {Object.keys(gallery).length > 0 && (
-        <div className="gallery-view">
-          {["PREFUNCTION", "FUNCTION", "POSTFUNCTION"].map(stageKey => (
-            <div key={stageKey}>
-              <h5>{stageKey}</h5>
-
-              <div className="gallery-grid">
-                {gallery[stageKey]?.map(img => (
-                  <div key={img.gallery_id} className="gallery-item">
-
-                    <img
-                    src={img.image_path}
-                    alt={stageKey}
-                    onClick={() => window.open(img.image_path, "_blank")}
-                  />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        {/* FORM */}
+        <div className="form-group">
+          <label>
+            Closed Booking <span>*</span>
+          </label>
+          <select
+            value={bookingId}
+            onChange={e => setBookingId(e.target.value)}
+            required
+          >
+            <option value="">Select Closed Booking</option>
+            {bookings.map(b => (
+              <option key={b.booking_id} value={b.booking_id}>
+                Booking #{b.booking_id}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
 
+        <div className="form-group">
+          <label>
+            Stage <span>*</span>
+          </label>
+          <select
+            value={stage}
+            disabled={!bookingId}
+            onChange={e => setStage(e.target.value)}
+            required
+          >
+            <option value="">Select Stage</option>
+            <option value="PREFUNCTION">Pre Function</option>
+            <option value="FUNCTION">Function</option>
+            <option value="POSTFUNCTION">Post Function</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>
+            Upload Images <span>*</span>
+          </label>
+          <input
+            type="file"
+            multiple
+            disabled={!stage}
+            required
+            onChange={e => setFiles(e.target.files)}
+          />
+        </div>
+
+        <button className="upload-btn" onClick={uploadImages}>
+          Upload Images
+        </button>
+
+        {/* GALLERY VIEW */}
+        {Object.keys(gallery).length > 0 && (
+          <div className="gallery-view">
+            {["PREFUNCTION", "FUNCTION", "POSTFUNCTION"].map(stageKey => (
+              <div key={stageKey}>
+                <h5>{stageKey}</h5>
+
+                <div className="gallery-grid">
+                  {gallery[stageKey]?.map(img => (
+                    <div key={img.gallery_id} className="gallery-item">
+                      <img
+                        src={img.image_path}
+                        alt={stageKey}
+                        onClick={() =>
+                          window.open(img.image_path, "_blank")
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
