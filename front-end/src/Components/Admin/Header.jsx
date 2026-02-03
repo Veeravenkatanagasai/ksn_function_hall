@@ -12,8 +12,11 @@ const Header = ({ filters, setFilters }) => {
 
   const adminName = admin.name || "Admin";
   const lastLogin = admin.last_login
-    ? new Date(admin.last_login).toLocaleString()
-    : "First Login";
+  ? new Date(admin.last_login + "Z").toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata"
+    })
+  : "First Login";
+
 
   const [localFilters, setLocalFilters] = useState(filters);
 
