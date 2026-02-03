@@ -108,6 +108,15 @@ const Employees = () => {
     boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
   };
 
+  const formatIST = (timestamp, emptyText = "First Login") => {
+  if (!timestamp) return emptyText;
+
+  return new Date(timestamp + "Z").toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+  });
+};
+
+
   return (
     <div className="container-fluid p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
       <ToastContainer position="top-right" autoClose={2000} />
@@ -180,8 +189,16 @@ const Employees = () => {
                 <ListGroup.Item><strong>Phone:</strong> {selectedEmployee.emp_phone}</ListGroup.Item>
                 <ListGroup.Item><strong>Username:</strong> {selectedEmployee.username}</ListGroup.Item>
                 <ListGroup.Item><strong>Login Count:</strong> <Badge bg="success">{selectedEmployee.login_count}</Badge></ListGroup.Item>
-                <ListGroup.Item><strong>Last Login:</strong> {selectedEmployee.last_login ? new Date(selectedEmployee.last_login).toLocaleString() : "Never"}</ListGroup.Item>
-                <ListGroup.Item><strong>Last Logout:</strong> {selectedEmployee.last_logout ? new Date(selectedEmployee.last_logout).toLocaleString() : "N/A"}</ListGroup.Item>
+                <ListGroup.Item>
+                      <strong>Last Login:</strong>{" "}
+                      {formatIST(selectedEmployee.last_login, "First Login")}
+                    </ListGroup.Item>
+                    
+                    <ListGroup.Item>
+                      <strong>Last Logout:</strong>{" "}
+                      {formatIST(selectedEmployee.last_logout, "Currently Logged In")}
+                </ListGroup.Item>
+
               </ListGroup>
             </div>
           )}
