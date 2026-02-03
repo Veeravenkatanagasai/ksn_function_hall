@@ -105,7 +105,9 @@ const InvoiceStep = ({ data, onBack }) => {
               <div className="detail-item"><span>Category:</span> {data.category}</div>
               <div className="detail-item"><span>Hall:</span> {data.hall}</div>
               <div className="detail-item"><span>Date:</span> {data.eventDate}</div>
-              <div className="detail-item"><span>Slot:</span> {data.startTime} - {data.endTime}</div>
+              <div className="detail-item"><span>Slot:</span> {data.timeslot}</div>
+              <div className="detail-item"><span>Time:</span> {data.startTime} - {data.endTime}</div>
+              <div className="detail-item"><span>Duration:</span>{data.duration}</div>
             </div>
           </div>
 
@@ -147,7 +149,12 @@ const InvoiceStep = ({ data, onBack }) => {
                       </tr>
                   </>
                 )}
-                
+
+                <tr className="fw-bold border-top">
+                  <td>Subtotal (Base Rent + Fixed Charges)</td>
+                  <td className="text-end">₹ {safe(invoice.baseAmount + invoice.fixedChargeAmount)}</td>
+                </tr>
+
                 <tr className="border-top">
                   <td className="text-danger">Discount ({invoice.discount}%)</td>
                   <td className="text-end text-danger">- ₹ {safe(invoice.discountAmount)}</td>
