@@ -165,7 +165,7 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
     onChange={(date) =>
       setData({
         ...data,
-        eventDate: date.toLocaleDateString("en-CA"),
+      eventDate: date.toISOString().split("T")[0],
       })
     }
     excludeDates={blockedDates}   // ✅ DISABLED DATES
