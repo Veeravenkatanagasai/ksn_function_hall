@@ -27,8 +27,12 @@ useEffect(() => {
     alert("Logout failed");
   }
 };
-
-
+  const formatIST = (ts) =>
+  ts
+    ? new Date(ts + "Z").toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+      })
+    : "First Login";
 
   if (!selectedEmployee) return null;
 
@@ -90,8 +94,9 @@ useEffect(() => {
             </div>
             <div className="row">
               <div className="col-md-4">
-                <p className="mb-1"><b>Last Login:</b> {selectedEmployee.last_login}</p>
+                <p className="mb-1"><b>Last Login:</b> {formatIST(selectedEmployee.last_login)}</p>
               </div>
+
               <div className="col-md-4 text-md-end">
                 <p className="mb-1"><b>Login Count:</b> {selectedEmployee.login_count}</p>
               </div>
