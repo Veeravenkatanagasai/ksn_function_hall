@@ -10,7 +10,9 @@ const AdminShowDetails = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("INPROGRESS");
+  const [searchBookingId, setSearchBookingId] = useState("");
+
 
   // ===== Cancellation =====
   const [cancellationDetails, setCancellationDetails] = useState(null);
@@ -56,11 +58,11 @@ const [paymentType, setPaymentType] = useState("CASH");
 
   useEffect(() => {
     loadBookings();
-  }, [page,statusFilter]);
+  }, [page,statusFilter,searchBookingId]);
 
   const loadBookings = async () => {
     try {
-      const res = await fetchBookings(page,12,statusFilter);
+      const res = await fetchBookings(page,12,statusFilter,searchBookingId);
       setBookings(Array.isArray(res.data) ? res.data : []);
       setTotalPages(res.totalPages);
     } catch (err) {
@@ -69,7 +71,6 @@ const [paymentType, setPaymentType] = useState("CASH");
     }
   };
 
-  const openImage = (path) => window.open(`${IMAGE_BASE}${path}`, "_blank");
 
   // ✅ Calculate totals dynamically from arrays
   const fixedTotal = selectedBooking
@@ -160,7 +161,7 @@ const handlePayBalance = async () => {
       );
 
 
-    const updated = await fetchBookings(page);
+    const updated = await fetchBookings(page, 12, statusFilter, searchBookingId);
     setBookings(updated.data);
 
     const updatedBooking = updated.data.find(
@@ -343,6 +344,22 @@ const deleteGalleryImage = async (galleryId) => {
   }
 };
 
+useEffect(() => {
+  if (!selectedBooking) return;
+
+  api
+    .get(`/gallery/stagewise/${selectedBooking.booking_id}`)
+    .then(res => setGalleryData(res.data))
+    .catch(() =>
+      setGalleryData({
+        PREFUNCTION: [],
+        FUNCTION: [],
+        POSTFUNCTION: []
+      })
+    );
+}, [selectedBooking]);
+
+
 const fetchBills = async (bookingId) => {
   try {
     const res = await api.get(`/bills/${bookingId}`);
@@ -394,6 +411,13 @@ const BookingPDFButton = ({ bookingId }) => (
   </button>
 );
 
+const hasGallery =
+  galleryData &&
+  (
+    (galleryData.PREFUNCTION?.length ?? 0) > 0 ||
+    (galleryData.FUNCTION?.length ?? 0) > 0 ||
+    (galleryData.POSTFUNCTION?.length ?? 0) > 0
+  );
 
   return (
     <div className="admin-wrapper py-4">
@@ -434,10 +458,35 @@ const BookingPDFButton = ({ bookingId }) => (
 >
   {btn.label}
 </button>
-
   ))}
+
+  <div style={{ width: "160px" }}>
+  <input
+    type="text"
+    className="form-control"
+    placeholder="Search by Booking ID"
+    value={searchBookingId}
+    onChange={(e) => {
+      setSearchBookingId(e.target.value);
+      setPage(1);
+    }}
+  />
 </div>
 
+  {searchBookingId && (
+    <div style={{ width: "90px" }}>
+      <button
+        className="btn btn-outline-secondary w-100"
+        onClick={() => {
+          setSearchBookingId("");
+          setPage(1);
+        }}
+      >
+        Clear
+      </button>
+    </div>
+  )}
+</div>
 
         {/* BOOKING CARDS */}
         <div className="row g-4">
@@ -1005,8 +1054,19 @@ const BookingPDFButton = ({ bookingId }) => (
 
   {/* ================= ON HOLD ================= */}
   {selectedBooking.booking_status === "ONHOLD" && (
+  <>
+    {selectedBooking.balance_amount > 0 && (
+      <button
+        className="btn btn-warning me-2"
+        onClick={() => setShowBalancePopup(true)}
+      >
+        Pay Remaining Balance
+      </button>
+    )}
+
     <BookingPDFButton bookingId={selectedBooking.booking_id} />
-  )}
+  </>
+)}
 
   {/* ================= IN PROGRESS ================= */}
   {selectedBooking.booking_status === "INPROGRESS" && (
@@ -1063,11 +1123,18 @@ const BookingPDFButton = ({ bookingId }) => (
       </button>
 
       <button
-        className="btn btn-outline-primary"
-        onClick={() => fetchBills(selectedBooking.booking_id)}
-      >
-        View Bills
-      </button>
+  className="btn btn-outline-primary"
+  disabled={!hasGallery}
+  onClick={() => fetchBills(selectedBooking.booking_id)}
+>
+  View Bills
+</button>
+
+{!hasGallery && (
+  <small className="text-muted d-block">
+    Upload gallery to enable bills
+  </small>
+)}
 
       <button
         className="btn btn-outline-primary"
