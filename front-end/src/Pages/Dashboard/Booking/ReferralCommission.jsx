@@ -11,6 +11,9 @@ const ReferralPayments = () => {
   const [selected, setSelected] = useState(null);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("");
+  const [filterStatus, setFilterStatus] = useState("PENDING");
+  const [searchBookingId, setSearchBookingId] = useState("");
+
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -51,6 +54,34 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   }
 };
 
+const filteredData = data.filter(row => {
+  // Status filter
+  if (filterStatus === "PENDING" && row.referral_status === "PAID") {
+    return false;
+  }
+
+  if (filterStatus === "PAID" && row.referral_status !== "PAID") {
+    return false;
+  }
+
+  // Search (works for both)
+  if (searchBookingId) {
+    return row.booking_id
+      .toString()
+      .includes(searchBookingId);
+  }
+
+  return true;
+});
+
+const pendingCount = data.filter(
+  row => row.referral_status !== "PAID"
+).length;
+
+const paidCount = data.filter(
+  row => row.referral_status === "PAID"
+).length;
+
   return (
     <div className="referral-payments-container">
       <div className="top-right-btn">
@@ -58,6 +89,46 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
           &larr; Back to Dashboard
         </Button>
       </div>
+
+      {/* Page Heading */}
+<h3 className="text-center mb-4 fw-bold">
+  Referral Payments
+</h3>
+
+{/* Filters */}
+<div className="d-flex flex-column align-items-center mb-4">
+  <div className="mb-3">
+    <Button
+      className="me-2 px-4 position-relative"
+      variant={filterStatus === "PENDING" ? "primary" : "outline-primary"}
+      onClick={() => setFilterStatus("PENDING")}
+    >
+      Pending
+      <span className="badge bg-light text-primary ms-2">
+      {pendingCount}
+    </span>
+    </Button>
+
+    <Button
+      className="px-4 position-relative"
+      variant={filterStatus === "PAID" ? "success" : "outline-success"}
+      onClick={() => setFilterStatus("PAID")}
+    >
+      Paid
+      <span className="badge bg-light text-success ms-2">
+        {paidCount}
+      </span>
+    </Button>
+  </div>
+
+  <Form.Control
+    type="text"
+    placeholder="Search by Booking ID"
+    style={{ width: "260px" }}
+    value={searchBookingId}
+    onChange={(e) => setSearchBookingId(e.target.value)}
+  />
+</div>
 
       <div className="table-wrapper">
         <table className="table table-bordered mt-3 referral-table">
@@ -71,7 +142,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
             </tr>
           </thead>
           <tbody>
-            {data.map(row => (
+             {filteredData.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-muted py-4">
+                  No records found
+                </td>
+              </tr>
+            ) : (
+            filteredData.map(row => (
               <tr key={row.booking_id}>
                 <td>{row.booking_id}</td>
                 <td>{row.referral_name}</td>
@@ -102,11 +180,10 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
                   )}
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>
-
       <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" keyboard={false} dialogClassName="referral-modal">
   <Modal.Header closeButton className="referral-modal-header">
     <Modal.Title>Referral Payment</Modal.Title>
