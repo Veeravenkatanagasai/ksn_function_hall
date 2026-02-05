@@ -64,12 +64,7 @@ const [paymentType, setPaymentType] = useState("CASH");
 
   const loadBookings = async () => {
     try {
-<<<<<<< HEAD
-      const res = await fetchBookings(page,12,statusFilter,searchBookingId);
-=======
-      const effectiveStatus = searchBookingId ? "ALL" : statusFilter;
       const res = await fetchBookings(page,12,effectiveStatus,searchBookingId);
->>>>>>> 129899e (update all)
       setBookings(Array.isArray(res.data) ? res.data : []);
       setTotalPages(res.totalPages);
     } catch (err) {
@@ -1183,7 +1178,6 @@ const hasGallery =
   {selectedBooking.booking_status === "CANCELLED" && (
     <>
       <BookingPDFButton bookingId={selectedBooking.booking_id} />
-
       <button
         className="btn btn-outline-danger"
         onClick={() =>

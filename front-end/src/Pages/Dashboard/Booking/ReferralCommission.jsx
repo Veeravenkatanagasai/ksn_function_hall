@@ -13,10 +13,6 @@ const ReferralPayments = () => {
   const [method, setMethod] = useState("");
   const [filterStatus, setFilterStatus] = useState("PENDING");
   const [searchBookingId, setSearchBookingId] = useState("");
-<<<<<<< HEAD
-
-=======
->>>>>>> 129899e (update all)
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -58,32 +54,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 };
 
 const filteredData = data.filter(row => {
-<<<<<<< HEAD
-  // Status filter
-  if (filterStatus === "PENDING" && row.referral_status === "PAID") {
-    return false;
-  }
-
-  if (filterStatus === "PAID" && row.referral_status !== "PAID") {
-    return false;
-  }
-
-  // Search (works for both)
-=======
 
   // 🔍 IF SEARCH IS ACTIVE → IGNORE STATUS FILTER
->>>>>>> 129899e (update all)
   if (searchBookingId) {
     return row.booking_id
       .toString()
       .includes(searchBookingId);
   }
 
-<<<<<<< HEAD
-  return true;
-});
-
-=======
   // ✅ STATUS FILTER ONLY WHEN NO SEARCH
   if (filterStatus === "PENDING") {
     return row.referral_status !== "PAID";
@@ -97,7 +75,6 @@ const filteredData = data.filter(row => {
 });
 
 
->>>>>>> 129899e (update all)
 const pendingCount = data.filter(
   row => row.referral_status !== "PAID"
 ).length;

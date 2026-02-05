@@ -102,16 +102,10 @@ const InvoiceStep = ({ data, onBack, onConfirmed }) => {
               <div className="detail-item"><span>Category:</span> {data.category}</div>
               <div className="detail-item"><span>Hall:</span> {data.hall}</div>
               <div className="detail-item"><span>Date:</span> {data.eventDate}</div>
-<<<<<<< HEAD
-              <div className="detail-item"><span>Slot:</span> {data.timeSlot}</div>
-              <div className="detail-item"><span>Time:</span> {data.startTime} - {data.endTime}</div>
-              <div className="detail-item"><span>Duration:</span>{data.duration}</div>
-=======
               <div className="detail-item"><span>Time Slot:</span> {data.timeSlot}</div>
               <div className="detail-item"><span>Slot:</span> {data.startTime} - {data.endTime}</div>
               <div className="detail-item"><span>Duration:</span> {data.duration} hours</div>
 
->>>>>>> 129899e (update all)
             </div>
           </div>
 
@@ -153,19 +147,11 @@ const InvoiceStep = ({ data, onBack, onConfirmed }) => {
                       </tr>
                   </>
                 )}
-<<<<<<< HEAD
-
-=======
->>>>>>> 129899e (update all)
                 <tr className="fw-bold border-top">
                   <td>Subtotal (Base Rent + Fixed Charges)</td>
                   <td className="text-end">₹ {safe(invoice.baseAmount + invoice.fixedChargeAmount)}</td>
                 </tr>
-<<<<<<< HEAD
-
-=======
                 
->>>>>>> 129899e (update all)
                 <tr className="border-top">
                   <td className="text-danger">Discount ({invoice.discount}%)</td>
                   <td className="text-end text-danger">- ₹ {safe(invoice.discountAmount)}</td>
