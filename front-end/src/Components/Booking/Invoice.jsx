@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import { generateInvoice } from "../../services/invoice";
 import api from "../../services/api";
 import "./Invoice.css";
-import { useNavigate } from "react-router-dom";
 
-const InvoiceStep = ({ data, onBack }) => {
+const InvoiceStep = ({ data, onBack, onConfirmed }) => {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); 
 
   useEffect(() => {
     generateInvoice(data)
@@ -71,8 +69,7 @@ const InvoiceStep = ({ data, onBack }) => {
       "Content-Type": "multipart/form-data",
     },
   });
-
-  navigate(`/payments/${res.data.bookingId}`);
+  onConfirmed(res.data.bookingId);
 } catch (error) {
   console.error(error);
   alert("Error confirming booking");
@@ -105,9 +102,16 @@ const InvoiceStep = ({ data, onBack }) => {
               <div className="detail-item"><span>Category:</span> {data.category}</div>
               <div className="detail-item"><span>Hall:</span> {data.hall}</div>
               <div className="detail-item"><span>Date:</span> {data.eventDate}</div>
+<<<<<<< HEAD
               <div className="detail-item"><span>Slot:</span> {data.timeSlot}</div>
               <div className="detail-item"><span>Time:</span> {data.startTime} - {data.endTime}</div>
               <div className="detail-item"><span>Duration:</span>{data.duration}</div>
+=======
+              <div className="detail-item"><span>Time Slot:</span> {data.timeSlot}</div>
+              <div className="detail-item"><span>Slot:</span> {data.startTime} - {data.endTime}</div>
+              <div className="detail-item"><span>Duration:</span> {data.duration} hours</div>
+
+>>>>>>> 129899e (update all)
             </div>
           </div>
 
@@ -149,12 +153,19 @@ const InvoiceStep = ({ data, onBack }) => {
                       </tr>
                   </>
                 )}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 129899e (update all)
                 <tr className="fw-bold border-top">
                   <td>Subtotal (Base Rent + Fixed Charges)</td>
                   <td className="text-end">₹ {safe(invoice.baseAmount + invoice.fixedChargeAmount)}</td>
                 </tr>
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> 129899e (update all)
                 <tr className="border-top">
                   <td className="text-danger">Discount ({invoice.discount}%)</td>
                   <td className="text-end text-danger">- ₹ {safe(invoice.discountAmount)}</td>

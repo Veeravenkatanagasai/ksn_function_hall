@@ -1,18 +1,20 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Users, Calendar, FileText, CheckCircle } from "lucide-react";
+import { User, Users, Calendar, FileText,CreditCard, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import Booking1 from "../../Components/Booking/Booking";
 import Customer from "../../Components/Booking/Customer";
 import Refferal from "../../Components/Booking/Refferal";
 import Invoice from "../../Components/Booking/Invoice";
+import Payment from "./Payment";
 
 import "./Booking.css";
 
 const Booking = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [bookingId, setBookingId] = useState(null);
 
   const [formData, setFormData] = useState({
     // Customer
@@ -50,7 +52,8 @@ const Booking = () => {
     { id: 2, label: "Referral", icon: <Users size={20} /> },
     { id: 3, label: "Booking", icon: <Calendar size={20} /> },
     { id: 4, label: "Invoice", icon: <FileText size={20} /> },
-  ];
+    { id: 5, label: "Payment", icon: <CreditCard size={20} /> },
+    ];
 
   return (
     <div className="main-viewport">
@@ -165,10 +168,18 @@ const Booking = () => {
                 <Invoice
                   data={formData}
                   onBack={() => setStep(3)}
-                  onConfirm={() => {
+                  onConfirmed={(id) => {
+                    setBookingId(id);  
+                    setStep(5); 
                     alert("✅ Booking Successfully Completed");
                   }}
-                  confirmText="Book Now"
+                />
+              )}
+
+              {step === 5 && bookingId && (
+                <Payment
+                  bookingId={bookingId}
+                  onFinish={() => alert("🎉 Booking & Payment Completed")}
                 />
               )}
 

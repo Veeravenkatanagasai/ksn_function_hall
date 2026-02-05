@@ -7,6 +7,8 @@ const EmployeeBills = () => {
   const [bills, setBills] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [modal, setModal] = useState({ show: false, type: "", bill: null });
+  const [filterStatus, setFilterStatus] = useState("UNPAID"); // default
+  const [searchBookingId, setSearchBookingId] = useState("");
 
   const [form, setForm] = useState({
     booking_id: "",
@@ -15,11 +17,6 @@ const EmployeeBills = () => {
     bill_amount: "",
     bill_photo: null,
   });
-
-  // ========== Pagination ==========
-  const [currentPage, setCurrentPage] = useState(1);
-  const bookingsPerPage = 20;
-  const totalPages = Math.ceil(bookings.length / bookingsPerPage);
 
   /* ================= FETCH CLOSED BOOKINGS ================= */
   useEffect(() => {
@@ -128,32 +125,84 @@ const EmployeeBills = () => {
     }
   };
 
-  /* ================= FILTER BILLS BY BOOKING ================= */
-  const billsForSelectedBooking = bills.filter(
-    (b) => b.booking_id === selectedBooking
-  );
+  /* ================= FILTER BOOKINGS ================= */
+  const filteredBookings = bookings.filter((b) => {
 
-  /* ================= PAGINATION ================= */
-  const indexOfLastBooking = currentPage * bookingsPerPage;
-  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  // 🔍 Search always overrides status
+  if (searchBookingId) {
+    return b.booking_id.toString().includes(searchBookingId);
+  }
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // ✅ Match exact DB value
+  return b.payment_status === filterStatus;
+});
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [filterStatus, searchBookingId]);
+
+
+
+  // ========== Pagination ==========
+const [currentPage, setCurrentPage] = useState(1);
+const bookingsPerPage = 20;
+
+const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+
+const indexOfLastBooking = currentPage * bookingsPerPage;
+const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+
+const currentBookings = filteredBookings.slice(
+  indexOfFirstBooking,
+  indexOfLastBooking
+);
+
+
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
   return (
-    <div className="eb-container">
-      {/* ===== HEADER ===== */}
-      <div className="eb-header">
-        <h2 className="eb-title">Bills Management</h2>
+    <div className="eb-wrapper">
+      {/* ===== FIXED HEADER ===== */}
+      <header className="eb-header">
+        <h1>💼 Bills Management</h1>
         <button
           className="eb-back-btn"
           onClick={() => (window.location.href = "/dashboard")}
         >
-          Back to Dashboard
+          ⬅ Back to Dashboard
         </button>
+      </header>
+
+      {/* ===== FILTER BAR ===== */}
+      <div className="eb-filter-bar">
+        <div className="status-buttons">
+          <button
+            className={filterStatus === "UNPAID" ? "active" : ""}
+            onClick={() => setFilterStatus("UNPAID")}
+            disabled={!!searchBookingId}
+          >
+            ⏳ Pending
+          </button>
+          <button
+            className={filterStatus === "PAID" ? "active" : ""}
+            onClick={() => setFilterStatus("PAID")}
+            disabled={!!searchBookingId}
+          >
+            ✅ Paid
+          </button>
+          <div className="search-box">
+        <input
+          type="text"
+          placeholder="🔍 Search Booking ID"
+          value={searchBookingId}
+          onChange={(e) => setSearchBookingId(e.target.value)}
+        />
+      </div>
+        </div>
       </div>
 
-      {/* ===== BOOKING GRID ===== */}
+      {/* ===== BOOKING CARDS ===== */}
       <div className="booking-grid">
         {currentBookings.map((b) => (
           <div
@@ -162,7 +211,13 @@ const EmployeeBills = () => {
             onClick={() => openBookingModal(b.booking_id)}
           >
             <h3>Booking #{b.booking_id}</h3>
-            <p>Click to view bills</p>
+            <span
+              className={`badge ${
+                b.payment_status === "PAID" ? "paid" : "unpaid"
+              }`}
+            >
+              {b.payment_status}
+            </span>
           </div>
         ))}
       </div>
@@ -172,8 +227,8 @@ const EmployeeBills = () => {
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
-            className={`page-btn ${currentPage === i + 1 ? "active" : ""}`}
-            onClick={() => paginate(i + 1)}
+            className={currentPage === i + 1 ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
           </button>

@@ -6,6 +6,8 @@ const EmployeeBills = () => {
   const [bills, setBills] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showBillModal, setShowBillModal] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("UNPAID"); // default
+  const [searchBookingId, setSearchBookingId] = useState("");
 
   const [form, setForm] = useState({
     booking_id: "",
@@ -14,11 +16,6 @@ const EmployeeBills = () => {
     bill_amount: "",
     bill_photo: null,
   });
-
-  /* ================= PAGINATION ================= */
-  const [currentPage, setCurrentPage] = useState(1);
-  const bookingsPerPage = 20;
-  const totalPages = Math.ceil(bookings.length / bookingsPerPage);
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
@@ -95,30 +92,84 @@ const EmployeeBills = () => {
     }
   };
 
-  /* ================= FILTER BILLS ================= */
-  const billsForBooking = bills.filter(
-    (b) => b.booking_id === selectedBooking
-  );
-
-  /* ================= PAGINATION ================= */
-  const indexOfLast = currentPage * bookingsPerPage;
-  const indexOfFirst = indexOfLast - bookingsPerPage;
-  const currentBookings = bookings.slice(indexOfFirst, indexOfLast);
-
+ /* ================= FILTER BOOKINGS ================= */
+   const filteredBookings = bookings.filter((b) => {
+ 
+   // 🔍 Search always overrides status
+   if (searchBookingId) {
+     return b.booking_id.toString().includes(searchBookingId);
+   }
+ 
+   // ✅ Match exact DB value
+   return b.payment_status === filterStatus;
+ });
+ 
+ useEffect(() => {
+   setCurrentPage(1);
+ }, [filterStatus, searchBookingId]);
+ 
+ 
+ 
+   // ========== Pagination ==========
+ const [currentPage, setCurrentPage] = useState(1);
+ const bookingsPerPage = 20;
+ 
+ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+ 
+ const indexOfLastBooking = currentPage * bookingsPerPage;
+ const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+ 
+ const currentBookings = filteredBookings.slice(
+   indexOfFirstBooking,
+   indexOfLastBooking
+ );
+ 
+ 
+ const paginate = (pageNumber) => setCurrentPage(pageNumber);
+ 
+ 
   return (
-    <div className="eb-container">
-      {/* ===== HEADER ===== */}
-      <div className="eb-header">
-        <h2>Employee Bills Management</h2>
+    <div className="eb-wrapper">
+      {/* ===== FIXED HEADER ===== */}
+      <header className="eb-header">
+        <h1>💼 Employee Bills Management</h1>
         <button
           className="eb-back-btn"
           onClick={() => (window.location.href = "/employee-dashboard")}
         >
-          Back to Dashboard
+          ⬅ Back to Dashboard
         </button>
+      </header>
+
+      {/* ===== FILTER BAR ===== */}
+      <div className="eb-filter-bar">
+        <div className="status-buttons">
+          <button
+            className={filterStatus === "UNPAID" ? "active" : ""}
+            onClick={() => setFilterStatus("UNPAID")}
+            disabled={!!searchBookingId}
+          >
+            ⏳ Pending
+          </button>
+          <button
+            className={filterStatus === "PAID" ? "active" : ""}
+            onClick={() => setFilterStatus("PAID")}
+            disabled={!!searchBookingId}
+          >
+            ✅ Paid
+          </button>
+          <div className="search-box">
+        <input
+          type="text"
+          placeholder="🔍 Search Booking ID"
+          value={searchBookingId}
+          onChange={(e) => setSearchBookingId(e.target.value)}
+        />
+      </div>
+        </div>
       </div>
 
-      {/* ===== BOOKINGS ===== */}
+       {/* ===== BOOKINGS ===== */}
       <div className="booking-grid">
         {currentBookings.map((b) => (
           <div

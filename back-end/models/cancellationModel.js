@@ -9,7 +9,8 @@ export const createCancellation = async ({
   penalty_amount,
   refund_amount,
   cancellation_paid_method,
-  final_amount
+  final_amount,
+  proof_image_path
 }) => {
   await db.query(`
     INSERT INTO ksn_function_hall_cancellation_payments
@@ -21,9 +22,10 @@ export const createCancellation = async ({
       penalty_amount,
       refund_amount,
       cancellation_paid_method,
-      final_amount
+      final_amount,
+      proof_image_path
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     booking_id,
     payment_id,
@@ -32,7 +34,8 @@ export const createCancellation = async ({
     penalty_amount,
     refund_amount,
     cancellation_paid_method,
-    final_amount
+    final_amount,
+    proof_image_path
   ]);
 };
 

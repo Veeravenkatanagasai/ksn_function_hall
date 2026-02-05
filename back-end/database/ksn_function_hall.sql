@@ -328,3 +328,12 @@ after add cloudinary application
 ALTER TABLE ksn_function_hall_gallery ADD COLUMN cloudinary_id VARCHAR(255) AFTER image_path;
 
 ALTER TABLE ksn_function_hall_electricity_bills ADD COLUMN current_previous_public_id VARCHAR(255), ADD COLUMN current_after_public_id VARCHAR(255), ADD COLUMN generator_previous_public_id VARCHAR(255), ADD COLUMN generator_after_public_id VARCHAR(255);
+
+ALTER TABLE ksn_function_hall_cancellation_payments
+ADD COLUMN proof_image_path VARCHAR(255) AFTER cancellation_paid_method;
+
+ALTER TABLE ksn_function_hall_bill_payments
+ADD COLUMN proof_image_path VARCHAR(255) AFTER payment_method;
+
+ALTER TABLE ksn_function_hall_maintenance_payments
+ADD COLUMN proof_image_path VARCHAR(255) AFTER payment_method;

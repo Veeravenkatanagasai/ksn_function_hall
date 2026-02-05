@@ -53,6 +53,8 @@ export const confirmCancellation = async (req, res) => {
     cancellation_paid_method
   } = req.body;
 
+  const proofImagePath = req.file ? req.file.path : null;
+
   const conn = await db.getConnection();
 
   try {
@@ -66,7 +68,8 @@ export const confirmCancellation = async (req, res) => {
       penalty_amount,
       refund_amount,
       cancellation_paid_method,
-      final_amount: penalty_amount
+      final_amount: penalty_amount,
+      proof_image_path: proofImagePath
     });
 
     await updateBookingStatus(booking_id, "CANCELLED");

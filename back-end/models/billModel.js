@@ -4,14 +4,26 @@ export const BillModel = {
 
   // ✅ Get closed bookings
   async getClosedBookings() {
-    const [rows] = await db.query(`
-      SELECT booking_id
-      FROM ksn_function_hall_bookings
-      WHERE booking_status = 'CLOSED'
-      ORDER BY booking_id DESC
-    `);
-    return rows;
-  },
+  const [rows] = await db.query(`
+    SELECT 
+      b.booking_id,
+      CASE 
+        WHEN SUM(CASE WHEN bp.payment_id IS NULL THEN 1 ELSE 0 END) > 0
+          THEN 'UNPAID'
+        ELSE 'PAID'
+      END AS payment_status
+    FROM ksn_function_hall_bookings b
+    LEFT JOIN ksn_function_hall_bills bl 
+      ON b.booking_id = bl.booking_id
+    LEFT JOIN ksn_function_hall_bill_payments bp
+      ON bl.bill_id = bp.bill_id
+    WHERE b.booking_status = 'CLOSED'
+    GROUP BY b.booking_id
+    ORDER BY b.booking_id DESC
+  `);
+
+  return rows;
+},
 
   // ✅ Create bill
   async createBill(data) {

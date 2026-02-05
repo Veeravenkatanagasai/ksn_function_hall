@@ -21,6 +21,8 @@ const AdminShowDetails = () => {
   const [showRefundPopup, setShowRefundPopup] = useState(false);
   const [cancelMethod, setCancelMethod] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelProof, setCancelProof] = useState(null);
+
     
   // ===== Pay remainming balance =====
 
@@ -62,7 +64,12 @@ const [paymentType, setPaymentType] = useState("CASH");
 
   const loadBookings = async () => {
     try {
+<<<<<<< HEAD
       const res = await fetchBookings(page,12,statusFilter,searchBookingId);
+=======
+      const effectiveStatus = searchBookingId ? "ALL" : statusFilter;
+      const res = await fetchBookings(page,12,effectiveStatus,searchBookingId);
+>>>>>>> 129899e (update all)
       setBookings(Array.isArray(res.data) ? res.data : []);
       setTotalPages(res.totalPages);
     } catch (err) {
@@ -101,27 +108,30 @@ const confirmRefund = async () => {
   try {
     setCancelLoading(true);
 
-    await api.post("/cancellation/confirm",
-      {
-        ...cancelPreview,
-        cancellation_paid_method: cancelMethod
-      }
-    );
+    const formData = new FormData();
 
-    alert("Booking cancelled successfully");
+    formData.append("booking_id", cancelPreview.booking_id);
+    formData.append("payment_id", cancelPreview.payment_id); // ✅ REQUIRED
+    formData.append("total_amount", cancelPreview.total_amount);
+    formData.append("penalty_percent", cancelPreview.penalty_percent);
+    formData.append("penalty_amount", cancelPreview.penalty_amount);
+    formData.append("refund_amount", cancelPreview.refund_amount);
+    formData.append("cancellation_paid_method", cancelMethod);
+
+    if (cancelProof) {
+      formData.append("proof_image", cancelProof);
+    }
+
+    await api.post("/cancellation/confirm", formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+
+    alert("Cancellation completed successfully");
 
     setShowRefundPopup(false);
     setCancelPreview(null);
     setCancelMethod("");
-
-    // Reload bookings
-    const updated = await fetchBookings(page);
-    setBookings(updated.data);
-
-    const updatedBooking = updated.data.find(
-      b => b.booking_id === selectedBooking.booking_id
-    );
-    setSelectedBooking(updatedBooking);
+    setCancelProof(null);
 
   } catch (err) {
     alert(err.response?.data?.message || "Cancellation failed");
@@ -129,8 +139,6 @@ const confirmRefund = async () => {
     setCancelLoading(false);
   }
 };
-
-
   const fetchCancellationDetails = async (bookingId) => {
   const res = await api.get(
     `/cancellation/details/${bookingId}`
@@ -292,6 +300,15 @@ useEffect(() => {
     setRefundDetails(null);
   }
 }, [selectedBooking]);
+const refreshFinalSettlement = async (bookingId) => {
+  try {
+    const res = await api.get(`/refund/details/${bookingId}`);
+    setRefundDetails(res.data);
+  } catch (err) {
+    console.error("Failed to refresh settlement");
+  }
+};
+
 
 const fetchElectricityData = async (bookingId) => {
   try {
@@ -389,7 +406,8 @@ const confirmPayment = async () => {
     });
     alert("Payment successful");
     setPayPopup(false);
-    fetchBills(selectedBill.booking_id); // refresh bills
+    fetchBills(selectedBill.booking_id); 
+    await refreshFinalSettlement(selectedBill.booking_id);
   } catch (err) {
     console.error(err);
     alert("Payment failed");
@@ -446,6 +464,7 @@ const hasGallery =
   ].map((btn) => (
     <button
   key={btn.value}
+   disabled={!!searchBookingId}
   className={`btn ${
     statusFilter === btn.value
       ? "btn-primary"
@@ -808,6 +827,21 @@ const hasGallery =
                                     {new Date(cancellationDetails.cancelled_at).toLocaleString("en-IN")}
                                   </strong>
                                 </div>
+                                {cancellationDetails.proof_image_path && (
+  <div className="mt-2">
+    <span className="fw-semibold">Refund Proof</span>
+    <br />
+    <img
+      src={cancellationDetails.proof_image_path}
+      width={120}
+      className="rounded shadow mt-1"
+      style={{ cursor: "pointer" }}
+      onClick={() =>
+        window.open(cancellationDetails.proof_image_path, "_blank")
+      }
+    />
+  </div>
+)}
                               </div>
                             )}
 
@@ -1243,13 +1277,32 @@ const hasGallery =
       <select
         className="form-select mt-1"
         value={cancelMethod}
-        onChange={(e) => setCancelMethod(e.target.value)}
+        onChange={(e) => {
+        setCancelMethod(e.target.value);
+        setCancelProof(null); // reset old file
+      }}
       >
         <option value="">Select</option>
         <option value="RAZORPAY">Razorpay</option>
         <option value="PHONEPE">PhonePe</option>
         <option value="CASH">Cash</option>
       </select>
+      {cancelMethod && (
+  <>
+    <label className="fw-semibold mt-3">
+      {cancelMethod === "CASH"
+        ? "Upload Signed Cash Voucher"
+        : `Upload ${cancelMethod} Refund Screenshot`}
+    </label>
+
+    <input
+      type="file"
+      className="form-control mt-1"
+      onChange={(e) => setCancelProof(e.target.files[0])}
+      required
+    />
+  </>
+)}
 
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button
@@ -1261,7 +1314,7 @@ const hasGallery =
 
         <button
           className="btn btn-success"
-          disabled={!cancelMethod || cancelLoading}
+          disabled={!cancelMethod || !cancelProof || cancelLoading}
           onClick={confirmRefund}
         >
           {cancelLoading ? "Processing..." : "Confirm Refund"}

@@ -5,8 +5,7 @@ import { toast } from "react-toastify";
 
 import "./Payment.css";
 
-const MakePayment = () => {
-  const { bookingId } = useParams();
+const MakePayment = ({ bookingId, onFinish }) => {
   const navigate = useNavigate();
 
   const [booking, setBooking] = useState({});
@@ -55,7 +54,9 @@ const MakePayment = () => {
         balance_days: paymentType === "ADVANCE" ? balanceDays : 0
       });
 
-      toast.success("Payment Successful");
+toast.success("Payment Successful");
+
+alert("✅ Payment Successful!\n\nYou can now download the receipt.");
 
       setBalance(prev => prev - paidAmount);
       setPdfPath(true);
@@ -84,12 +85,6 @@ const MakePayment = () => {
 
     <div className="payment-header">
       <h3>💳 Make Payment</h3>
-      <button
-        className="btn btn-outline-secondary btn-sm"
-        onClick={() => window.history.back()}
-      >
-        ← Back to Dashboard
-      </button>
     </div>
 
     {/* Booking Summary */}
