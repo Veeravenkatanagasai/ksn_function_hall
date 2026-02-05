@@ -64,6 +64,7 @@ const [paymentType, setPaymentType] = useState("CASH");
 
   const loadBookings = async () => {
     try {
+      const effectiveStatus = searchBookingId ? "ALL" : statusFilter;
       const res = await fetchBookings(page,12,effectiveStatus,searchBookingId);
       setBookings(Array.isArray(res.data) ? res.data : []);
       setTotalPages(res.totalPages);
