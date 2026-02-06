@@ -1,132 +1,214 @@
-/* ===== Container ===== */
+/* ===== ROOT ===== */
 .mb-container {
-  padding: 30px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9fafc;
+  background: #f4f6fb;
   min-height: 100vh;
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
-/* ===== Top Bar ===== */
-.mb-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.mb-back-btn {
-  background: #007bff;
+/* ===== HEADER ===== */
+.mb-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, #8b0000, #b91c1c);
   color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
 }
-.mb-back-btn:hover { background: #0056b3; }
 
-/* ===== Add Bill Button ===== */
-.mb-add-btn {
-  padding: 10px 20px;
-  background: #28a745;
-  color: white;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
+/* ===== CONTENT ===== */
+.mb-content {
+  padding: 130px 40px 40px;
+}
+
+/* ===== TOOLBAR ===== */
+.mb-toolbar {
+   display: flex;
+  gap: 14px;
   margin-bottom: 20px;
+}
+
+.mb-search {
+  width: 280px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
   transition: 0.2s;
 }
-.mb-add-btn:hover { background: #218838; }
-
-/* ===== Table ===== */
-.mb-table-container {
-  overflow-x: auto;
-  background: #fff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+.mb-search:focus {
+  border-color: #ea0f0f;
+  box-shadow: 0 0 0 3px rgba(234, 15, 15, 0.15);
 }
+/* ===== TABLE ===== */
+.mb-table-container {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
 .mb-table {
   width: 100%;
   border-collapse: collapse;
 }
-.mb-table th, .mb-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-}
+
 .mb-table th {
-  background: #f1f3f6;
+  background: #00060b;
+  padding: 14px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #f9f9fa;
 }
+
+.mb-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #111827;
+}
+
+.mb-table tr:hover {
+  background: #f8fafc;
+}
+
+/* ===== IMAGE ===== */
 .mb-bill-img {
-  width: 60px;
-  border-radius: 6px;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: 0.2s;
+}
+.mb-bill-img:hover {
+  transform: scale(1.05);
 }
 
-/* ===== Buttons ===== */
-.mb-edit-btn { background: #ffc107; color: #212529; padding: 6px 12px; border-radius: 6px; margin-right: 5px; cursor: pointer; }
-.mb-edit-btn:hover { background: #e0a800; }
-.mb-delete-btn { background: #dc3545; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-.mb-delete-btn:hover { background: #c82333; }
-.mb-payment-btn { background: #17a2b8; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 5px; }
-.mb-payment-btn:hover { background: #138496; }
+/* ===== ACTION BUTTONS ===== */
+.mb-action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-/* ===== Modal ===== */
+.mb-edit-btn,
+.mb-delete-btn,
+.mb-payment-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.mb-edit-btn {
+  background: #facc15;
+}
+.mb-edit-btn:hover {
+  background: #eab308;
+}
+
+.mb-delete-btn {
+  background: #ef4444;
+  color: #fff;
+}
+.mb-delete-btn:hover {
+  background: #dc2626;
+}
+
+.mb-payment-btn {
+  background: #06b6d4;
+  color: #fff;
+}
+.mb-payment-btn:hover {
+  background: #0891b2;
+}
+
+.mb-payment-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* ===== PAYMENTS ===== */
+.mb-payments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mb-payments-list li {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* ===== MODAL ===== */
 .mb-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2000;
 }
+
 .mb-modal-content {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  width: 400px;
+  background: #ffffff;
+  padding: 26px;
+  border-radius: 16px;
+  width: 420px;
   max-width: 90%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
-.mb-modal-content h3 { margin-bottom: 15px; }
-.mb-modal-content label { display: block; margin-top: 10px; font-weight: 600; margin-bottom: 4px; }
-.mb-modal-content input, .mb-modal-content textarea, .mb-modal-content select {
+
+.mb-modal-content h3 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.mb-modal-content label {
+  margin-top: 12px;
+  font-weight: 600;
+  display: block;
+}
+
+.mb-modal-content input,
+.mb-modal-content textarea,
+.mb-modal-content select {
   width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  margin-top: 4px;
 }
+
 .mb-modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
+
 .mb-modal-buttons button {
-  padding: 8px 16px;
+  padding: 8px 18px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
 }
-.mb-modal-buttons button:first-child { background: #28a745; color: #fff; }
-.mb-modal-buttons button:first-child:hover { background: #218838; }
-.mb-modal-buttons button:last-child { background: #dc3545; color: #fff; }
-.mb-modal-buttons button:last-child:hover { background: #c82333; }
 
-/* ===== Payment List Styling ===== */
-.mb-payments-list {
-  list-style: none;
-  padding-left: 0;
+.mb-modal-buttons button:first-child {
+  background: #22c55e;
+  color: #fff;
 }
-.mb-payments-list li {
-  padding: 4px 0;
-  font-size: 14px;
-  color: #333;
-}
-.mb-payment-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.7;
+.mb-modal-buttons button:last-child {
+  background: #ef4444;
+  color: #fff;
 }

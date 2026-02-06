@@ -38,10 +38,10 @@ useEffect(() => {
 
   return (
     // 1. Flex wrapper to hold Sidebar and Content side-by-side
-    <div className="d-flex" style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
+    <div className="d-flex" style={{ minHeight: "100vh", backgroundColor: "#9fc5eb" }}>
       
       {/* LEFT SIDE: Sidebar */}
-      <div style={{ width: "250px", minWidth: "250px" }}>
+      <div style={{ width: "300px", minWidth: "250px" }}>
         <Sidebar />
       </div>
 
@@ -49,8 +49,8 @@ useEffect(() => {
       <div className="flex-grow-1 p-4">
         
         {/* ================= HEADER ================= */}
-        <div className="bg-white p-3 rounded-4 shadow-sm d-flex justify-content-between align-items-center mb-4 border">
-          <h4 className="mb-0">
+        <div className="bg-white p-4 rounded-4 shadow-sm d-flex justify-content-between align-items-center mb-4 border">
+          <h4 className="mb-1">
             Welcome, <span className="text-primary">{selectedEmployee.emp_name}</span>!
           </h4>
           <Button variant="danger" className="d-flex align-items-center gap-2" onClick={logout}>

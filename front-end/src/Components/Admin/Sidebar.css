@@ -1,5 +1,7 @@
-/* Sidebar Outer Container */
-.sidebar-container {
+/* =========================
+   CONTAINER
+========================= */
+.sb-container {
   width: 300px;
   height: 100vh;
   position: sticky;
@@ -7,146 +9,146 @@
   z-index: 1000;
 }
 
-/* The dark floating card based on photo */
-.dark-floating-sidebar {
-background: linear-gradient(180deg, #041731, #031225);  height: 100vh;
+/* =========================
+   SIDEBAR CARD
+========================= */
+.sb-card {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
-  padding: 1.5rem 0; 
-  overflow: hidden;
+  background: linear-gradient(180deg, #041731, #031225);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Brand Section */
-.sidebar-top {
-  padding: 10px 20px 30px;
+/* =========================
+   BRAND
+========================= */
+.sb-top {
+  padding: 20px;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.brand-title {
+.sb-brand {
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: 900;
-  margin: 0;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-/* Menu Items */
-.sidebar-menu {
-  flex-grow: 1;
-  padding: 20px 0;
+/* =========================
+   MENU
+========================= */
+.sb-menu {
+  flex: 1;
+  padding: 14px 0;
   overflow-y: auto;
 }
-.sidebar-menu::-webkit-scrollbar {
+
+/* Scrollbar */
+.sb-menu::-webkit-scrollbar {
   width: 6px;
 }
-.sidebar-menu::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 0.2)
-  );
-  border-radius: 10px;
-}
-.sidebar-menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.65);
+.sb-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
 }
 
-
-.menu-link {
+/* =========================
+   LINKS
+========================= */
+.sb-link {
   display: flex;
   align-items: center;
-  padding: 14px 25px;
+  gap: 14px;
+  padding: 12px 22px;
+  color: #9fc4e6;
   text-decoration: none;
-  color: #1e6fa5; /* Grayish text */
-  font-weight: 500;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  border-radius: 12px;
+  margin: 4px 10px;
   position: relative;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
-.menu-icon {
-  font-size: 1.2rem;
-  margin-right: 15px;
-  min-width: 20px;
+.sb-icon {
+  font-size: 1.1rem;
+  min-width: 18px;
 }
+
 @media (hover: hover) {
-  .menu-link:hover {
+  .sb-link:hover {
+    background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
   }
 }
 
-/* Active State - Matches the orange bar in your photo */
-.active-link {
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.05);
+/* =========================
+   ACTIVE
+========================= */
+.sb-active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f39c12;
 }
 
-.active-link::before {
+.sb-active::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 15%;
-  height: 70%;
+  left: -10px;
+  top: 12%;
+  height: 76%;
   width: 4px;
   background: linear-gradient(180deg, #f39c12, #f1c40f);
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px;
 }
 
-/* Red Logout Button from Photo */
+/* =========================
+   LOGOUT
+========================= */
+.sb-bottom {
+  padding: 16px;
+}
 
-.logout-btn-red {
-  background: #e74c3c; /* Red color from image */
-  color: white;
+.sb-logout {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
   border: none;
-  padding: 12px;
-  border-radius: 10px;
+  background: #e74c3c;
+  color: #ffffff;
+  font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 @media (hover: hover) {
-  .logout-btn-red:hover {
+  .sb-logout:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 8px 18px rgba(231, 76, 60, 0.4);
   }
 }
 
-
-/* ===========================
-   MOBILE SIDEBAR
-=========================== */
+/* =========================
+   MOBILE
+========================= */
 @media (max-width: 768px) {
-  .sidebar-container {
+  .sb-container {
     position: fixed;
     left: 0;
     top: 0;
-    width: 260px;
     transform: translateX(-100%);
     transition: transform 0.35s ease;
     z-index: 1200;
   }
 
-  .sidebar-container.open {
+  .sb-container.open {
     transform: translateX(0);
-  }
-
-  .dark-floating-sidebar {
-    padding-top: 1.2rem;
-  }
-
-  /* Dim background overlay */
-  .sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 1100;
   }
 }

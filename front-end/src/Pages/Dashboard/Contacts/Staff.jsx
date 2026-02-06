@@ -8,9 +8,11 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import "./Staff.css";
 
 const Staff = () => {
   const [staff, setStaff] = useState([]);
+  const [search, setSearch] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -29,10 +31,10 @@ const Staff = () => {
 
   const navigate = useNavigate();
 
-  /* ================= LOAD STAFF ================= */
+  /* ================= LOAD ================= */
   const loadStaff = async () => {
     const res = await fetchStaff();
-    setStaff(res.data);
+    setStaff(res.data || []);
   };
 
   useEffect(() => {
@@ -55,73 +57,94 @@ const Staff = () => {
 
   /* ================= VALIDATION ================= */
   const validateForm = () => {
-    if (!form.name.trim())
-      return toast.error("Name is required");
+  // Name
+  if (!form.name.trim()) {
+    toast.error("Name is required");
+    return false;
+  }
+  if (!/^[a-zA-Z\s]+$/.test(form.name)) {
+    toast.error("Name should contain only letters");
+    return false;
+  }
+  if (form.name.trim().length < 3) {
+    toast.error("Name must be at least 3 characters");
+    return false;
+  }
 
-    if (form.name.trim().length < 3)
-      return toast.error("Name must be at least 3 characters");
+  // Role
+  if (!form.role.trim()) {
+    toast.error("Role is required");
+    return false;
+  }
 
-    if (!form.role.trim())
-      return toast.error("Role is required");
+  // Email
+  if (!form.email.trim()) {
+    toast.error("Email is required");
+    return false;
+  }
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+    toast.error("Invalid email format");
+    return false;
+  }
 
-    if (!form.email.trim())
-      return toast.error("Email is required");
+  // Phone
+  if (!form.phone.trim()) {
+    toast.error("Phone number is required");
+    return false;
+  }
+  if (!/^[6-9]\d{9}$/.test(form.phone)) {
+    toast.error("Enter valid 10-digit Indian mobile number");
+    return false;
+  }
 
-    if (!/^\S+@\S+\.\S+$/.test(form.email))
-      return toast.error("Invalid email format");
+  // Salary
+  if (!form.salary) {
+    toast.error("Salary is required");
+    return false;
+  }
+  if (isNaN(form.salary) || Number(form.salary) <= 0) {
+    toast.error("Salary must be a positive number");
+    return false;
+  }
 
-    if (!form.phone.trim())
-      return toast.error("Phone number is required");
+  // Join Date
+  if (!form.join_date) {
+    toast.error("Join date is required");
+    return false;
+  }
 
-    // 🚫 BLOCK 11 or 12 digit numbers
-    if (form.phone.length !== 10)
-      return toast.error("Phone number must be exactly 10 digits");
+  // Status
+  if (!form.status) {
+    toast.error("Status is required");
+    return false;
+  }
 
-    // 🇮🇳 Indian mobile validation
-    if (!/^[6-9]\d{9}$/.test(form.phone))
-      return toast.error("Enter a valid Indian mobile number");
+  return true; // ✅ ONLY when everything is valid
+};
 
-    if (!form.salary)
-      return toast.error("Salary is required");
-
-    if (isNaN(form.salary) || Number(form.salary) <= 0)
-      return toast.error("Salary must be a positive number");
-
-    if (!form.join_date)
-      return toast.error("Join date is required");
-
-    return true;
-  };
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) return; // ⛔ STOP SAVE
+  if (!validateForm()) return; // 🚫 stops submit correctly
 
-    try {
-      if (editId) {
-        await updateStaff(editId, form);
-        toast.success("Staff updated successfully");
-      } else {
-        await addStaff(form);
-        toast.success("Staff added successfully");
-      }
-
-      resetForm();
-      setShowFormModal(false);
-      loadStaff();
-    } catch {
-      toast.error("Something went wrong");
+  try {
+    if (editId) {
+      await updateStaff(editId, form);
+      toast.success("Staff updated successfully");
+    } else {
+      await addStaff(form);
+      toast.success("Staff added successfully");
     }
-  };
 
-  /* ================= EDIT ================= */
-  const handleEdit = (s) => {
-    setForm(s);
-    setEditId(s.id);
-    setShowFormModal(true);
-  };
+    resetForm();
+    setShowFormModal(false);
+    loadStaff();
+  } catch {
+    toast.error("Something went wrong");
+  }
+};
 
   /* ================= DELETE ================= */
   const confirmDelete = (id) => {
@@ -140,178 +163,204 @@ const Staff = () => {
     }
   };
 
+  /* ================= SEARCH ================= */
+  const filteredStaff = staff.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.email.toLowerCase().includes(search.toLowerCase()) ||
+      s.phone.includes(search)
+  );
+
   return (
-    <div className="container mt-4 position-relative">
+    <div className="staff-page">
+      {/* HEADER */}
+      <div className="staff-header">
+        <h3>Staff Management</h3>
+        <button className="btn btn-outline-light" onClick={() => navigate("/dashboard")}>
+          ← Back to Dashboard
+        </button>
+      </div>
 
-      {/* 🔙 BACK TO DASHBOARD */}
-      <button
-        className="btn btn-outline-dark position-fixed top-0 end-0 m-4"
-        onClick={() => navigate("/dashboard")}
-      >
-        ← Back to Dashboard
-      </button>
+      {/* CONTENT */}
+      <div className="staff-content">
+        {/* TOOLBAR */}
+        <div className="staff-toolbar">
+          <input
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            className="btn-primary"
+            onClick={() => {
+              resetForm();
+              setShowFormModal(true);
+            }}
+          >
+            + Add Staff
+          </button>
+        </div>
 
-      <h3 className="fw-bold mb-4">Staff Management</h3>
-
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          resetForm();
-          setShowFormModal(true);
-        }}
-      >
-        + Add Staff
-      </button>
-
-      {/* ================= TABLE ================= */}
-      <table className="table table-bordered table-hover">
-        <thead className="bg-black text-white text-center">
-          <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Salary</th>
-            <th>Status</th>
-            <th width="150">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staff.length === 0 ? (
-            <tr>
-              <td colSpan="7" className="text-center text-muted">
-                No staff found
-              </td>
-            </tr>
-          ) : (
-            staff.map((s) => (
-              <tr key={s.id}>
-                <td>{s.name}</td>
-                <td>{s.role}</td>
-                <td>{s.email}</td>
-                <td>{s.phone}</td>
-                <td>₹ {s.salary}</td>
-                <td>
-                  <span className={`badge ${s.status === "Active" ? "bg-success" : "bg-secondary"}`}>
-                    {s.status}
-                  </span>
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-warning me-2" onClick={() => handleEdit(s)}>
-                    Edit
-                  </button>
-                  <button className="btn btn-sm btn-danger" onClick={() => confirmDelete(s.id)}>
-                    Delete
-                  </button>
-                </td>
+        {/* TABLE */}
+        <div className="staff-table-wrapper">
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Salary</th>
+                <th>Status</th>
+                <th width="160">Actions</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {filteredStaff.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="empty">
+                    No staff found
+                  </td>
+                </tr>
+              ) : (
+                filteredStaff.map((s) => (
+                  <tr key={s.id}>
+                    <td>{s.name}</td>
+                    <td>{s.role}</td>
+                    <td>{s.email}</td>
+                    <td>{s.phone}</td>
+                    <td>₹ {s.salary}</td>
+                    <td>
+                      <span
+                        className={`status ${
+                          s.status === "Active" ? "active" : "inactive"
+                        }`}
+                      >
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button
+                        className="btn-warning"
+                        onClick={() => {
+                          setForm(s);
+                          setEditId(s.id);
+                          setShowFormModal(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-danger"
+                        onClick={() => confirmDelete(s.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {/* ================= ADD / EDIT MODAL ================= */}
+      {/* ADD / EDIT MODAL */}
       {showFormModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content">
+        <div className="staff-modal">
+          <div className="staff-modal-card">
+            <h5>{editId ? "Edit Staff" : "Add Staff"}</h5>
 
-              <div className="modal-header">
-                <h5>{editId ? "Edit Staff" : "Add Staff"}</h5>
-                <button className="btn-close" onClick={() => setShowFormModal(false)} />
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body row g-3">
-
-                  <div className="col-md-6">
-                    <input className="form-control" placeholder="Name *"
+            <form onSubmit={handleSubmit}>
+              <div className="grid">
+                <input
+                      placeholder="Name *"
+                      required
                       value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                  </div>
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    />
 
-                  <div className="col-md-6">
-                    <input className="form-control" placeholder="Role *"
+                    <input
+                      placeholder="Role *"
+                      required
                       value={form.role}
-                      onChange={(e) => setForm({ ...form, role: e.target.value })} />
-                  </div>
+                      onChange={(e) => setForm({ ...form, role: e.target.value })}
+                    />
 
-                  <div className="col-md-6">
-                    <input className="form-control" placeholder="Email *"
+                    <input
+                      placeholder="Email *"
+                      required
                       value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                  </div>
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
 
-                  <div className="col-md-6">
-                    <input className="form-control" placeholder="Phone *"
+                    <input
+                      placeholder="Phone *"
+                      required
                       maxLength="10"
                       value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })} />
-                  </div>
+                      onChange={(e) =>
+                        setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
+                      }
+                    />
 
-                  <div className="col-md-6">
-                    <input type="date" className="form-control"
+                    <input
+                      type="date"
+                      required
                       value={form.join_date}
-                      onChange={(e) => setForm({ ...form, join_date: e.target.value })} />
-                  </div>
+                      onChange={(e) => setForm({ ...form, join_date: e.target.value })}
+                    />
 
-                  <div className="col-md-6">
-                    <input className="form-control" placeholder="Salary *"
+                    <input
+                      placeholder="Salary *"
+                      required
                       value={form.salary}
-                      onChange={(e) => setForm({ ...form, salary: e.target.value })} />
-                  </div>
+                      onChange={(e) => setForm({ ...form, salary: e.target.value })}
+                    />
 
-                  <div className="col-md-6">
-                    <select className="form-select"
+                    <select
+                      required
                       value={form.status}
-                      onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
+                      onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
 
-                </div>
-
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary"
-                    onClick={() => setShowFormModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {editId ? "Update" : "Save"}
-                  </button>
-                </div>
-              </form>
-
-            </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowFormModal(false)}
+                >
+                  Cancel
+                </button>
+                <button className="btn-primary">
+                  {editId ? "Update" : "Save"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* ================= DELETE MODAL ================= */}
+      {/* DELETE MODAL */}
       {showDeleteModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-
-              <div className="modal-header">
-                <h5>Confirm Delete</h5>
-                <button className="btn-close" onClick={() => setShowDeleteModal(false)} />
-              </div>
-
-              <div className="modal-body">
-                Are you sure you want to delete this staff member?
-              </div>
-
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>
-                  Cancel
-                </button>
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  Delete
-                </button>
-              </div>
-
+        <div className="staff-modal">
+          <div className="staff-modal-card">
+            <h5>Confirm Delete</h5>
+            <p>Are you sure you want to delete this staff member?</p>
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button className="btn-danger" onClick={handleDelete}>
+                Delete
+              </button>
             </div>
           </div>
         </div>

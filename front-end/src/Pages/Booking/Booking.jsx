@@ -56,133 +56,83 @@ const Booking = () => {
     ];
 
   return (
-    <div className="main-viewport">
+    <div className="booking-page">
+      <div className="booking-bg blob-a" />
+      <div className="booking-bg blob-b" />
+      <div className="booking-bg blob-c" />
 
-      <div className="bg-blob blob-1"></div>
-      <div className="bg-blob blob-2"></div>
-      <div className="bg-blob blob-3"></div>
-
-      <div className="booking-wrapper">
+      <div className="booking-shell">
         {/* HEADER */}
-        <header className="glass-header">
-          <div className="header-content">
-  {/* LEFT – BACK BUTTON */}
-  <div className="header-left">
-    <button
-      className="btn btn-outline-dark back-btn"
-      onClick={() => navigate("/dashboard")}
-    >
-      ← Back to Dashboard
-    </button>
-  </div>
+        <header className="booking-header">
+          <div className="booking-header-row">
+            <button
+              className="booking-back-btn"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Back to Dashboard
+            </button>
 
-  {/* CENTER – LOGO + TITLE */}
-  <motion.div
-    initial={{ x: -20, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    className="brand-section center-brand"
-  >
-    <div className="app-logo">
-      <span></span><span></span><span></span><span></span>
-    </div>
-    <div>
-      <h1>Booking</h1>
-      <p>KSN Function Hall</p>
-    </div>
-  </motion.div>
+            <div className="booking-brand">
+              <div className="booking-logo">
+                <span /><span /><span /><span />
+              </div>
+              <div>
+                <h1>Booking</h1>
+                <p>KSN Function Hall</p>
+              </div>
+            </div>
 
-  {/* RIGHT – SESSION */}
-  <div className="header-right">
-    <span className="label">Session</span><br />
-    <span className="value">
-      {new Date().toLocaleDateString("en-GB")}
-    </span>
-  </div>
-</div>
+            <div className="booking-session">
+              <h6>Session Date</h6>
+              {new Date().toLocaleDateString("en-GB")}
+            </div>
+          </div>
 
           {/* STEPPER */}
-          <nav className="stepper-nav">
-            {steps.map((s, idx) => (
-              <div key={s.id} className="step-item">
+          <nav className="booking-stepper">
+            {steps.map((s, i) => (
+              <div key={s.id} className="booking-step">
                 <div
-                  className={`step-node 
+                  className={`booking-node 
                     ${step >= s.id ? "active" : ""} 
                     ${step > s.id ? "done" : ""}`}
                 >
-                  {step > s.id ? <CheckCircle size={22} /> : s.icon}
+                  {step > s.id ? <CheckCircle size={20} /> : s.icon}
                 </div>
-
-                <span className="step-label">{s.label}</span>
-
-                {idx !== steps.length - 1 && (
-                  <div className={`connector ${step > s.id ? "filled" : ""}`} />
+                <span>{s.label}</span>
+                {i < steps.length - 1 && (
+                  <div className={`booking-line ${step > s.id ? "filled" : ""}`} />
                 )}
               </div>
             ))}
           </nav>
         </header>
 
-        {/* FORM CONTENT */}
-        <main className="form-container">
+        {/* FORM */}
+        <main className="booking-content">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
+              className="booking-card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.35 }}
-              className="glass-card"
+              transition={{ duration: 0.3 }}
             >
-
-              {/* STEP 1 – CUSTOMER */}
-              {step === 1 && (
-                <Customer
-                  data={formData}
-                  setData={setFormData}
-                  onNext={() => setStep(2)}
-                />
-              )}
-
-              {/* STEP 2 – REFERRAL */}
-              {step === 2 && (
-                <Refferal
-                  data={formData}
-                  setData={setFormData}
-                  onBack={() => setStep(1)}
-                  onNext={() => setStep(3)}
-                />
-              )}
-
-              {/* STEP 3 – BOOKING */}
-              {step === 3 && (
-                <Booking1
-                  data={formData}
-                  setData={setFormData}
-                  onBack={() => setStep(2)}
-                  onNext={() => setStep(4)}
-                />
-              )}
-
-              {/* STEP 4 – INVOICE */}
+              {step === 1 && <Customer data={formData} setData={setFormData} onNext={() => setStep(2)} />}
+              {step === 2 && <Refferal data={formData} setData={setFormData} onBack={() => setStep(1)} onNext={() => setStep(3)} />}
+              {step === 3 && <Booking1 data={formData} setData={setFormData} onBack={() => setStep(2)} onNext={() => setStep(4)} />}
               {step === 4 && (
                 <Invoice
                   data={formData}
                   onBack={() => setStep(3)}
                   onConfirmed={(id) => {
-                    setBookingId(id);  
-                    setStep(5); 
-                    alert("✅ Booking Successfully Completed");
+                    setBookingId(id);
+                    setStep(5);
                   }}
                 />
               )}
-
-              {step === 5 && bookingId && (
-                <Payment
-                  bookingId={bookingId}
-                  onFinish={() => alert("🎉 Booking & Payment Completed")}
-                />
-              )}
-
+              {step === 5 && bookingId && <Payment bookingId={bookingId} />}
             </motion.div>
           </AnimatePresence>
         </main>

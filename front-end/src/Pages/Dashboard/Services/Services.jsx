@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchServices, addService, updateService, deleteService } from "../../../services/services";
+import {
+  fetchServices,
+  addService,
+  updateService,
+  deleteService,
+} from "../../../services/services";
 import { fetchVendors } from "../../../services/vendor";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./Services.css";
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [vendors, setVendors] = useState([]);
 
+  const [search, setSearch] = useState("");
+  const [vendorFilter, setVendorFilter] = useState("");
+
   const [form, setForm] = useState({
     service_name: "",
     service_description: "",
-    vendor_id: ""
+    vendor_id: "",
   });
 
   const [editId, setEditId] = useState(null);
@@ -20,7 +29,6 @@ const Services = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     loadServices();
     loadVendors();
@@ -36,21 +44,19 @@ const Services = () => {
     setVendors(res.data);
   };
 
-  /* ================= FORM ================= */
   const resetForm = () => {
     setForm({
       service_name: "",
       service_description: "",
-      vendor_id: ""
+      vendor_id: "",
     });
     setEditId(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.service_name || !form.vendor_id) {
-      return toast.error("Service name and vendor are required");
+      return toast.error("Service name & vendor required");
     }
 
     try {
@@ -67,194 +73,193 @@ const Services = () => {
     }
   };
 
-  const handleEdit = (s) => {
-    setForm({
-      service_name: s.service_name,
-      service_description: s.service_description,
-      vendor_id: s.vendor_id
-    });
-    setEditId(s.service_id);
-    setShowFormModal(true);
-  };
+  const filteredServices = services.filter((s) => {
+    const matchesSearch =
+      s.service_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.vendor_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.phone.includes(search);
 
-  /* ================= DELETE ================= */
-  const confirmDelete = (id) => {
-    setDeleteId(id);
-    setShowDeleteModal(true);
-  };
+    
 
-  const handleDelete = async () => {
-    try {
-      await deleteService(deleteId);
-      toast.success("Service deleted");
-      setShowDeleteModal(false);
-      loadServices();
-    } catch {
-      toast.error("Delete failed");
-    }
-  };
+    return matchesSearch;
+  });
 
   return (
-    <div className="container mt-4 position-relative">
+    <section className="services-page">
       <ToastContainer position="top-right" autoClose={2500} />
 
-      {/* 🔙 Back to Dashboard */}
-      <Link
-        to="/dashboard"
-        className="btn btn-outline-dark position-absolute top-0 end-0"
-      >
-        ← Back to Dashboard
-      </Link>
+      {/* ================= HEADER ================= */}
+      <header className="services-header">
+        <h2>Services Management</h2>
+        <Link to="/dashboard" className="btn btn-outline-light">
+          ← Back to Dashboard
+        </Link>
+      </header>
 
-      <h3 className="mb-4">Services Management</h3>
+      {/* ================= CONTENT ================= */}
+      <main className="services-content">
+        {/* Search & Filter */}
+        <div className="services-filters">
+          <input
+            type="text"
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          resetForm();
-          setShowFormModal(true);
-        }}
-      >
-        + Add Service
-      </button>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              resetForm();
+              setShowFormModal(true);
+            }}
+          >
+            + Add Service
+          </button>
+        </div>
 
-      {/* ================= TABLE ================= */}
-      <div className="table-responsive">
-        <table className="table table-bordered table-hover">
-          <thead className="bg-black text-white text-center">
-            <tr>
-              <th>Service</th>
-              <th>Description</th>
-              <th>Vendor</th>
-              <th>Phone</th>
-              <th width="160">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.length === 0 ? (
+        {/* ================= TABLE ================= */}
+        <div className="services-table-wrapper">
+          <table className="services-table">
+            <thead>
               <tr>
-                <td colSpan="5" className="text-center">
-                  No services found
-                </td>
+                <th>Service</th>
+                <th>Description</th>
+                <th>Vendor</th>
+                <th>Phone</th>
+                <th width="160">Actions</th>
               </tr>
-            ) : (
-              services.map((s) => (
-                <tr key={s.service_id}>
-                  <td>{s.service_name}</td>
-                  <td>{s.service_description}</td>
-                  <td>{s.vendor_name} ({s.vendor_category})</td>
-                  <td>{s.phone}</td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-warning me-2"
-                      onClick={() => handleEdit(s)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => confirmDelete(s.service_id)}
-                    >
-                      Delete
-                    </button>
+            </thead>
+            <tbody>
+              {filteredServices.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="empty">
+                    No services found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filteredServices.map((s) => (
+                  <tr key={s.service_id}>
+                    <td>{s.service_name}</td>
+                    <td>{s.service_description}</td>
+                    <td>
+                      <span className="category-chip">
+                        {s.vendor_name}
+                        </span></td>
+                    <td>{s.phone}</td>
+                    <td className="actions">
+                      <button
+                        className="btn-warning"
+                        onClick={() => {
+                          setForm(s);
+                          setEditId(s.service_id);
+                          setShowFormModal(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-danger"
+                        onClick={() => {
+                          setDeleteId(s.service_id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
 
       {/* ================= ADD / EDIT MODAL ================= */}
       {showFormModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5>{editId ? "Edit Service" : "Add Service"}</h5>
-                <button className="btn-close" onClick={() => setShowFormModal(false)} />
+        <div className="services-modal">
+          <div className="services-modal-card">
+            <h4>{editId ? "Edit Service" : "Add Service"}</h4>
+
+            <form onSubmit={handleSubmit}>
+              <input
+                placeholder="Service Name"
+                value={form.service_name}
+                onChange={(e) =>
+                  setForm({ ...form, service_name: e.target.value })
+                }
+                required
+              />
+              <textarea
+                placeholder="Description"
+                value={form.service_description}
+                onChange={(e) =>
+                  setForm({ ...form, service_description: e.target.value })
+                }
+                required
+              />
+              <select
+                value={form.vendor_id}
+                onChange={(e) =>
+                  setForm({ ...form, vendor_id: e.target.value })
+                }
+                required
+              >
+                <option value="">Select Vendor</option>
+                {vendors.map((v) => (
+                  <option key={v.vendor_id} value={v.vendor_id}>
+                    {v.vendor_name} | {v.phone}
+                  </option>
+                ))}
+              </select>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowFormModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  {editId ? "Update" : "Save"}
+                </button>
               </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <label>
-                    Service Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Service Name"
-                    value={form.service_name} required
-                    onChange={(e) => setForm({ ...form, service_name: e.target.value })}
-                  />
-                  <label>Description <span className="text-danger">*</span></label>
-                  <textarea
-                    className="form-control mb-2"
-                    placeholder="Description"
-                    value={form.service_description} required
-                    onChange={(e) => setForm({ ...form, service_description: e.target.value })}
-                  />
-                  <label>Vendors <span className="text-danger">*</span></label>
-                  <select
-                    className="form-select"
-                    value={form.vendor_id}
-                    onChange={(e) => setForm({ ...form, vendor_id: e.target.value })} required
-                  >
-                    <option value="">-- Select Vendor --</option>
-                    {vendors.map((v) => (
-                      <option key={v.vendor_id} value={v.vendor_id}>
-                        {v.vendor_name} | {v.vendor_category} | {v.phone}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowFormModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {editId ? "Update" : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
       {/* ================= DELETE MODAL ================= */}
       {showDeleteModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5>Confirm Delete</h5>
-                <button className="btn-close" onClick={() => setShowDeleteModal(false)} />
-              </div>
-              <div className="modal-body">
-                Are you sure you want to delete this service?
-              </div>
-              <div className="modal-footer">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowDeleteModal(false)}
-                >
-                  Cancel
-                </button>
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  Delete
-                </button>
-              </div>
+        <div className="services-modal">
+          <div className="services-modal-card">
+            <h4>Confirm Delete</h4>
+            <p>Are you sure you want to delete this service?</p>
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-danger"
+                onClick={async () => {
+                  await deleteService(deleteId);
+                  toast.success("Service deleted");
+                  setShowDeleteModal(false);
+                  loadServices();
+                }}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
       )}
-
-    </div>
+    </section>
   );
 };
 

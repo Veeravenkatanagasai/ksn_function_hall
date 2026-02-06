@@ -150,7 +150,7 @@ export default function PricingRules() {
                     </td>
                     <td><span className="badge bg-soft-primary text-primary border border-primary-subtle">{r.time_slot}</span></td>
                     <td><div className="small fw-semibold">{r.start_time} - {r.end_time}</div></td>
-                    <td><span className="fw-bold text-dark">${r.base_price_per_hour}</span></td>
+                    <td><span className="fw-bold text-dark">₹{r.base_price_per_hour}</span></td>
                     <td>
                       <div className="small text-muted">From: {formatDate(r.from_date)}</div>
                       <div className="small text-muted">To: {formatDate(r.to_date)}</div>

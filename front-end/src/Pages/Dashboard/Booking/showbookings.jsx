@@ -12,7 +12,7 @@ const AdminShowDetails = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [statusFilter, setStatusFilter] = useState("INPROGRESS");
   const [searchBookingId, setSearchBookingId] = useState("");
-
+  const [inputBookingId, setInputBookingId] = useState("");
 
   // ===== Cancellation =====
   const [cancellationDetails, setCancellationDetails] = useState(null);
@@ -63,15 +63,38 @@ const [paymentType, setPaymentType] = useState("CASH");
   }, [page,statusFilter,searchBookingId]);
 
   const loadBookings = async () => {
-    try {
-      const res = await fetchBookings(page,12,effectiveStatus,searchBookingId);
-      setBookings(Array.isArray(res.data) ? res.data : []);
-      setTotalPages(res.totalPages);
-    } catch (err) {
-      console.error("Failed to load bookings:", err);
-      setBookings([]);
-    }
-  };
+  try {
+    // Ensure page >= 1
+    const safePage = Math.max(1, page);
+
+    const effectiveStatus = searchBookingId ? "ALL" : statusFilter;
+    const searchTerm = searchBookingId ? searchBookingId.trim() : "";
+
+    const res = await fetchBookings(safePage, 12, effectiveStatus, searchTerm);
+
+    setBookings(Array.isArray(res.data) ? res.data : []);
+    setTotalPages(res.totalPages);
+  } catch (err) {
+    console.error("Failed to load bookings:", err);
+    setBookings([]);
+    setTotalPages(1);
+  }
+};
+
+  const handleSearchClick = () => {
+  setSearchBookingId(inputBookingId.trim());
+  setPage(1);
+};
+const handleSearchChange = (e) => {
+  const value = e.target.value;
+  setSearchBookingId(value);
+  setPage(1);
+};
+
+const handleClearSearch = () => {
+  setSearchBookingId("");
+  setPage(1);
+};
 
 
   // ✅ Calculate totals dynamically from arrays
@@ -100,13 +123,14 @@ const [paymentType, setPaymentType] = useState("CASH");
   }
 };
 const confirmRefund = async () => {
+  if (!cancelPreview) return;
+
   try {
     setCancelLoading(true);
 
     const formData = new FormData();
-
     formData.append("booking_id", cancelPreview.booking_id);
-    formData.append("payment_id", cancelPreview.payment_id); // ✅ REQUIRED
+    formData.append("payment_id", cancelPreview.payment_id);
     formData.append("total_amount", cancelPreview.total_amount);
     formData.append("penalty_percent", cancelPreview.penalty_percent);
     formData.append("penalty_amount", cancelPreview.penalty_amount);
@@ -118,22 +142,35 @@ const confirmRefund = async () => {
     }
 
     await api.post("/cancellation/confirm", formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    });
+  headers: { "Content-Type": "multipart/form-data" }
+});
 
-    alert("Cancellation completed successfully");
+// ✅ update selected booking instantly
+setSelectedBooking(prev => ({
+  ...prev,
+  booking_status: "CANCELLED"
+}));
 
-    setShowRefundPopup(false);
-    setCancelPreview(null);
-    setCancelMethod("");
-    setCancelProof(null);
+// ✅ fetch & set cancellation details immediately
+const detailsRes = await api.get(
+  `/cancellation/details/${cancelPreview.booking_id}`
+);
 
+setCancellationDetails(detailsRes.data);
+
+alert("Cancellation completed successfully");
+
+setShowRefundPopup(false);
+setCancelPreview(null);
+setCancelMethod("");
+setCancelProof(null);
   } catch (err) {
     alert(err.response?.data?.message || "Cancellation failed");
   } finally {
     setCancelLoading(false);
   }
 };
+
   const fetchCancellationDetails = async (bookingId) => {
   const res = await api.get(
     `/cancellation/details/${bookingId}`
@@ -142,11 +179,11 @@ const confirmRefund = async () => {
 };
 
 useEffect(() => {
-  if (selectedBooking?.booking_status === "CANCELLED") {
-    api
-      .get(`/cancellation/details/${selectedBooking.booking_id}`)
-      .then(res => setCancellationDetails(res.data))
-      .catch(() => setCancellationDetails(null));
+  if (
+    selectedBooking?.booking_status === "CANCELLED" &&
+    !cancellationDetails
+  ) {
+    fetchCancellationDetails(selectedBooking.booking_id);
   }
 }, [selectedBooking]);
 
@@ -442,8 +479,6 @@ const hasGallery =
         <i className="bi bi-arrow-left-circle-fill me-2"></i>
         Back to Dashboard
       </button>
-
-
       <div className="container">
         <h2 className="mb-4 fw-bold">Booking Management</h2>
 
@@ -475,23 +510,30 @@ const hasGallery =
   ))}
 
   <div style={{ width: "160px" }}>
-  <input
-    type="text"
-    className="form-control"
-    placeholder="Search by Booking ID"
-    value={searchBookingId}
-    onChange={(e) => {
-      setSearchBookingId(e.target.value);
-      setPage(1);
-    }}
-  />
-</div>
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Search by Booking ID"
+      value={inputBookingId}
+      onChange={(e) => setInputBookingId(e.target.value)}
+    />
+  </div>
+
+  <div style={{ width: "160px" }}>
+    <button
+      className="btn btn-outline-primary w-100"
+      onClick={handleSearchClick}
+    >
+      Search
+    </button>
+  </div>
 
   {searchBookingId && (
     <div style={{ width: "90px" }}>
       <button
         className="btn btn-outline-secondary w-100"
         onClick={() => {
+          setInputBookingId("");
           setSearchBookingId("");
           setPage(1);
         }}
@@ -823,20 +865,20 @@ const hasGallery =
                                   </strong>
                                 </div>
                                 {cancellationDetails.proof_image_path && (
-  <div className="mt-2">
-    <span className="fw-semibold">Refund Proof</span>
-    <br />
-    <img
-      src={cancellationDetails.proof_image_path}
-      width={120}
-      className="rounded shadow mt-1"
-      style={{ cursor: "pointer" }}
-      onClick={() =>
-        window.open(cancellationDetails.proof_image_path, "_blank")
-      }
-    />
-  </div>
-)}
+                                    <div className="mt-2">
+                                      <span className="fw-semibold">Refund Proof</span>
+                                      <br />
+                                      <img
+                                        src={cancellationDetails.proof_image_path}
+                                        width={120}
+                                        className="rounded shadow mt-1"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() =>
+                                          window.open(cancellationDetails.proof_image_path, "_blank")
+                                        }
+                                      />
+                                    </div>
+                                  )}
                               </div>
                             )}
 

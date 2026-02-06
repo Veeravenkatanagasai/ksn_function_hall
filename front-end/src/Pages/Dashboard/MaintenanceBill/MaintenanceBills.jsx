@@ -21,6 +21,7 @@ const MaintenanceBills = () => {
   const [preview, setPreview] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   // Payment modal
   const [paymentModal, setPaymentModal] = useState(false);
@@ -129,18 +130,35 @@ const MaintenanceBills = () => {
     }
   };
 
+  const filteredBills = bills.filter((b) =>
+    b.maintenance_bill_name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="mb-container">
-      <div className="mb-topbar">
+      {/* ===== FIXED HEADER ===== */}
+      <header className="mb-header">
         <h2>Maintenance Bills</h2>
-        <button className="mb-back-btn" onClick={() => navigate("/dashboard")}>
+        <button className="btn btn-outline-light" onClick={() => navigate("/dashboard")}>
           ← Back to Dashboard
         </button>
-      </div>
+      </header>
 
-      <button className="mb-add-btn" onClick={openAddModal}>
-        + Add Bill
-      </button>
+      {/* ===== CONTENT ===== */}
+      <div className="mb-content">
+
+        {/* TOOLBAR */}
+        <div className="mb-toolbar">
+          <input
+            className="mb-search"
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            + Add Bill
+          </button>
+        </div>
 
       <div className="mb-table-container">
         <table className="mb-table">
@@ -155,7 +173,7 @@ const MaintenanceBills = () => {
             </tr>
           </thead>
           <tbody>
-  {bills.map((bill) => {
+  {filteredBills.map((bill) => {
     const isPaid = bill.payments.some(
       (p) => p.payment_status?.toLowerCase() === "paid"
     );
@@ -226,6 +244,7 @@ const MaintenanceBills = () => {
 </tbody>
 
         </table>
+      </div>
       </div>
 
       {/* ===== ADD / EDIT BILL MODAL ===== */}

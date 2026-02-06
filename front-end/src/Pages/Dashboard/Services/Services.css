@@ -1,0 +1,174 @@
+/* ================= ROOT ================= */
+.services-page {
+  min-height: 100vh;
+  background: #f4f6fb;
+  font-family: system-ui, sans-serif;
+  overflow: auto;
+}
+
+/* ================= HEADER ================= */
+.services-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, #8b0000, #b91c1c);
+  color: #fff;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+/* ================= CONTENT ================= */
+.services-content {
+  padding: 130px 40px 40px;
+}
+
+/* ================= SEARCH & FILTER ================= */
+.services-filters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.services-filters input,
+.services-filters select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  min-width: 240px;
+  background: #fff;
+}
+
+.services-filters input:focus,
+.services-filters select:focus {
+  border-color: #b91c1c;
+}
+
+/* ================= TABLE ================= */
+.services-table-wrapper {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.services-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.services-table thead {
+  background: #111827;
+  color: #fff;
+}
+
+.services-table th,
+.services-table td {
+  padding: 14px;
+  text-align: center;
+}
+
+.services-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.services-table .actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ================= EMPTY STATE ================= */
+.empty {
+  padding: 30px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.btn-warning {
+  background: #f59e0b;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background: #dc2626;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #9ca3af;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ================= MODAL ================= */
+.services-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.services-modal-card {
+  background: #fff;
+  width: 420px;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  animation: pop 0.25s ease;
+}
+
+.services-modal-card h4 {
+  margin-bottom: 14px;
+}
+
+/* ================= FORM ================= */
+.services-modal-card input,
+.services-modal-card textarea,
+.services-modal-card select {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+/* ================= MODAL ACTIONS ================= */
+.services-modal-card .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

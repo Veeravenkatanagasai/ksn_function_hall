@@ -1,140 +1,169 @@
-/* Container Spacing */
-.header-modern {
-  padding-top: 1rem;
-  padding-bottom: 0.75rem;
-}
-
-/* Typography */
-.welcome-title {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: #3b71ca; /* High-end Blue */
-  letter-spacing: -0.5px;
-  margin-bottom: 0.25rem;
-  line-height: 1.2;
-}
-
-.admin-highlight {
-  color: #212529;
-  text-transform: capitalize;
-}
-
-.last-login-tag {
-  font-size: 0.9rem;
-  color: #6c757d;
+/* =========================
+   WRAPPER
+========================= */
+.hd-wrapper {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 16px 0;
 }
 
-/* Filter Card - The Glassmorphism Look */
-.filter-card {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 16px;
+/* =========================
+   LEFT SECTION
+========================= */
+.hd-left {
+  flex: 1;
 }
 
-/* Vertical Labels and Inputs */
-.vertical-input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #495057;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.hd-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #010205;
   margin-bottom: 4px;
 }
 
-.modern-input {
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  padding: 0.5rem 0.75rem;
-  background-color: #f8f9fa;
-  font-size: 16px;
-  transition: all 0.2s ease-in-out;
+.hd-title span {
+  color: #01060c;
+  text-transform: capitalize;
 }
 
-.modern-input:focus {
-  background-color: #fff;
-  border-color: #3b71ca;
-  box-shadow: 0 0 0 3px rgba(59, 113, 202, 0.1);
-  outline: none;
-}
-
-/* Modern Buttons */
-.modern-btn {
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  padding: 0.5rem 0.75rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+.hd-login {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
+  font-size: 0.95rem;
+  color: #010e1a;
 }
 
-@media (hover: hover) {
-  .modern-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-  }
+/* =========================
+   RIGHT SECTION
+========================= */
+.hd-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
 }
-.btn-primary.modern-btn {
-  background-color: #3b71ca;
+
+/* =========================
+   FILTER CARD
+========================= */
+.hd-filter-card {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f1f1f1;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* =========================
+   INPUT GROUP
+========================= */
+.hd-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hd-input label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #01060b;
+  text-transform: uppercase;
+}
+
+.hd-input input {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #dcdfe3;
+  background: #ffffff;
+}
+
+.hd-input input:focus {
+  outline: none;
+  border-color: #3b71ca;
+  box-shadow: 0 0 0 3px rgba(59, 113, 202, 0.12);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.hd-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.hd-btn {
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
   border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hd-btn.primary {
+  background: #3b71ca;
   color: #ffffff;
 }
 
-@media (max-width: 991px) {
-  .welcome-title {
-    font-size: 1.85rem;   /* 30px */
-  }
+.hd-btn.ghost {
+  background: transparent;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
 
-  .filter-card {
-    padding: 14px;
+@media (hover: hover) {
+  .hd-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
   }
 }
 
 /* =========================
-   MOBILE FIRST
+   RESPONSIVE
 ========================= */
-@media (max-width: 576px) {
-  .header-modern {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+@media (max-width: 992px) {
+  .hd-wrapper {
+    flex-direction: column;
   }
 
-  .welcome-title {
-    font-size: 1.6rem;    /* 26px */
+  .hd-right {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 576px) {
+  .hd-title {
+    font-size: 1.6rem;
     text-align: center;
   }
 
-  .last-login-tag {
-    font-size: 0.8rem;
+  .hd-login {
     justify-content: center;
   }
 
-  .filter-card {
-    border-radius: 14px;
-    padding: 14px;
-  }
-
-  .vertical-input-group {
-    margin-bottom: 10px;
-  }
-
-  .modern-input {
-    font-size: 0.85rem;
-    padding: 0.6rem 0.75rem;
-  }
-
-  .modern-btn {
+  .hd-filter-card {
+    flex-direction: column;
     width: 100%;
-    padding: 0.65rem;
+  }
+
+  .hd-actions {
+    width: 100%;
+  }
+
+  .hd-btn {
+    flex: 1;
+    justify-content: center;
   }
 }

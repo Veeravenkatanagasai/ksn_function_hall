@@ -147,7 +147,7 @@ export default function FixedCharges() {
                     <td className="ps-4 text-muted">{i + 1}</td>
                     <td><span className="badge bg-light text-primary border">{c.category_name}</span></td>
                     <td className="fw-semibold">{c.charges_name}</td>
-                    <td className="text-success fw-bold">${c.charges_value}</td>
+                    <td className="text-success fw-bold">₹ {c.charges_value}</td>
                     <td className="text-end pe-4">
                       <button className="btn btn-light btn-sm rounded-circle me-2" onClick={() => openForm(c)}>
                         <i className="bi bi-pencil-square text-primary"></i>

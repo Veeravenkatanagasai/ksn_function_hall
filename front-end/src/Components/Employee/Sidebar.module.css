@@ -1,0 +1,76 @@
+.sidebar {
+  width: 300px;
+  height: 100vh;
+  background: #0f172a;
+  color: #e5e7eb;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Brand */
+.brand {
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffffcc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Menu */
+.menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.menu::-webkit-scrollbar {
+  width: 10px;
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+/* Links */
+.link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #94a3b8;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #e5e7eb;
+  transform: translateX(4px);
+}
+
+/* Active */
+.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #29066b;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+/* Icon */
+.icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Text */
+.text {
+  flex: 1;
+}

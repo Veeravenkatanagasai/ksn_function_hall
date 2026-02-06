@@ -9,6 +9,7 @@ import {
   BsPeople,
   BsTools,
   BsCurrencyRupee,
+  BsReceipt,
 } from "react-icons/bs";
 import { getDashboardStats } from "../../services/dashboard";
 import "./AdminDashboard.css";
@@ -55,61 +56,60 @@ const AdminDashboard = () => {
   }, [filters]);
 
   return (
-    <div className="admin-container">
+    <div className="admin-dashboard-container">
       <Sidebar />
 
-      <main className="main-content">
+      <main className="admin-dashboard-main">
         <Header filters={filters} setFilters={setFilters} />
 
-        {/* DASHBOARD CARDS */}
-        <section className="stats-grid">
-  <DashboardCard
-    title="Total Bookings"
-    value={stats.bookings}
-    icon={BsCalendarCheck}
-    subtitle="Recent bookings shown in Bookings page"
-    link="/bookings"
-    variant="primary"
-  />
+        <section className="admin-dashboard-grid">
+          <DashboardCard
+            title="Total Bookings"
+            value={stats.bookings}
+            icon={BsCalendarCheck}
+            subtitle="Recent bookings shown in Bookings page"
+            link="/bookings"
+            variant="primary"
+          />
 
-  <DashboardCard
-    title="Total Vendors"
-    value={stats.vendors}
-    icon={BsPeople}
-    subtitle="Manage vendors from Vendors section"
-    link="/vendors"
-    variant="success"
-  />
+          <DashboardCard
+            title="Total Vendors"
+            value={stats.vendors}
+            icon={BsPeople}
+            subtitle="Manage vendors from Vendors section"
+            link="/vendors"
+            variant="success"
+          />
 
-  <DashboardCard
-    title="Total Services"
-    value={stats.services}
-    icon={BsTools}
-    subtitle="Available services overview"
-    link="/dashboard-services"
-    variant="warning"
-  />
+          <DashboardCard
+            title="Total Services"
+            value={stats.services}
+            icon={BsTools}
+            subtitle="Available services overview"
+            link="/dashboard-services"
+            variant="warning"
+          />
+        </section>
 
-</section>
+        <section className="admin-dashboard-actions">
+          <div className="admin-dashboard-actions-card">
+            <h5>Quick Actions</h5>
 
+            <div className="admin-dashboard-actions-buttons">
+              <button onClick={() => navigate("/bookings")}>
+                <BsCalendarCheck /> View Bookings
+              </button>
 
-      {/* QUICK ACTIONS */}
-<section className="quick-actions mt-4">
-  <div className="card p-4 shadow-sm border-0 rounded-4">
-    <h5 className="mb-3 fw-bold">Quick Actions</h5>
+              <button onClick={() => navigate("/paymentanalytics")}>
+                <BsCurrencyRupee /> View Revenue
+              </button>
 
-    <div className="d-flex flex-wrap gap-2">
-      <button
-        className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
-        onClick={() => navigate("/bookings")}
-      >
-        <BsCalendarCheck /> View Bookings
-      </button>
-
-    </div>
-  </div>
-</section>
-
+              <button onClick={() => navigate("/bills")}>
+                <BsReceipt /> View Bills
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );

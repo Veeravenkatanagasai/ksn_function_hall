@@ -165,9 +165,9 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
     <div className="eb-wrapper">
       {/* ===== FIXED HEADER ===== */}
       <header className="eb-header">
-        <h1>💼 Bills Management</h1>
+        <h1> Bills Management</h1>
         <button
-          className="eb-back-btn"
+          className="btn btn-outline-light"
           onClick={() => (window.location.href = "/dashboard")}
         >
           ⬅ Back to Dashboard
@@ -175,6 +175,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
       </header>
 
       {/* ===== FILTER BAR ===== */}
+      <div className="eb-content">
       <div className="eb-filter-bar">
         <div className="status-buttons">
           <button
@@ -233,6 +234,7 @@ const paginate = (pageNumber) => setCurrentPage(pageNumber);
             {i + 1}
           </button>
         ))}
+      </div>
       </div>
 
       {/* ===== BOOKING BILLS MODAL ===== */}

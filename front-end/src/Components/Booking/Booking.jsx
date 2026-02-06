@@ -117,6 +117,19 @@ const handleNext = () => {
 if (validate()) onNext();
 };
 
+const isFormComplete =
+  data.category &&
+  data.timeSlot &&
+  data.hall &&
+  data.eventDate &&
+  data.startTime &&
+  data.endTime &&
+  data.duration &&
+  data.discount !== "" &&
+  data.discount !== null &&
+  data.discount !== undefined;
+
+
 
 const req = (msg) => <span className="text-danger ms-1">*</span>;
     
@@ -171,6 +184,7 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
           <select
             className={`form-control ${errors.hall ? "is-invalid" : ""}`}
             value={data.hall}
+            disabled={!data.category}
             onChange={(e) =>
               setData({ ...data, hall: e.target.value })
             }
@@ -191,6 +205,7 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
   <DatePicker
     className={`form-control ${errors.eventDate ? "is-invalid" : ""}`}
     selected={data.eventDate ? new Date(data.eventDate) : null}
+    disabled={!data.hall || !data.timeSlot}
     onChange={(date) =>
       setData({
         ...data,
@@ -267,9 +282,14 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
         <button className="btn btn-outline-secondary" onClick={onBack}>
           ← Back
         </button>
-        <button className="btn btn-warning fw-bold" onClick={onNext}>
+        <button
+          className="btn btn-warning fw-bold"
+          onClick={handleNext}
+          disabled={!isFormComplete}
+        >
           Generate Order →
         </button>
+
       </div>
     </div>
   );

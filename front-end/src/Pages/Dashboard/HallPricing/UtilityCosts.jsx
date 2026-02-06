@@ -141,7 +141,7 @@ export default function UtilityCosts() {
                     <td className="ps-4 text-muted">{i + 1}</td>
                     <td className="fw-semibold">{u.utility_name}</td>
                     <td><span className="badge bg-light text-secondary border">{u.category_name}</span></td>
-                    <td className="text-primary fw-bold">{u.price_per_hour}</td>
+                    <td className="text-primary fw-bold">₹ {u.price_per_hour}</td>
                     <td>{u.default_hours || "0"} hrs</td>
                     <td className="text-end pe-4">
                       <button className="btn btn-light btn-sm rounded-circle me-2" onClick={() => openForm(u)}>

@@ -48,37 +48,19 @@ const Employees = () => {
   };
 
   const openEditModal = (emp) => {
-  setSelectedEmployee(emp);
+    setSelectedEmployee(emp);
+    setEditForm({ ...emp, password: "" });
+    setShowEdit(true);
+  };
 
-  setEditForm({
-    emp_name: emp.emp_name,
-    emp_email: emp.emp_email,
-    emp_phone: emp.emp_phone,
-    emp_role: emp.emp_role,
-    username: emp.username,
-    password: "", 
-  });
-
-  setShowEdit(true);
-};
-
-
- const handleUpdate = async () => {
-  try {
-    const payload = { ...editForm };
-
-    if (!payload.password) delete payload.password;
-
-    await updateEmployee(selectedEmployee.emp_id, payload);
-
-    toast.success("Employee updated");
-    setShowEdit(false);
-    loadEmployees();
-  } catch (err) {
-    toast.error("Update failed");
-  }
-};
-
+  const handleUpdate = async () => {
+    try {
+      await updateEmployee(selectedEmployee.emp_id, editForm);
+      toast.success("Employee updated");
+      setShowEdit(false);
+      loadEmployees();
+    } catch (err) { toast.error("Update failed"); }
+  };
 
   const confirmDelete = async () => {
     try {
@@ -107,15 +89,6 @@ const Employees = () => {
     padding: '10px 20px',
     boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
   };
-
-  const formatIST = (timestamp, emptyText = "First Login") => {
-  if (!timestamp) return emptyText;
-
-  return new Date(timestamp + "Z").toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
-  });
-};
-
 
   return (
     <div className="container-fluid p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
@@ -189,16 +162,8 @@ const Employees = () => {
                 <ListGroup.Item><strong>Phone:</strong> {selectedEmployee.emp_phone}</ListGroup.Item>
                 <ListGroup.Item><strong>Username:</strong> {selectedEmployee.username}</ListGroup.Item>
                 <ListGroup.Item><strong>Login Count:</strong> <Badge bg="success">{selectedEmployee.login_count}</Badge></ListGroup.Item>
-                <ListGroup.Item>
-                      <strong>Last Login:</strong>{" "}
-                      {formatIST(selectedEmployee.last_login, "First Login")}
-                    </ListGroup.Item>
-                    
-                    <ListGroup.Item>
-                      <strong>Last Logout:</strong>{" "}
-                      {formatIST(selectedEmployee.last_logout, "Currently Logged In")}
-                </ListGroup.Item>
-
+                <ListGroup.Item><strong>Last Login:</strong> {selectedEmployee.last_login ? new Date(selectedEmployee.last_login).toLocaleString() : "Never"}</ListGroup.Item>
+                <ListGroup.Item><strong>Last Logout:</strong> {selectedEmployee.last_logout ? new Date(selectedEmployee.last_logout).toLocaleString() : "N/A"}</ListGroup.Item>
               </ListGroup>
             </div>
           )}
@@ -231,88 +196,26 @@ const Employees = () => {
 
       {/* EDIT MODAL */}
       <Modal show={showEdit} onHide={() => setShowEdit(false)} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Update Profile</Modal.Title>
-  </Modal.Header>
-
-  <Modal.Body>
-    <Form>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">EMP NAME</Form.Label>
-        <Form.Control
-          value={editForm.emp_name}
-          onChange={(e) =>
-            setEditForm({ ...editForm, emp_name: e.target.value })
-          }
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">EMP EMAIL</Form.Label>
-        <Form.Control
-          value={editForm.emp_email}
-          onChange={(e) =>
-            setEditForm({ ...editForm, emp_email: e.target.value })
-          }
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">EMP PHONE</Form.Label>
-        <Form.Control
-          value={editForm.emp_phone}
-          onChange={(e) =>
-            setEditForm({ ...editForm, emp_phone: e.target.value })
-          }
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">EMP ROLE</Form.Label>
-        <Form.Control
-          value={editForm.emp_role}
-          onChange={(e) =>
-            setEditForm({ ...editForm, emp_role: e.target.value })
-          }
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">USERNAME</Form.Label>
-        <Form.Control
-          value={editForm.username}
-          onChange={(e) =>
-            setEditForm({ ...editForm, username: e.target.value })
-          }
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label className="small fw-bold">PASSWORD</Form.Label>
-        <Form.Control
-          type="password"
-          placeholder="Leave blank to keep current password"
-          value={editForm.password}
-          onChange={(e) =>
-            setEditForm({ ...editForm, password: e.target.value })
-          }
-        />
-      </Form.Group>
-
-    </Form>
-  </Modal.Body>
-
-  <Modal.Footer>
-    <Button variant="light" onClick={() => setShowEdit(false)}>
-      Close
-    </Button>
-    <Button variant="warning" onClick={handleUpdate}>
-      Update Details
-    </Button>
-  </Modal.Footer>
-</Modal>
-
+        <Modal.Header closeButton><Modal.Title>Update Profile</Modal.Title></Modal.Header>
+        <Modal.Body>
+          <Form>
+            {Object.keys(editForm).map((f) => (
+              <Form.Group className="mb-3" key={f}>
+                <Form.Label className="small fw-bold">{f.replace("_", " ").toUpperCase()}</Form.Label>
+                <Form.Control
+                  type={f === "password" ? "password" : "text"}
+                  value={editForm[f]}
+                  onChange={e => setEditForm({ ...editForm, [f]: e.target.value })}
+                />
+              </Form.Group>
+            ))}
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="light" onClick={() => setShowEdit(false)}>Close</Button>
+          <Button variant="warning" onClick={handleUpdate}>Update Details</Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* DELETE MODAL */}
       <Modal show={showDelete} onHide={() => setShowDelete(false)} centered size="sm">
@@ -329,5 +232,6 @@ const Employees = () => {
     </div>
   );
 };
+
 
 export default Employees;

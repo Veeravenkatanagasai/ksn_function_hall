@@ -1,81 +1,108 @@
-/* Card Container */
-.dashboard-card-wrapper {
+/* =============================
+   WRAPPER
+============================= */
+.dc-wrapper {
   display: block;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: slideUpFade 0.6s ease-out backwards;
+  text-decoration: none;
+  animation: dcFadeUp 0.6s ease both;
 }
+
+/* =============================
+   CARD
+============================= */
+.dc-card {
+  height: 100%;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* Hover effect */
 @media (hover: hover) {
-  .dashboard-card-wrapper:hover {
-    transform: translateY(-8px);
+  .dc-wrapper:hover .dc-card {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
   }
 }
 
-.dashboard-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+/* =============================
+   HEADER
+============================= */
+.dc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-/* Lift Animation on Hover */
-.dashboard-card-wrapper:hover {
-  transform: translateY(-10px);
+.dc-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #00060b;
 }
 
-.dashboard-card-wrapper:hover .dashboard-card {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
-  border-color: rgba(59, 113, 202, 0.2) !important;
-}
-
-/* Title & Value Typography */
-.card-title-text {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #6c757d;
-  letter-spacing: 0.3px;
-}
-
-.card-value-text {
-  font-size: 1.75rem; /* 28px */
-  font-weight: 700;
-  color: #3b71ca; /* Your specific blue */
-  letter-spacing: -0.4px;
-  line-height: 1.2;
-}
-
-/* Icon Box Variants - Matching your Photo */
-.card-icon-box {
+/* =============================
+   ICON
+============================= */
+.dc-icon {
   width: 44px;
   height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.25s ease;
-  background: rgba(25, 135, 84, 0.12);
-  color: #198754;
+  transition: transform 0.3s ease;
 }
 
-.card-icon-box.warning {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: #ffc107;
-}
-
-.card-icon-box.primary {
-  background-color: rgba(59, 113, 202, 0.1);
+.dc-icon.primary {
+  background: rgba(59, 113, 202, 0.12);
   color: #3b71ca;
 }
 
+.dc-icon.warning {
+  background: rgba(255, 193, 7, 0.12);
+  color: #d39e00;
+}
+
 @media (hover: hover) {
-  .dashboard-card-wrapper:hover .card-icon-box {
-    transform: scale(1.08);
+  .dc-wrapper:hover .dc-icon {
+    transform: scale(1.1) rotate(5deg);
   }
 }
 
-/* Arrow Interaction */
-.hover-arrow {
+/* =============================
+   BODY
+============================= */
+.dc-body {
+  margin-bottom: 1rem;
+}
+
+.dc-value {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #0851c7;
+}
+
+/* =============================
+   FOOTER
+============================= */
+.dc-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dc-subtitle {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Arrow animation */
+.dc-arrow {
   color: #3b71ca;
   opacity: 0;
   transform: translateX(-8px);
@@ -83,22 +110,19 @@
 }
 
 @media (hover: hover) {
-  .dashboard-card-wrapper:hover .hover-arrow {
+  .dc-wrapper:hover .dc-arrow {
     opacity: 1;
     transform: translateX(6px);
-    color: #0d6efd;
   }
 }
 
-.dashboard-card-wrapper:hover .card-icon-box {
-  transform: scale(1.1) rotate(5deg);
-}
-
-/* Entry Animation Keyframe */
-@keyframes slideUpFade {
+/* =============================
+   ANIMATION
+============================= */
+@keyframes dcFadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -106,44 +130,20 @@
   }
 }
 
-/* ===========================
-   MOBILE OPTIMIZATION
-=========================== */
+/* =============================
+   MOBILE
+============================= */
 @media (max-width: 768px) {
-  .dashboard-card {
-    border-radius: 14px;
+  .dc-title {
+    font-size: 0.85rem;
   }
 
-  .card-title-text {
-    font-size: 0.8125rem;   /* 13px */
+  .dc-value {
+    font-size: 1.5rem;
   }
 
-  .card-value-text {
-    font-size: 1.5rem;      /* 24px */
-  }
-
-  .card-icon-box {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-  }
-
-  /* Always show arrow on mobile (no hover) */
-  .hover-arrow {
+  .dc-arrow {
     opacity: 1;
     transform: translateX(4px);
-  }
-}
-
-/* ===========================
-   SMALL MOBILE (PHONES)
-=========================== */
-@media (max-width: 480px) {
-  .card-value-text {
-    font-size: 1.375rem;    /* 22px */
-  }
-
-  .card-title-text {
-    font-size: 0.75rem;     /* 12px */
   }
 }

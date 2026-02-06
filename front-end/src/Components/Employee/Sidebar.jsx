@@ -1,19 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Users, 
-  UserCircle, 
-  CreditCard, 
-  FileText, 
-  Zap, 
+import {
+  LayoutDashboard,
+  Users,
+  UserCircle,
+  CreditCard,
+  FileText,
   ImageIcon,
-  ChevronRight
-} from "lucide-react"; // Modern lightweight icons
-import "./Sidebar.css";
+} from "lucide-react";
+import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
-  const location = useLocation(); // To highlight active link
+  const location = useLocation();
 
   const menuItems = [
     { path: "/employee-dashboard", name: "Overview", icon: <LayoutDashboard size={20} /> },
@@ -25,37 +23,30 @@ const Sidebar = () => {
     { path: "/employee-staff", name: "Staff", icon: <Users size={20} /> },
     { path: "/employeemaintenancebill", name: "Maintenance Bill", icon: <CreditCard size={20} /> },
     { path: "/gallery", name: "Gallery", icon: <ImageIcon size={20} /> },
-    { path: "/employeebill", name: "Bills", icon: <FileText size={20} /> }
+    { path: "/employeebill", name: "Bills", icon: <FileText size={20} /> },
   ];
 
   return (
-    <aside className="sidebar-wrapper d-flex flex-column shadow-lg">
-      {/* Brand Header */}
-      <div className="sidebar-brand p-4">
-        <small className="text-white-50 fw-bold">Employee Portal</small>
-      </div>
+    <aside className={styles.sidebar}>
+      {/* Brand */}
+      <div className={styles.brand}>Employee Portal</div>
 
-      <hr className="sidebar-divider mx-4" />
-
-      {/* Navigation Links */}
-      <ul className="nav nav-pills flex-column mb-auto px-3 py-2">
-        {menuItems.map((item) => (
-          <li className="nav-item mb-2" key={item.path}>
+      {/* Menu */}
+      <nav className={styles.menu}>
+        {menuItems.map((item) => {
+          const active = location.pathname === item.path;
+          return (
             <Link
+              key={item.path}
               to={item.path}
-              className={`nav-link d-flex align-items-center justify-content-between ${
-                location.pathname === item.path ? "active-link" : "inactive-link"
-              }`}
+              className={`${styles.link} ${active ? styles.active : ""}`}
             >
-              <div className="d-flex align-items-center gap-3">
-                {item.icon}
-                <span>{item.name}</span>
-              </div>
-              <ChevronRight size={14} className="chevron" />
+              <span className={styles.icon}>{item.icon}</span>
+              <span className={styles.text}>{item.name}</span>
             </Link>
-          </li>
-        ))}
-      </ul>
+          );
+        })}
+      </nav>
     </aside>
   );
 };

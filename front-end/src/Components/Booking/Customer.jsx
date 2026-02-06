@@ -92,6 +92,9 @@ const Customer = ({ data, setData, onNext }) => {
 
   return (
     <div className="customer-card">
+      <h3 style={{ marginBottom: "20px" }}>
+        Customer Details
+      </h3>
       <div className="grid">
         {/* Name */}
         <div className="input-group">
