@@ -42,7 +42,7 @@ const PORT = process.env.PORT || 5000;
 /* -------- Middleware -------- */
 const allowedOrigins = [
   "http://localhost:5173", // local dev
-  "https://ksn-function-hall-ten.vercel.app/" // production frontend
+  "https://ksn-function-hall-ten.vercel.app" // production frontend
 ];
 
 app.use(cors({
