@@ -1,31 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { fetchContacts, addContact } from "../../../services/savecontact";
+import {
+  fetchContacts,
+  addContact,
+} from "../../../services/savecontact";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
   const [contacts, setContacts] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
     mobile: "",
     subject: ""
   });
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
 
-  /* ================= LOAD CONTACTS ================= */
+  /* ================= LOAD ================= */
   const loadContacts = async () => {
-    try {
-      const res = await fetchContacts();
-      setContacts(res.data);
-    } catch {
-      toast.error("Failed to load contacts");
-    }
+    const res = await fetchContacts();
+    setContacts(res.data || []);
   };
 
   useEffect(() => {
@@ -39,18 +37,38 @@ const Contact = () => {
       return false;
     }
 
-    if (!/^[a-zA-Z\s]+$/.test(form.name)) {
+    if (!/^[A-Za-z\s]+$/.test(form.name)) {
       toast.error("Name must contain only letters");
       return false;
     }
 
+    if (!form.email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
+
     if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      toast.error("Invalid email address");
+      toast.error("Invalid email format");
+      return false;
+    }
+
+    if (!form.mobile.trim()) {
+      toast.error("Mobile number is required");
       return false;
     }
 
     if (!/^[6-9]\d{9}$/.test(form.mobile)) {
-      toast.error("Mobile must be a valid 10-digit number");
+      toast.error("Mobile must be 10 digits starting with 6–9");
+      return false;
+    }
+
+    if (!form.subject.trim()) {
+      toast.error("Subject is required");
+      return false;
+    }
+
+    if (form.subject.length < 3) {
+      toast.error("Subject must be at least 3 characters");
       return false;
     }
 
@@ -60,156 +78,154 @@ const Contact = () => {
   /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     try {
-      await addContact(form);
-      toast.success("Contact added successfully");
+        await addContact(form);
+        toast.success("Contact added successfully");
       setForm({ name: "", email: "", mobile: "", subject: "" });
       setShowModal(false);
       loadContacts();
-    } catch {
-      toast.error("Failed to save contact");
+    } catch (error) {
+      toast.error("Something went wrong. Try again.");
     }
   };
 
+  /* ================= SEARCH ================= */
+  const filteredContacts = contacts.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.email.toLowerCase().includes(search.toLowerCase()) ||
+      c.mobile.includes(search)
+  );
+
   return (
-    <div className="container mt-4 contact-wrapper">
+    <div className="contact-page">
+      {/* HEADER */}
+      <div className="contact-header">
+        <h3>Contact Management</h3>
+        <button className="btn btn-outline-light" onClick={() => navigate("/employee-dashboard")}>
+          ← Back to Dashboard
+        </button>
+      </div>
 
-      {/* 🔙 BACK TO DASHBOARD */}
-      <button
-        className="btn btn-outline-dark position-fixed top-0 end-0 m-4 shadow"
-        onClick={() => navigate("/employee-dashboard")}
-      >
-        ← Back to Dashboard
-      </button>
+      {/* CONTENT */}
+      <div className="contact-content">
+        {/* TOOLBAR */}
+        <div className="contact-toolbar">
+          <input
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setForm({ name: "", email: "", mobile: "", subject: "" });
+              setShowModal(true);
+            }}
+          >
+            + Add Contact
+          </button>
+        </div>
 
-      <h3 className="fw-bold mb-4">Contact Management</h3>
-
-      {/* ADD BUTTON */}
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          setForm({ name: "", email: "", mobile: "", subject: "" });
-          setShowModal(true);
-        }}
-      >
-        + Add Contact
-      </button>
-
-      {/* ================= TABLE ================= */}
-      <div className="table-responsive shadow-sm">
-        <table className="table table-bordered table-hover">
-          <thead className="bg-black text-white text-center">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Mobile</th>
-              <th>Subject</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contacts.length === 0 ? (
+        {/* TABLE */}
+        <div className="contact-table-wrapper">
+          <table className="contact-table">
+            <thead>
               <tr>
-                <td colSpan="4" className="text-center text-muted">
-                  No contacts found
-                </td>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Subject</th>
               </tr>
-            ) : (
-              contacts.map((c) => (
+            </thead>
+            <tbody>
+              {filteredContacts.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="empty">
+                    No contacts found
+                  </td>
+                </tr>
+              )}
+
+              {filteredContacts.map((c) => (
                 <tr key={c.contact_id}>
                   <td>{c.name}</td>
                   <td>{c.email}</td>
                   <td>{c.mobile}</td>
                   <td>{c.subject}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* ================= ADD MODAL ================= */}
+      {/* MODAL */}
       {showModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content shadow-lg">
-
-              <div className="modal-header">
-                <h5 className="modal-title">Add Contact</h5>
-                <button
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
+        <div className="contact-modal">
+          <div className="contact-modal-card">
+            <h4>Add Contact</h4>
+            <form onSubmit={handleSubmit}>
+              <div className="field">
+                <label>Name *</label>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
                 />
               </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <label className="form-label">
-                    Name <span className="required">*</span>
-                  </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Name"
-                    value={form.name} required
-                    onChange={(e) =>
-                      setForm({ ...form, name: e.target.value })
-                    }
-                  />
-                  <label className="form-label">
-                    Email <span className="required">*</span>
-                  </label>
+              <div className="field">
+                <label>Email *</label>
+                <input
+                  required
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
+                />
+              </div>
 
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Email"
-                    value={form.email} required
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
-                  />
+              <div className="field">
+                <label>Mobile *</label>
+                <input
+                  required
+                  value={form.mobile}
+                  onChange={(e) =>
+                    setForm({ ...form, mobile: e.target.value })
+                  }
+                />
+              </div>
 
-                  <label className="form-label">
-                    Mobile <span className="required">*</span>
-                  </label>
+              <div className="field">
+                <label>Subject *</label>
+                <input
+                  required
+                  value={form.subject}
+                  onChange={(e) =>
+                    setForm({ ...form, subject: e.target.value })
+                  }
+                />
+              </div>
 
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Mobile"
-                    value={form.mobile} required
-                    onChange={(e) =>
-                      setForm({ ...form, mobile: e.target.value })
-                    }
-                  />
-                  <label className="form-label">
-                    Subject
-                  </label>
-
-                  <input
-                    className="form-control"
-                    placeholder="Subject"
-                    value={form.subject} required
-                    onChange={(e) =>
-                      setForm({ ...form, subject: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save Contact
-                  </button>
-                </div>
-              </form>
-
-            </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -5,7 +5,7 @@ const EmployeeBills = () => {
   const [bookings, setBookings] = useState([]);
   const [bills, setBills] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [showBillModal, setShowBillModal] = useState(false);
+  const [modal, setModal] = useState({ show: false, type: "", bill: null });
   const [filterStatus, setFilterStatus] = useState("UNPAID"); // default
   const [searchBookingId, setSearchBookingId] = useState("");
 
@@ -17,7 +17,7 @@ const EmployeeBills = () => {
     bill_photo: null,
   });
 
-  /* ================= FETCH DATA ================= */
+  /* ================= FETCH CLOSED BOOKINGS ================= */
   useEffect(() => {
     fetchClosedBookings();
   }, []);
@@ -27,7 +27,7 @@ const EmployeeBills = () => {
       const res = await api.get("/bills/closed-bookings");
       setBookings(res.data);
     } catch (err) {
-      console.error("Error fetching bookings", err);
+      console.error("Error fetching bookings:", err);
     }
   };
 
@@ -40,101 +40,106 @@ const EmployeeBills = () => {
     }
   };
 
-  /* ================= HANDLERS ================= */
+  /* ================= HANDLE FORM CHANGE ================= */
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setForm((prev) => ({ ...prev, [name]: files ? files[0] : value }));
   };
 
-  const openBookingModal = (bookingId) => {
-    setSelectedBooking(bookingId);
-    fetchBillsByBooking(bookingId);
+  /* ================= OPEN / CLOSE MODAL ================= */
+  const openBookingModal = (booking_id) => {
+    setSelectedBooking(booking_id);
+    fetchBillsByBooking(booking_id);
+    setModal({ show: false, type: "", bill: null });
   };
 
   const closeBookingModal = () => {
     setSelectedBooking(null);
+    setModal({ show: false, type: "", bill: null });
   };
 
-  const openAddBillModal = () => {
-    setForm({
-      booking_id: selectedBooking,
-      bill_category: "",
-      bill_description: "",
-      bill_amount: "",
-      bill_photo: null,
-    });
-    setShowBillModal(true);
-  };
+  const openBillModal = () => {
+  setModal({ show: true, type: "add", bill: null });
 
-  const closeBillModal = () => {
-    setShowBillModal(false);
-  };
-
-  /* ================= ADD BILL ================= */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const fd = new FormData();
-    Object.entries(form).forEach(([key, value]) => {
-      if (value) fd.append(key, value);
-    });
-
-    try {
-       await api.post("/bills/create", fd, {
-    headers: { "Content-Type": "multipart/form-data" },
+  setForm({
+    booking_id: selectedBooking,
+    bill_category: "",
+    bill_description: "",
+    bill_amount: "",
+    bill_photo: null,
   });
-  alert("Bill added");
-      fetchBillsByBooking(selectedBooking);
-      closeBillModal();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add bill");
-    }
-  };
+};
 
- /* ================= FILTER BOOKINGS ================= */
-   const filteredBookings = bookings.filter((b) => {
- 
-   // 🔍 Search always overrides status
-   if (searchBookingId) {
-     return b.booking_id.toString().includes(searchBookingId);
-   }
- 
-   // ✅ Match exact DB value
-   return b.payment_status === filterStatus;
- });
- 
- useEffect(() => {
-   setCurrentPage(1);
- }, [filterStatus, searchBookingId]);
- 
- 
- 
-   // ========== Pagination ==========
- const [currentPage, setCurrentPage] = useState(1);
- const bookingsPerPage = 20;
- 
- const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
- 
- const indexOfLastBooking = currentPage * bookingsPerPage;
- const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
- 
- const currentBookings = filteredBookings.slice(
-   indexOfFirstBooking,
-   indexOfLastBooking
- );
- 
- 
- const paginate = (pageNumber) => setCurrentPage(pageNumber);
- 
- 
+  const closeBillModal = () => setModal({ show: false, type: "", bill: null });
+
+  /* ================= ADD / EDIT BILL ================= */
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const fd = new FormData();
+  fd.append("booking_id", form.booking_id);
+  fd.append("bill_category", form.bill_category);
+  fd.append("bill_description", form.bill_description);
+  fd.append("bill_amount", form.bill_amount);
+  if (form.bill_photo) fd.append("bill_photo", form.bill_photo);
+
+  try {
+    await api.post("/bills/create", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    alert("Bill added");
+    fetchBillsByBooking(selectedBooking);
+    closeBillModal();
+  } catch (err) {
+    console.error(err);
+    alert("Error adding bill");
+  }
+};
+
+  /* ================= FILTER BOOKINGS ================= */
+  const filteredBookings = bookings.filter((b) => {
+
+  // 🔍 Search always overrides status
+  if (searchBookingId) {
+    return b.booking_id.toString().includes(searchBookingId);
+  }
+
+  // ✅ Match exact DB value
+  return b.payment_status === filterStatus;
+});
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [filterStatus, searchBookingId]);
+
+
+
+  // ========== Pagination ==========
+const [currentPage, setCurrentPage] = useState(1);
+const bookingsPerPage = 20;
+
+const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+
+const indexOfLastBooking = currentPage * bookingsPerPage;
+const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+
+const currentBookings = filteredBookings.slice(
+  indexOfFirstBooking,
+  indexOfLastBooking
+);
+
+
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+
   return (
     <div className="eb-wrapper">
       {/* ===== FIXED HEADER ===== */}
       <header className="eb-header">
-        <h1>💼 Employee Bills Management</h1>
+        <h1> Bills Management</h1>
         <button
-          className="eb-back-btn"
+          className="btn btn-outline-light"
           onClick={() => (window.location.href = "/employee-dashboard")}
         >
           ⬅ Back to Dashboard
@@ -142,6 +147,7 @@ const EmployeeBills = () => {
       </header>
 
       {/* ===== FILTER BAR ===== */}
+      <div className="eb-content">
       <div className="eb-filter-bar">
         <div className="status-buttons">
           <button
@@ -169,7 +175,7 @@ const EmployeeBills = () => {
         </div>
       </div>
 
-       {/* ===== BOOKINGS ===== */}
+      {/* ===== BOOKING CARDS ===== */}
       <div className="booking-grid">
         {currentBookings.map((b) => (
           <div
@@ -178,7 +184,13 @@ const EmployeeBills = () => {
             onClick={() => openBookingModal(b.booking_id)}
           >
             <h3>Booking #{b.booking_id}</h3>
-            <p>View Bills</p>
+            <span
+              className={`badge ${
+                b.payment_status === "PAID" ? "paid" : "unpaid"
+              }`}
+            >
+              {b.payment_status}
+            </span>
           </div>
         ))}
       </div>
@@ -188,12 +200,13 @@ const EmployeeBills = () => {
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
-            className={`page-btn ${currentPage === i + 1 ? "active" : ""}`}
+            className={currentPage === i + 1 ? "active" : ""}
             onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
           </button>
         ))}
+      </div>
       </div>
 
       {/* ===== BOOKING BILLS MODAL ===== */}
@@ -205,7 +218,7 @@ const EmployeeBills = () => {
           >
             <h3>Bills for Booking #{selectedBooking}</h3>
 
-            <button className="eb-add-btn" onClick={openAddBillModal}>
+            <button className="eb-add-btn" onClick={openBillModal}>
               + Add Bill
             </button>
 
@@ -251,16 +264,12 @@ const EmployeeBills = () => {
         </div>
       )}
 
-      {/* ===== ADD BILL MODAL ===== */}
-      {showBillModal && (
+      {/* ===== ADD / EDIT BILL MODAL ===== */}
+      {modal.show && (
         <div className="eb-modal-backdrop" onClick={closeBillModal}>
           <div className="eb-modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Add Bill</h3>
-
             <form onSubmit={handleSubmit}>
-              <label className="eb-label">
-          Category <span className="eb-required">*</span>
-        </label>
               <select
                 name="bill_category"
                 value={form.bill_category}
@@ -277,10 +286,6 @@ const EmployeeBills = () => {
                 )}
               </select>
 
-              <label className="eb-label">
-          Description <span className="eb-required">*</span>
-        </label>
-
               <input
                 name="bill_description"
                 placeholder="Description"
@@ -288,10 +293,6 @@ const EmployeeBills = () => {
                 onChange={handleChange}
                 required
               />
-               <label className="eb-label">
-          Amount <span className="eb-required">*</span>
-        </label>
-
               <input
                 type="number"
                 name="bill_amount"
@@ -300,10 +301,6 @@ const EmployeeBills = () => {
                 onChange={handleChange}
                 required
               />
-
-              <label className="eb-label">
-          Bill Photo
-        </label>
 
               <input type="file" name="bill_photo" onChange={handleChange} />
 

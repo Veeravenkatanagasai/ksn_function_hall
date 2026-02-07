@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchVendors, addVendor } from "../../../services/vendor";
+import {
+  fetchVendors,
+  addVendor,
+} from "../../../services/vendor";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Vendors = () => {
   const [vendors, setVendors] = useState([]);
-  const [showFormModal, setShowFormModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
   const [form, setForm] = useState({
     vendor_name: "",
     vendor_category: "",
     vendor_address: "",
     phone: "",
-    email: ""
+    email: "",
   });
 
-  /* ================= LOAD ================= */
+  const [showFormModal, setShowFormModal] = useState(false);
+
+  useEffect(() => {
+    loadVendors();
+  }, []);
+
   const loadVendors = async () => {
     try {
       const res = await fetchVendors();
@@ -26,201 +35,202 @@ const Vendors = () => {
     }
   };
 
-  useEffect(() => {
-    loadVendors();
-  }, []);
-
-  /* ================= FORM ================= */
   const resetForm = () => {
     setForm({
       vendor_name: "",
       vendor_category: "",
       vendor_address: "",
       phone: "",
-      email: ""
+      email: "",
     });
   };
 
   const validateForm = () => {
-    if (!form.vendor_name.trim()) return toast.error("Vendor name is required");
-    if (!form.vendor_category.trim()) return toast.error("Vendor category is required");
-    if (!/^\d{10}$/.test(form.phone)) return toast.error("Phone must be 10 digits");
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) return toast.error("Invalid email");
-    return true;
-  };
+  if (!form.vendor_name.trim()) {
+    toast.error("Vendor name required");
+    return false;
+  }
+
+  if (!form.vendor_category.trim()) {
+    toast.error("Vendor category required");
+    return false;
+  }
+
+  if (!/^\d{10}$/.test(form.phone)) {
+    toast.error("Phone must be exactly 10 digits");
+    return false;
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+    toast.error("Invalid email");
+    return false;
+  }
+
+  return true;
+};
+
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    try {
-      await addVendor(form);
-      toast.success("Vendor added successfully");
-      setShowFormModal(false);
-      resetForm();
-      loadVendors();
-    } catch {
-      toast.error("Something went wrong");
-    }
-  };
+  try {
+    await addVendor(form);
+    toast.success("Vendor added");
+    setShowFormModal(false);
+    resetForm();
+    loadVendors();
+  } catch {
+    toast.error("Something went wrong");
+  }
+};
+
+
+  /* ================= FILTER LOGIC ================= */
+  const filteredVendors = vendors.filter((v) => {
+    const matchSearch =
+      v.vendor_name.toLowerCase().includes(search.toLowerCase()) ||
+      v.phone.includes(search) ||
+      v.email.toLowerCase().includes(search.toLowerCase());
+
+    const matchCategory = categoryFilter
+      ? v.vendor_category === categoryFilter
+      : true;
+
+    return matchSearch && matchCategory;
+  });
+
+  const categories = [...new Set(vendors.map(v => v.vendor_category))];
 
   return (
-    <div className="container mt-4 position-relative">
-
-      {/* 🔙 Back to Dashboard */}
-      <Link
-        to="/employee-dashboard"
-        className="btn btn-outline-dark position-absolute top-0 end-0"
-      >
-        ← Back to Dashboard
-      </Link>
-
+    <section className="vendors-page">
       <ToastContainer position="top-right" autoClose={2500} />
 
-      <h3 className="mb-4">Vendors Management</h3>
+      {/* HEADER */}
+      <header className="vendors-header">
+        <h2>Vendors Management</h2>
+        <Link to="/employee-dashboard" className="btn btn-outline-light">
+          ← Back to Dashboard
+        </Link>
+      </header>
 
-      {/* ADD BUTTON */}
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          resetForm();
-          setShowFormModal(true);
-        }}
-      >
-        + Add Vendor
-      </button>
+      {/* CONTENT */}
+      <main className="vendors-content">
 
-      {/* ================= TABLE ================= */}
-      <div className="table-responsive shadow-sm">
-        <table className="table table-bordered table-hover">
-          <thead className="bg-black text-white text-center">
-            <tr>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Address</th>
-              <th>Phone</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vendors.length === 0 ? (
+        {/* SEARCH + FILTER BAR */}
+        <div className="vendors-toolbar">
+          <input
+            type="text"
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              resetForm();
+              setShowFormModal(true);
+            }}
+          >
+            + Add Vendor
+          </button>
+        </div>
+
+        {/* TABLE */}
+        <div className="vendors-table-wrapper">
+          <table className="vendors-table">
+            <thead>
               <tr>
-                <td colSpan="5" className="text-center text-muted">
-                  No vendors found
-                </td>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
               </tr>
-            ) : (
-              vendors.map((v) => (
-                <tr key={v.vendor_id}>
-                  <td>{v.vendor_name}</td>
-                  <td>{v.vendor_category}</td>
-                  <td>{v.vendor_address}</td>
-                  <td>{v.phone}</td>
-                  <td>{v.email}</td>
+            </thead>
+            <tbody>
+              {filteredVendors.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="empty">
+                    No vendors found
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filteredVendors.map((v) => (
+                  <tr key={v.vendor_id}>
+                    <td>{v.vendor_name}</td>
+                    <td>
+                      <span className="category-chip">
+                        {v.vendor_category}
+                      </span>
+                    </td>
+                    <td>{v.vendor_address}</td>
+                    <td>{v.phone}</td>
+                    <td>{v.email}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
 
-      {/* ================= ADD MODAL ================= */}
+      {/* ADD / EDIT MODAL */}
       {showFormModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+        <div className="vendors-modal">
+          <div className="vendors-modal-card">
+            <h4>Add Vendor</h4>
 
-              <div className="modal-header">
-                <h5>Add Vendor</h5>
+            <form onSubmit={handleSubmit}>
+              {[
+                ["Vendor Name", "vendor_name"],
+                ["Category", "vendor_category"],
+                ["Address", "vendor_address"],
+                ["Phone", "phone"],
+                ["Email", "email"],
+              ].map(([label, key]) => (
+                <div className="field" key={key}>
+                  <label>{label}</label>
+                  <input
+                    value={form[key]}
+                    onChange={(e) =>
+                      setForm({ ...form, [key]: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              ))}
+
+              <div className="modal-actions">
                 <button
-                  className="btn-close"
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={() => setShowFormModal(false)}
-                />
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                    Save
+                  </button>
+
               </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <label className="form-label">
-                    Vendor Name <span className="required">*</span>
-                  </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Vendor Name"
-                    value={form.vendor_name} required
-                    onChange={(e) =>
-                      setForm({ ...form, vendor_name: e.target.value })
-                    }
-                  />
-                  <label className="form-label">
-                    Category <span className="required">*</span>
-                  </label>
-
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Category"
-                    value={form.vendor_category} required
-                    onChange={(e) =>
-                      setForm({ ...form, vendor_category: e.target.value })
-                    }
-                  />
-                  <label className="form-label">
-                    Address <span className="required">*</span>
-                  </label>
-
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Address"
-                    value={form.vendor_address} required
-                    onChange={(e) =>
-                      setForm({ ...form, vendor_address: e.target.value })
-                    }
-                  />
-                    <label className="form-label">
-                  Phone <span className="required">*</span>
-                </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Phone"
-                    value={form.phone}
-                    required
-                    onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
-                    }
-                  />
-                <label className="form-label">
-                    Email <span className="required">*</span>
-                  </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Email"
-                    value={form.email}
-                    required
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowFormModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save Vendor
-                  </button>
-                </div>
-              </form>
-
-            </div>
+            </form>
           </div>
         </div>
       )}
 
-    </div>
+    </section>
   );
 };
 

@@ -1,64 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchServices, addService } from "../../../services/services";
+import {
+  fetchServices,
+  addService,
+} from "../../../services/services";
 import { fetchVendors } from "../../../services/vendor";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [vendors, setVendors] = useState([]);
-  const [showFormModal, setShowFormModal] = useState(false);
 
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     service_name: "",
     service_description: "",
-    vendor_id: ""
+    vendor_id: "",
   });
 
-  /* ================= LOAD DATA ================= */
+  const [showFormModal, setShowFormModal] = useState(false);
+
   useEffect(() => {
     loadServices();
     loadVendors();
   }, []);
 
   const loadServices = async () => {
-    try {
-      const res = await fetchServices();
-      setServices(res.data);
-    } catch {
-      toast.error("Failed to load services");
-    }
+    const res = await fetchServices();
+    setServices(res.data);
   };
 
   const loadVendors = async () => {
-    try {
-      const res = await fetchVendors();
-      setVendors(res.data);
-    } catch {
-      toast.error("Failed to load vendors");
-    }
+    const res = await fetchVendors();
+    setVendors(res.data);
   };
 
-  /* ================= FORM ================= */
   const resetForm = () => {
     setForm({
       service_name: "",
       service_description: "",
-      vendor_id: ""
+      vendor_id: "",
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.service_name || !form.vendor_id) {
-      return toast.error("Service name and vendor are required");
+      return toast.error("Service name & vendor required");
     }
 
     try {
       await addService(form);
-      toast.success("Service added successfully");
+      toast.success("Service added");
       setShowFormModal(false);
       resetForm();
       loadServices();
@@ -67,147 +61,144 @@ const Services = () => {
     }
   };
 
+  const filteredServices = services.filter((s) => {
+    const matchesSearch =
+      s.service_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.vendor_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.phone.includes(search);
+
+    
+
+    return matchesSearch;
+  });
+
   return (
-    <div className="container mt-4 position-relative">
+    <section className="services-page">
       <ToastContainer position="top-right" autoClose={2500} />
 
-      {/* 🔙 Back to Dashboard */}
-      <Link
-        to="/employee-dashboard"
-        className="btn btn-outline-dark position-absolute top-0 end-0"
-      >
-        ← Back to Dashboard
-      </Link>
+      {/* ================= HEADER ================= */}
+      <header className="services-header">
+        <h2>Services Management</h2>
+        <Link to="/employee-dashboard" className="btn btn-outline-light">
+          ← Back to Dashboard
+        </Link>
+      </header>
 
-      <h3 className="mb-4">Services Management</h3>
+      {/* ================= CONTENT ================= */}
+      <main className="services-content">
+        {/* Search & Filter */}
+        <div className="services-filters">
+          <input
+            type="text"
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-      {/* ADD BUTTON */}
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          resetForm();
-          setShowFormModal(true);
-        }}
-      >
-        + Add Service
-      </button>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              resetForm();
+              setShowFormModal(true);
+            }}
+          >
+            + Add Service
+          </button>
+        </div>
 
-      {/* ================= TABLE ================= */}
-      <div className="table-responsive shadow-sm">
-        <table className="table table-bordered table-hover">
-          <thead className="bg-black text-white text-center">
-            <tr>
-              <th>Service</th>
-              <th>Description</th>
-              <th>Vendor</th>
-              <th>Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.length === 0 ? (
+        {/* ================= TABLE ================= */}
+        <div className="services-table-wrapper">
+          <table className="services-table">
+            <thead>
               <tr>
-                <td colSpan="4" className="text-center text-muted">
-                  No services found
-                </td>
-              </tr>
-            ) : (
-              services.map((s) => (
-                <tr key={s.service_id}>
-                  <td>{s.service_name}</td>
-                  <td>{s.service_description}</td>
-                  <td>
-                    {s.vendor_name}{" "}
-                    <span className="text-muted">
-                      ({s.vendor_category})
-                    </span>
-                  </td>
-                  <td>{s.phone}</td>
+                <th>Service</th>
+                <th>Description</th>
+                <th>Vendor</th>
+                <th>Phone</th>              
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredServices.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="empty">
+                    No services found
+                  </td>
+                </tr>
+              ) : (
+                filteredServices.map((s) => (
+                  <tr key={s.service_id}>
+                    <td>{s.service_name}</td>
+                    <td>{s.service_description}</td>
+                    <td>
+                      <span className="category-chip">
+                        {s.vendor_name}
+                        </span></td>
+                    <td>{s.phone}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
 
-      {/* ================= ADD MODAL ================= */}
+      {/* ================= ADD / EDIT MODAL ================= */}
       {showFormModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+        <div className="services-modal">
+          <div className="services-modal-card">
+            <h4>Add Service</h4>
+            <form onSubmit={handleSubmit}>
+              <label>Service Name</label>
+              <input
+                placeholder="Service Name"
+                value={form.service_name}
+                onChange={(e) =>
+                  setForm({ ...form, service_name: e.target.value })
+                }
+                required
+              />
+              <label>Description</label>
+              <textarea
+                placeholder="Description"
+                value={form.service_description}
+                onChange={(e) =>
+                  setForm({ ...form, service_description: e.target.value })
+                }
+                required
+              />
+              <label>Vendor Link</label>
+              <select
+                value={form.vendor_id}
+                onChange={(e) =>
+                  setForm({ ...form, vendor_id: e.target.value })
+                }
+                required
+              >
+                <option value="">Select Vendor</option>
+                {vendors.map((v) => (
+                  <option key={v.vendor_id} value={v.vendor_id}>
+                    {v.vendor_name} | {v.phone}
+                  </option>
+                ))}
+              </select>
 
-              <div className="modal-header">
-                <h5>Add Service</h5>
+              <div className="modal-actions">
                 <button
-                  className="btn-close"
+                  type="button"
+                  className="btn-secondary"
                   onClick={() => setShowFormModal(false)}
-                />
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                    Save
+                </button>
               </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <label className="form-label">
-                    Service Name <span className="required">*</span>
-                  </label>
-                  <input
-                    className="form-control mb-2"
-                    placeholder="Service Name"
-                    value={form.service_name} required
-                    onChange={(e) =>
-                      setForm({ ...form, service_name: e.target.value })
-                    }
-                  />
-                    <label className="form-label">
-                      Service Description
-                    </label>
-                  <textarea
-                    className="form-control mb-2"
-                    placeholder="Service Description"
-                    value={form.service_description} required
-                    onChange={(e) =>
-                      setForm({ ...form, service_description: e.target.value })
-                    }
-                  />
-
-                  <label className="form-label">
-                    Vendors<span className="required">*</span>
-                  </label>
-
-                  <select
-                    className="form-select"
-                    value={form.vendor_id} required
-                    onChange={(e) =>
-                      setForm({ ...form, vendor_id: e.target.value })
-                    }
-                  >
-                    <option value="">-- Select Vendor --</option>
-                    {vendors.map((v) => (
-                      <option key={v.vendor_id} value={v.vendor_id}>
-                        {v.vendor_name} | {v.vendor_category} | {v.phone}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowFormModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save Service
-                  </button>
-                </div>
-              </form>
-
-            </div>
+            </form>
           </div>
         </div>
       )}
-
-    </div>
+    </section>
   );
 };
 

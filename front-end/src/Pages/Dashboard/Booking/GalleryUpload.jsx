@@ -64,7 +64,7 @@ const GalleryUpload = () => {
       {/* FIXED HEADER */}
       <div className="gallery-header-fixed">
         <h4 className="page-title">
-          <FaImages className="header-icon" /> Function Gallery
+          <p className="header-icon" /> Function Gallery
         </h4>
         <button className="btn btn-outline-light" onClick={() => window.history.back()}>
           <FaArrowLeft /> Back To Dashboard

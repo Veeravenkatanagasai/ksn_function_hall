@@ -78,6 +78,16 @@ alert("✅ Payment Successful!\n\nYou can now download the receipt.");
   }
 }, [paymentType, balance]);
 
+const isPayEnabled =
+  !isPaid &&
+  booking.booking_status !== "CANCELLED" &&
+  paymentType &&
+  paymentMethod &&
+  paidAmount > 0 &&
+  paidAmount <= balance &&
+  (paymentType !== "ADVANCE" || balanceDays > 0);
+
+
 
   return (
     <div className="payment-container">
@@ -174,7 +184,7 @@ alert("✅ Payment Successful!\n\nYou can now download the receipt.");
         <button
           className="btn btn-success pay-btn"
           onClick={handlePayment}
-          disabled={isPaid}
+          disabled={!isPayEnabled}
         >
           💰 Pay Now
         </button>

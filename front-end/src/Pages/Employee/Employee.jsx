@@ -10,6 +10,7 @@ import {
   updateEmployee,
   deleteEmployee
 } from "../../services/employee";
+import "./Employee.css";
 
 const Employees = () => {
   /* ================= STATES ================= */
@@ -18,6 +19,8 @@ const Employees = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -48,10 +51,18 @@ const Employees = () => {
   };
 
   const openEditModal = (emp) => {
-    setSelectedEmployee(emp);
-    setEditForm({ ...emp, password: "" });
-    setShowEdit(true);
-  };
+  setSelectedEmployee(emp);
+  setEditForm({
+    emp_name: emp.emp_name,
+    emp_email: emp.emp_email,
+    emp_phone: emp.emp_phone,
+    emp_role: emp.emp_role,
+    username: emp.username,
+    password: "",
+  });
+  setShowEdit(true);
+};
+
 
   const handleUpdate = async () => {
     try {
@@ -71,6 +82,19 @@ const Employees = () => {
     } catch { toast.error("Delete failed"); }
   };
 
+  const filteredEmployees = employees.filter(emp => {
+  const matchesSearch =
+    emp.emp_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.emp_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.username.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesRole =
+    roleFilter === "all" || emp.emp_role === roleFilter;
+
+  return matchesSearch && matchesRole;
+});
+
+
   /* ================= STYLES ================= */
   const cardStyle = {
     borderRadius: "15px",
@@ -80,37 +104,74 @@ const Employees = () => {
     cursor: "pointer"
   };
 
-  const fixedBackBtn = {
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    zIndex: 1000,
-    borderRadius: '50px',
-    padding: '10px 20px',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
-  };
+  const formatIST = (timestamp, emptyText = "First Login") => {
+  if (!timestamp) return emptyText;
+
+  return new Date(timestamp + "Z").toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+  });
+};
 
   return (
-    <div className="container-fluid p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      <ToastContainer position="top-right" autoClose={2000} />
+    <div className="employees-page">
+  <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* FIXED BACK BUTTON */}
-      <Button variant="dark" style={fixedBackBtn} onClick={() => window.history.back()}>
-        <FaArrowLeft className="me-2" /> Back
-      </Button>
+  {/* FIXED HEADER */}
+  <div className="employees-header">
+    <h2 className="employees-title">Employee Management</h2>
 
-      <div className="mb-4">
-        <h2 className="fw-bold text-primary">Employee Management</h2>
-        <Button variant="primary" className="rounded-pill shadow" onClick={() => setShowAdd(true)}>
-          <FaUserPlus className="me-2" /> Add New Employee
-        </Button>
-      </div>
+    <button className="btn btn-outline-light" onClick={() => window.history.back()}>
+     <FaArrowLeft /> Back To Dashboard
+    </button>
+  </div>
 
+  {/* PAGE CONTENT */}
+  <div className="employees-content">
+    <Button
+      variant="primary"
+      className="rounded-pill shadow mb-4"
+      onClick={() => setShowAdd(true)}
+    >
+      <FaUserPlus className="me-2" /> Add New Employee
+    </Button>
+
+    <Row className="align-items-center mb-4 g-3">
+  <Col lg={2} md={2}>
+    <Form.Control
+      type="text"
+      placeholder="🔍 Search by name, email or username..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="rounded-pill"
+    />
+  </Col>
+
+  <Col lg={2} md={2}>
+    <Form.Select
+      value={roleFilter}
+      onChange={(e) => setRoleFilter(e.target.value)}
+      className="rounded-pill"
+    >
+      <option value="all">All Roles</option>
+      {[...new Set(employees.map(emp => emp.emp_role))].map(role => (
+        <option key={role} value={role}>
+          {role}
+        </option>
+      ))}
+    </Form.Select>
+  </Col>
+
+  <Col lg={1} md={1} className="text-end">
+    <Badge bg="secondary" pill className="px-4 py-3">
+      {filteredEmployees.length} Results
+    </Badge>
+  </Col>
+</Row>
       <hr />
 
       {/* GRID VIEW */}
       <Row>
-        {employees.map(emp => (
+        {filteredEmployees.map(emp => (
           <Col key={emp.emp_id} xs={12} md={6} lg={4} xl={3} className="mb-4">
             <Card 
               style={cardStyle} 
@@ -162,8 +223,15 @@ const Employees = () => {
                 <ListGroup.Item><strong>Phone:</strong> {selectedEmployee.emp_phone}</ListGroup.Item>
                 <ListGroup.Item><strong>Username:</strong> {selectedEmployee.username}</ListGroup.Item>
                 <ListGroup.Item><strong>Login Count:</strong> <Badge bg="success">{selectedEmployee.login_count}</Badge></ListGroup.Item>
-                <ListGroup.Item><strong>Last Login:</strong> {selectedEmployee.last_login ? new Date(selectedEmployee.last_login).toLocaleString() : "Never"}</ListGroup.Item>
-                <ListGroup.Item><strong>Last Logout:</strong> {selectedEmployee.last_logout ? new Date(selectedEmployee.last_logout).toLocaleString() : "N/A"}</ListGroup.Item>
+                <ListGroup.Item>
+                      <strong>Last Login:</strong>{" "}
+                      {formatIST(selectedEmployee.last_login, "First Login")}
+                    </ListGroup.Item>
+                    
+                    <ListGroup.Item>
+                      <strong>Last Logout:</strong>{" "}
+                      {formatIST(selectedEmployee.last_logout, "Currently Logged In")}
+                </ListGroup.Item>
               </ListGroup>
             </div>
           )}
@@ -229,6 +297,7 @@ const Employees = () => {
           </div>
         </Modal.Body>
       </Modal>
+    </div>
     </div>
   );
 };

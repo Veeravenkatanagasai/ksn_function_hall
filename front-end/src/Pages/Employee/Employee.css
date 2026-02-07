@@ -1,0 +1,77 @@
+/* ================= PAGE WRAPPER ================= */
+.employees-page {
+  background-color: #f6f8fb;
+  min-height: 100vh;
+}
+
+/* ================= FIXED HEADER ================= */
+.employees-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, #8b0000, #b91c1c);
+  color: #fff;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+
+/* ================= CONTENT ================= */
+.employees-content {
+  padding: 120px 35px 35px; /* space for fixed header */
+}
+
+/* ================= SEARCH & FILTER ================= */
+.employees-page .form-control,
+.employees-page .form-select {
+  border: 1px solid #0c6dce;
+  transition: all 0.2s ease;
+}
+
+.employees-page .form-control:focus,
+.employees-page .form-select:focus {
+  border-color: #00050c;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+
+/* ================= EMPLOYEE CARD ================= */
+.employee-card {
+  background: hsl(0, 48%, 77%);
+  border-radius: 15px;
+}
+
+.employee-card:hover {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+/* ================= BADGES ================= */
+.employee-card .badge {
+  font-size: 0.85rem;
+}
+
+/* ================= MODALS ================= */
+.employees-page .modal-header {
+  border-bottom: none;
+}
+
+.employees-page .modal-footer {
+  border-top: none;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .employees-header {
+    flex-direction: column;
+    height: auto;
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .employees-content {
+    padding-top: 130px;
+  }
+}

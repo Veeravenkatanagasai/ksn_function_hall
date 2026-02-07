@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { Link } from "react-router-dom";
 import "./PaymentAnalytics.css";
 
 /* ================= COLORS ================= */
@@ -192,24 +193,28 @@ const PaymentAnalytics = () => {
   /* ================= UI ================= */
 
   return (
-    <div className="finance-dashboard">
-      <div className="dashboard-header">
-        <h2>Payment Analytics Dashboard</h2>
-        <button className="back-button" onClick={() => window.history.back()}>
-          Back
-        </button>
-      </div>
+    <div className="payment-analytics-page">
+    {/* Fixed Header */}
+    <div className="payment-header">
+      <h2 className="payment-title">Payment Analytics Dashboard</h2>
 
-      <p className="subtitle">
+      <Link to="/dashboard" className="btn btn-outline-light">
+        ← Back to Dashboard
+      </Link>
+    </div>
+
+    {/* Page Content */}
+    <div className="payment-content">
+      <p className="payment-subtitle">
         Inflows, Outflows, and Net Revenue visualization
       </p>
 
       {/* Filters */}
-      <div className="filters">
+      <div className="payment-filters">
         <input type="date" value={from} onChange={e => setFrom(e.target.value)} />
         <input type="date" value={to} onChange={e => setTo(e.target.value)} />
 
-        <div className="booking-filter">
+        <div className="payment-booking-filter">
           <select value={bookingId} onChange={e => setBookingId(e.target.value)}>
             <option value="">All Bookings</option>
             {closedBookings.map(id => (
@@ -221,7 +226,7 @@ const PaymentAnalytics = () => {
 
           {bookingStatus && (
             <span
-              className={`status-badge ${
+              className={`payment-status-badge ${
                 bookingStatus === "CLOSED" ? "closed" : "cancelled"
               }`}
             >
@@ -262,6 +267,7 @@ const PaymentAnalytics = () => {
         💰 Total Net Revenue: ₹
         {(analytics.totalRevenue ?? 0).toLocaleString("en-IN")}
       </h2>
+    </div>
     </div>
   );
 };

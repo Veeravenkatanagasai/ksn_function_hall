@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { fetchStaff, addStaff } from "../../../services/staff";
+import {
+  fetchStaff,
+  addStaff,
+} from "../../../services/staff";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
 const Staff = () => {
   const [staff, setStaff] = useState([]);
+  const [search, setSearch] = useState("");
+
   const [form, setForm] = useState({
     name: "",
     role: "",
@@ -15,14 +20,15 @@ const Staff = () => {
     join_date: "",
     status: "Active"
   });
+
   const [showFormModal, setShowFormModal] = useState(false);
 
   const navigate = useNavigate();
 
-  /* ================= LOAD STAFF ================= */
+  /* ================= LOAD ================= */
   const loadStaff = async () => {
     const res = await fetchStaff();
-    setStaff(res.data);
+    setStaff(res.data || []);
   };
 
   useEffect(() => {
@@ -44,195 +50,252 @@ const Staff = () => {
 
   /* ================= VALIDATION ================= */
   const validateForm = () => {
-    if (!form.name.trim()) return toast.error("Name is required");
-    if (form.name.trim().length < 3) return toast.error("Name must be at least 3 characters");
-    if (!form.role.trim()) return toast.error("Role is required");
-    if (!form.email.trim()) return toast.error("Email is required");
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) return toast.error("Invalid email format");
-    if (!form.phone.trim()) return toast.error("Phone number is required");
-    if (form.phone.length !== 10) return toast.error("Phone number must be exactly 10 digits");
-    if (!/^[6-9]\d{9}$/.test(form.phone)) return toast.error("Enter a valid Indian mobile number");
-    if (!form.salary) return toast.error("Salary is required");
-    if (isNaN(form.salary) || Number(form.salary) <= 0) return toast.error("Salary must be a positive number");
-    if (!form.join_date) return toast.error("Join date is required");
-    return true;
-  };
+  // Name
+  if (!form.name.trim()) {
+    toast.error("Name is required");
+    return false;
+  }
+  if (!/^[a-zA-Z\s]+$/.test(form.name)) {
+    toast.error("Name should contain only letters");
+    return false;
+  }
+  if (form.name.trim().length < 3) {
+    toast.error("Name must be at least 3 characters");
+    return false;
+  }
+
+  // Role
+  if (!form.role.trim()) {
+    toast.error("Role is required");
+    return false;
+  }
+
+  // Email
+  if (!form.email.trim()) {
+    toast.error("Email is required");
+    return false;
+  }
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+    toast.error("Invalid email format");
+    return false;
+  }
+
+  // Phone
+  if (!form.phone.trim()) {
+    toast.error("Phone number is required");
+    return false;
+  }
+  if (!/^[6-9]\d{9}$/.test(form.phone)) {
+    toast.error("Enter valid 10-digit Indian mobile number");
+    return false;
+  }
+
+  // Salary
+  if (!form.salary) {
+    toast.error("Salary is required");
+    return false;
+  }
+  if (isNaN(form.salary) || Number(form.salary) <= 0) {
+    toast.error("Salary must be a positive number");
+    return false;
+  }
+
+  // Join Date
+  if (!form.join_date) {
+    toast.error("Join date is required");
+    return false;
+  }
+
+  // Status
+  if (!form.status) {
+    toast.error("Status is required");
+    return false;
+  }
+
+  return true; // ✅ ONLY when everything is valid
+};
+
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
 
-    try {
+  if (!validateForm()) return; // 🚫 stops submit correctly
+
+  try {
       await addStaff(form);
       toast.success("Staff added successfully");
-      resetForm();
-      setShowFormModal(false);
-      loadStaff();
-    } catch {
-      toast.error("Something went wrong");
-    }
-  };
+
+    resetForm();
+    setShowFormModal(false);
+    loadStaff();
+  } catch (error) {
+    toast.error("Something went wrong");
+  }
+};
+
+  /* ================= SEARCH ================= */
+  const filteredStaff = staff.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.email.toLowerCase().includes(search.toLowerCase()) ||
+      s.phone.includes(search)
+  );
 
   return (
-    <div className="container mt-4 position-relative">
+    <div className="staff-page">
+      {/* HEADER */}
+      <div className="staff-header">
+        <h3>Staff Management</h3>
+        <button className="btn btn-outline-light" onClick={() => navigate("/employee-dashboard")}>
+          ← Back to Dashboard
+        </button>
+      </div>
 
-      {/* 🔙 BACK TO DASHBOARD */}
-      <button
-        className="btn btn-outline-dark position-fixed top-0 end-0 m-4"
-        onClick={() => navigate("/employee-dashboard")}
-      >
-        ← Back to Dashboard
-      </button>
+      {/* CONTENT */}
+      <div className="staff-content">
+        {/* TOOLBAR */}
+        <div className="staff-toolbar">
+          <input
+            placeholder="🔍 Search by name, phone or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            className="btn-primary"
+            onClick={() => {
+              resetForm();
+              setShowFormModal(true);
+            }}
+          >
+            + Add Staff
+          </button>
+        </div>
 
-      <h3 className="fw-bold mb-4">Staff Management</h3>
-
-      <button
-        className="btn btn-primary mb-3"
-        onClick={() => {
-          resetForm();
-          setShowFormModal(true);
-        }}
-      >
-        + Add Staff
-      </button>
-
-      {/* ================= TABLE ================= */}
-      <table className="table table-bordered table-hover">
-        <thead className="bg-black text-white text-center">
-          <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Salary</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staff.length === 0 ? (
-            <tr>
-              <td colSpan="6" className="text-center text-muted">
-                No staff found
-              </td>
-            </tr>
-          ) : (
-            staff.map((s) => (
-              <tr key={s.id}>
-                <td>{s.name}</td>
-                <td>{s.role}</td>
-                <td>{s.email}</td>
-                <td>{s.phone}</td>
-                <td>₹ {s.salary}</td>
-                <td>
-                  <span className={`badge ${s.status === "Active" ? "bg-success" : "bg-secondary"}`}>
-                    {s.status}
-                  </span>
-                </td>
+        {/* TABLE */}
+        <div className="staff-table-wrapper">
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Salary</th>
+                <th>Status</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {filteredStaff.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="empty">
+                    No staff found
+                  </td>
+                </tr>
+              ) : (
+                filteredStaff.map((s) => (
+                  <tr key={s.id}>
+                    <td>{s.name}</td>
+                    <td>{s.role}</td>
+                    <td>{s.email}</td>
+                    <td>{s.phone}</td>
+                    <td>₹ {s.salary}</td>
+                    <td>
+                      <span
+                        className={`status ${
+                          s.status === "Active" ? "active" : "inactive"
+                        }`}
+                      >
+                        {s.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {/* ================= ADD MODAL ================= */}
+      {/* ADD / EDIT MODAL */}
       {showFormModal && (
-        <div className="modal fade show d-block bg-dark bg-opacity-50">
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content">
+        <div className="staff-modal">
+          <div className="staff-modal-card">
+              <h4>Add Staff</h4>
+            <form onSubmit={handleSubmit}>
+              <div className="grid">
+                <input
+                      placeholder="Name *"
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    />
 
-              <div className="modal-header">
-                <h5>Add Staff</h5>
-                <button className="btn-close" onClick={() => setShowFormModal(false)} />
+                    <input
+                      placeholder="Role *"
+                      required
+                      value={form.role}
+                      onChange={(e) => setForm({ ...form, role: e.target.value })}
+                    />
+
+                    <input
+                      placeholder="Email *"
+                      required
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+
+                    <input
+                      placeholder="Phone *"
+                      required
+                      maxLength="10"
+                      value={form.phone}
+                      onChange={(e) =>
+                        setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
+                      }
+                    />
+
+                    <input
+                      type="date"
+                      required
+                      value={form.join_date}
+                      onChange={(e) => setForm({ ...form, join_date: e.target.value })}
+                    />
+
+                    <input
+                      placeholder="Salary *"
+                      required
+                      value={form.salary}
+                      onChange={(e) => setForm({ ...form, salary: e.target.value })}
+                    />
+
+                    <select
+                      required
+                      value={form.status}
+                      onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
               </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body row g-3">
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Name <span className="required">*</span>
-                    </label>
-                    <input className="form-control" placeholder="Name *"
-                      value={form.name} required
-                      onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Role <span className="required">*</span>
-                    </label>
-                    <input className="form-control" placeholder="Role *"
-                      value={form.role} required
-                      onChange={(e) => setForm({ ...form, role: e.target.value })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Email <span className="required">*</span>
-                    </label>
-                    <input className="form-control" placeholder="Email *"
-                      value={form.email} required
-                      onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Phone <span className="required">*</span>
-                    </label>
-                    <input className="form-control" placeholder="Phone *"
-                      maxLength="10"
-                      value={form.phone} required
-                      onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Join Date <span className="required">*</span>
-                    </label>
-                    <input type="date" className="form-control"
-                      value={form.join_date} required
-                      onChange={(e) => setForm({ ...form, join_date: e.target.value })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Salary <span className="required">*</span>
-                    </label>
-                    <input className="form-control" placeholder="Salary *"
-                      value={form.salary} required
-                      onChange={(e) => setForm({ ...form, salary: e.target.value })} />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Status
-                    </label>
-                    <select className="form-select"
-                      value={form.status} required
-                      onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-
-                </div>
-
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary"
-                    onClick={() => setShowFormModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save
-                  </button>
-                </div>
-              </form>
-
-            </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowFormModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
 
       <ToastContainer position="top-right" autoClose={2500} />
     </div>

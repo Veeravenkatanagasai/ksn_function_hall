@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../../services/api";
 import { Modal, Button, Form } from "react-bootstrap";
 import "./ReferralCommission.css";
+import { Link } from "react-router-dom";
 
 
 const ReferralPayments = () => {
@@ -84,72 +85,74 @@ const paidCount = data.filter(
 ).length;
 
   return (
-    <div className="referral-payments-container">
-      <div className="top-right-btn">
-        <Button variant="secondary" onClick={() => window.location.href="/dashboard"}>
-          &larr; Back to Dashboard
+   <div className="referral-payments-container">
+  {/* Fixed Header */}
+  <div className="referral-header">
+    <h3 className="referral-title">Referral Payments</h3>
+
+    <Link to="/dashboard" className="btn btn-outline-light">
+      ← Back to Dashboard
+    </Link>
+  </div>
+
+  {/* Page Content */}
+  <div className="referral-content">
+
+    {/* Filters */}
+    <div className="referral-filters">
+      <div className="mb-3">
+        <Button
+          className="me-2 px-4"
+          variant={filterStatus === "PENDING" ? "primary" : "outline-primary"}
+          onClick={() => setFilterStatus("PENDING")}
+        >
+          Pending
+          <span className="badge bg-light text-primary ms-2">
+            {pendingCount}
+          </span>
+        </Button>
+
+        <Button
+          className="px-4"
+          variant={filterStatus === "PAID" ? "success" : "outline-success"}
+          onClick={() => setFilterStatus("PAID")}
+        >
+          Paid
+          <span className="badge bg-light text-success ms-2">
+            {paidCount}
+          </span>
         </Button>
       </div>
 
-      {/* Page Heading */}
-<h3 className="text-center mb-4 fw-bold">
-  Referral Payments
-</h3>
+      <Form.Control
+        type="text"
+        placeholder="🔍 Search by Booking ID"
+        className="referral-search"
+        value={searchBookingId}
+        onChange={(e) => setSearchBookingId(e.target.value)}
+      />
+    </div>
 
-{/* Filters */}
-<div className="d-flex flex-column align-items-center mb-4">
-  <div className="mb-3">
-    <Button
-      className="me-2 px-4 position-relative"
-      variant={filterStatus === "PENDING" ? "primary" : "outline-primary"}
-      onClick={() => setFilterStatus("PENDING")}
-    >
-      Pending
-      <span className="badge bg-light text-primary ms-2">
-      {pendingCount}
-    </span>
-    </Button>
-
-    <Button
-      className="px-4 position-relative"
-      variant={filterStatus === "PAID" ? "success" : "outline-success"}
-      onClick={() => setFilterStatus("PAID")}
-    >
-      Paid
-      <span className="badge bg-light text-success ms-2">
-        {paidCount}
-      </span>
-    </Button>
-  </div>
-
-  <Form.Control
-    type="text"
-    placeholder="Search by Booking ID"
-    style={{ width: "260px" }}
-    value={searchBookingId}
-    onChange={(e) => setSearchBookingId(e.target.value)}
-  />
-</div>
-
-      <div className="table-wrapper">
-        <table className="table table-bordered mt-3 referral-table">
-          <thead className="table-dark">
+    {/* Table */}
+    <div className="referral-table-wrapper">
+      <table className="table table-bordered referral-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Referral Name</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredData.length === 0 ? (
             <tr>
-              <th>Booking ID</th>
-              <th>Referral Name</th>
-              <th>Mobile</th>
-              <th>Email</th>
-              <th>Action</th>
+              <td colSpan="5" className="text-muted py-4">
+                No records found
+              </td>
             </tr>
-          </thead>
-          <tbody>
-             {filteredData.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-muted py-4">
-                  No records found
-                </td>
-              </tr>
-            ) : (
+          ) : (
             filteredData.map(row => (
               <tr key={row.booking_id}>
                 <td>{row.booking_id}</td>
@@ -158,33 +161,36 @@ const paidCount = data.filter(
                 <td>{row.referral_email}</td>
                 <td>
                   <Button
-                    className="me-2"
+                    size="sm"
                     variant="success"
                     disabled={row.referral_status === "PAID"}
                     onClick={() => openModal(row)}
                   >
                     Pay Now
                   </Button>
-                  {row.booking_status === "CLOSED" && row.referral_status === "PAID" && (
+
+                  {row.referral_status === "PAID" && (
                     <Button
+                      size="sm"
                       variant="outline-primary"
+                      className="ms-2"
                       onClick={() =>
                         window.open(
-                        `${BASE_URL}/pdf/referral/${row.booking_id}`,
-                        "_blank"
-                      )
+                          `${BASE_URL}/pdf/referral/${row.booking_id}`,
+                          "_blank"
+                        )
                       }
                     >
-                      <i className="bi bi-file-earmark-pdf-fill me-2"></i>
                       View PDF
                     </Button>
                   )}
                 </td>
               </tr>
-            )))}
-          </tbody>
-        </table>
-      </div>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
       <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" keyboard={false} dialogClassName="referral-modal">
   <Modal.Header closeButton className="referral-modal-header">
     <Modal.Title>Referral Payment</Modal.Title>
@@ -217,6 +223,7 @@ const paidCount = data.filter(
           <Button variant="primary" onClick={handlePay}>Pay</Button>
         </Modal.Footer>
       </Modal>
+      </div>
     </div>
   );
 };

@@ -63,7 +63,6 @@ const [paymentType, setPaymentType] = useState("CASH");
   }, [page,statusFilter,searchBookingId]);
 
   const loadBookings = async () => {
-<<<<<<< HEAD
   try {
     // Ensure page >= 1
     const safePage = Math.max(1, page);
@@ -96,20 +95,6 @@ const handleClearSearch = () => {
   setSearchBookingId("");
   setPage(1);
 };
-=======
-    try {
-      const effectiveStatus = searchBookingId ? "ALL" : statusFilter;
-      const res = await fetchBookings(page,12,effectiveStatus,searchBookingId);
-      setBookings(Array.isArray(res.data) ? res.data : []);
-      setTotalPages(res.totalPages);
-    } catch (err) {
-      console.error("Failed to load bookings:", err);
-      setBookings([]);
-    }
-  };
->>>>>>> f8bd3cf0b8f7323f75a547419f786e16e26ac564
-
-
   // ✅ Calculate totals dynamically from arrays
   const fixedTotal = selectedBooking
     ? selectedBooking.fixed_charges.reduce((sum, fc) => sum + Number(fc.charges_value), 0)
@@ -532,7 +517,7 @@ const hasGallery =
     />
   </div>
 
-  <div style={{ width: "160px" }}>
+  <div style={{ width: "100px" }}>
     <button
       className="btn btn-outline-primary w-100"
       onClick={handleSearchClick}
@@ -544,7 +529,7 @@ const hasGallery =
   {searchBookingId && (
     <div style={{ width: "90px" }}>
       <button
-        className="btn btn-outline-secondary w-100"
+        className="btn btn-outline-primary w-100"
         onClick={() => {
           setInputBookingId("");
           setSearchBookingId("");

@@ -271,16 +271,27 @@ const Vendors = () => {
                 Cancel
               </button>
               <button
-                className="btn btn-danger"
-                onClick={async () => {
-                  await deleteVendor(deleteId);
-                  toast.success("Vendor deleted");
-                  setShowDeleteModal(false);
-                  loadVendors();
-                }}
-              >
-                Delete
-              </button>
+  className="btn btn-danger"
+  onClick={async () => {
+    const confirmDelete = window.confirm(
+      "⚠️ This vendor may be linked to services.\nAre you sure you want to delete?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteVendor(deleteId);
+      toast.success("Vendor deleted successfully");
+      setShowDeleteModal(false);
+      loadVendors();
+    } catch (err) {
+      toast.error("Failed to delete vendor. It may be linked to existing services.")
+    }
+  }}
+>
+  Delete
+</button>
+
             </div>
           </div>
         </div>

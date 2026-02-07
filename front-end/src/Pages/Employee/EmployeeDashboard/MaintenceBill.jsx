@@ -17,6 +17,7 @@ const MaintenanceBills = () => {
   });
   const [preview, setPreview] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   // Load bills from API
   const loadBills = async () => {
@@ -66,20 +67,36 @@ const MaintenanceBills = () => {
     }
   };
 
+  const filteredBills = bills.filter((b) =>
+    b.maintenance_bill_name.toLowerCase().includes(search.toLowerCase())
+  );
+
+
   return (
     <div className="mb-container">
-      {/* Top bar */}
-      <div className="mb-topbar">
+      {/* ===== FIXED HEADER ===== */}
+      <header className="mb-header">
         <h2>Maintenance Bills</h2>
-        <button className="mb-back-btn" onClick={() => navigate("/employee-dashboard")}>
+        <button className="btn btn-outline-light" onClick={() => navigate("/employee-dashboard")}>
           ← Back to Dashboard
         </button>
-      </div>
+      </header>
 
-      {/* Add Bill button */}
-      <button className="mb-add-btn" onClick={() => setShowModal(true)}>
-        + Add Maintenance Bill
-      </button>
+      {/* ===== CONTENT ===== */}
+      <div className="mb-content">
+
+        {/* TOOLBAR */}
+        <div className="mb-toolbar">
+          <input
+            className="mb-search"
+            placeholder="🔍 Search by bill name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            + Add Bill
+          </button>
+        </div>
 
       {/* Bills Table */}
       <div className="mb-table-container">
@@ -95,7 +112,7 @@ const MaintenanceBills = () => {
             </tr>
           </thead>
           <tbody>
-            {bills.map((bill) => (
+            {filteredBills.map((bill) => (
               <tr key={bill.maintenance_bill_id}>
                 <td>{bill.maintenance_bill_name}</td>
                 <td>₹{bill.maintenance_bill_amount}</td>
@@ -185,6 +202,7 @@ const MaintenanceBills = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

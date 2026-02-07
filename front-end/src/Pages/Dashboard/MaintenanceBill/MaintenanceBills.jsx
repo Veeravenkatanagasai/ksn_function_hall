@@ -151,7 +151,7 @@ const MaintenanceBills = () => {
         <div className="mb-toolbar">
           <input
             className="mb-search"
-            placeholder="🔍 Search by name, phone or email"
+            placeholder="🔍 Search by bill name"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
