@@ -26,6 +26,8 @@ export const confirmBooking = async (req, res) => {
 
     const customer = {
       ...req.body,
+      brideName: req.body.brideName || null,
+      groomName: req.body.groomName || null,
       aadharCustomer: files.aadharCustomer?.[0]?.path ?? null,
       aadharBride: files.aadharBride?.[0]?.path ?? null,
       aadharGroom: files.aadharGroom?.[0]?.path ?? null,
@@ -87,6 +89,8 @@ export const updateCustomerDetails = async (req, res) => {
       alternatePhone: req.body.alternate_phone ?? null,
       email: req.body.email ?? "",
       address: req.body.address ?? "",
+      brideName: req.body.bride_name || null,
+      groomName: req.body.groom_name || null,
       aadharCustomer: files.aadharCustomer?.[0]?.path ?? null,
       aadharBride: files.aadharBride?.[0]?.path ?? null,
       aadharGroom: files.aadharGroom?.[0]?.path ?? null,

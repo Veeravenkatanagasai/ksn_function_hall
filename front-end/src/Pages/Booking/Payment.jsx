@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchBooking, payNow } from "../../services/payment";
-import { toast } from "react-toastify";
 
 import "./Payment.css";
 
@@ -16,6 +15,7 @@ const MakePayment = ({ bookingId, onFinish }) => {
   const [balanceDays, setBalanceDays] = useState(3);
   const [pdfPath, setPdfPath] = useState(false);
   const [isPaid, setIsPaid] = useState(false); // 🔒 NEW STATE
+  const [payLoading, setPayLoading] = useState(false);
 
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -30,22 +30,24 @@ const MakePayment = ({ bookingId, onFinish }) => {
   }, [bookingId]);
 
   const handlePayment = async () => {
+    if (payLoading) return;
     if (!paymentType || !paymentMethod || !paidAmount) {
-      toast.error("Please fill all payment details");
+      alert("Please fill all payment details.");
       return;
     }
 
     if (paidAmount > balance) {
-      toast.error("Paid amount cannot exceed remaining balance");
+      alert("Paid amount cannot exceed remaining balance.");
       return;
     }
 
     if (booking.booking_status === "CANCELLED") {
-      toast.error("Cannot pay for CANCELLED booking");
+      alert("Cannot make payment for a cancelled booking.");
       return;
     }
 
     try {
+      setPayLoading(true);
       const response = await payNow({
         booking_id: bookingId,
         payment_type: paymentType.toUpperCase(),
@@ -54,20 +56,20 @@ const MakePayment = ({ bookingId, onFinish }) => {
         balance_days: paymentType === "ADVANCE" ? balanceDays : 0
       });
 
-toast.success("Payment Successful");
 
-alert("✅ Payment Successful!\n\nYou can now download the receipt.");
+      alert("✅ Payment Successful!\n\nYou can now download the receipt.");
 
       setBalance(prev => prev - paidAmount);
       setPdfPath(true);
       setIsPaid(true); // 🔒 LOCK FORM
-
+      setPayLoading(false);
       setBooking(prev => ({
         ...prev,
         booking_status: response.data.booking_status
       }));
     } catch (err) {
-      toast.error(err.response?.data?.error || "Payment failed");
+      setPayLoading(false);
+      alert(err.response?.data?.error || "Payment failed");
     }
   };
  useEffect(() => {
@@ -80,6 +82,7 @@ alert("✅ Payment Successful!\n\nYou can now download the receipt.");
 
 const isPayEnabled =
   !isPaid &&
+  !payLoading &&
   booking.booking_status !== "CANCELLED" &&
   paymentType &&
   paymentMethod &&
@@ -186,8 +189,9 @@ const isPayEnabled =
           onClick={handlePayment}
           disabled={!isPayEnabled}
         >
-          💰 Pay Now
+          {payLoading ? "Processing..." : "💰 Pay Now"}
         </button>
+
       </div>
     )}
 

@@ -62,6 +62,8 @@ export const getAllBookingDetails = async (req, res) => {
         c.wedding_card_path,
         c.no_of_guests,
         c.furniture_details,
+        c.bride_name,
+        c.groom_name,
 
         r.referral_id,
         r.referral_name,

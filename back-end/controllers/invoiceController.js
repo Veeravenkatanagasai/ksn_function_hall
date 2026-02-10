@@ -3,75 +3,101 @@ import { getPriceRuleForInvoice } from "../models/invoiceModel.js";
 export const generateInvoice = async (req, res) => {
   try {
     const {
+      pricingRule,          // YES | NO
       category,
       hall,
       timeSlot,
       eventDate,
       duration,
       discount = 0,
-      base_price_per_hour,
-      usePricingRule,
+      totalAmount,          // only for NO
     } = req.body;
 
-    if (!category || !hall || !timeSlot || !eventDate || !duration) {
-      return res.status(400).json({ message: "Missing invoice fields" });
+    if (!pricingRule) {
+      return res.status(400).json({ message: "Pricing rule required" });
     }
 
-    // Fetch DB price rule for fixed charges and utilities
-    const dbPricing = await getPriceRuleForInvoice({ category, hall, timeSlot, eventDate });
-    if (!dbPricing) return res.status(404).json({ message: "Price rule not found" });
+    let baseAmount = 0;
+    let base_price_per_hour = 0;
+    let fixedCharges = [];
 
-    // Determine final pricing
-    const pricing = {
-      base_price_per_hour: usePricingRule
-        ? dbPricing.base_price_per_hour
-        : Number(base_price_per_hour) || 0,   // use custom base price if needed
-      fixedCharges: dbPricing.fixedCharges || [],
-      utilities: dbPricing.utilities || [],
-    };
+    /* ---------------- PRICING RULE = YES ---------------- */
+    if (pricingRule === "YES") {
+      if (!category || !hall || !timeSlot || !eventDate || !duration) {
+        return res.status(400).json({ message: "Missing invoice fields" });
+      }
 
-    const hours = Number(duration);
+      const pricing = await getPriceRuleForInvoice({
+        category,
+        hall,
+        timeSlot,
+        eventDate,
+      });
 
-    const baseAmount = hours * pricing.base_price_per_hour;
+      if (!pricing) {
+        return res.status(404).json({ message: "Price rule not found" });
+      }
 
-    const fixedCharges = (pricing.fixedCharges || [])
-      .filter(f => f.charges_name && f.charges_name.trim() !== "")
-      .map(f => ({
-        name: f.charges_name,
-        amount: Number(f.charges_value) || 0,
-      }));
+      const hours = Number(duration);
+      base_price_per_hour = Number(pricing.base_price_per_hour);
+      baseAmount = hours * base_price_per_hour;
 
-    const fixedChargeAmount = fixedCharges.reduce((sum, f) => sum + f.amount, 0);
+      fixedCharges = (pricing.fixedCharges || [])
+        .filter(f => f.charges_name?.trim())
+        .map(f => ({
+          name: f.charges_name,
+          amount: Number(f.charges_value) || 0,
+        }));
+    }
 
-    // Utilities – only with names
-    const utilities = (pricing.utilities || [])
-      .filter(u => u.utility_name && u.utility_name.trim() !== "")
-      .map(u => ({
-        name: u.utility_name,
-        rate: Number(u.price_per_hour) || 0,
-        hours: Number(u.default_hours) || 0,
-        amount: (Number(u.price_per_hour) || 0) * (Number(u.default_hours) || 0),
-      }));
+    /* ---------------- PRICING RULE = NO ---------------- */
+    if (pricingRule === "NO") {
+  if (!totalAmount || !category || !hall) {
+    return res.status(400).json({ message: "Missing custom invoice fields" });
+  }
+
+  baseAmount = Number(totalAmount);
+
+  const pricing = await getPriceRuleForInvoice({
+    category,
+    hall,
+    timeSlot,
+    eventDate,
+  });
+
+  fixedCharges = (pricing?.fixedCharges || [])
+    .filter(f => f.charges_name?.trim())
+    .map(f => ({
+      name: f.charges_name,
+      amount: Number(f.charges_value) || 0,
+    }));
+}
 
 
+    const fixedChargeAmount = fixedCharges.reduce(
+      (sum, f) => sum + f.amount,
+      0
+    );
 
     const gross = baseAmount + fixedChargeAmount;
     const discountAmount = (gross * discount) / 100;
     const grandTotal = gross - discountAmount;
 
     res.json({
-      base_price_per_hour: pricing.base_price_per_hour,
-      hours,
+      pricingRule,
+      base_price_per_hour,
+      duration,
       baseAmount,
       fixedCharges,
       fixedChargeAmount,
-      utilities,
       discount,
       discountAmount,
       grandTotal,
     });
+
   } catch (err) {
     console.error("Invoice generation error:", err);
     res.status(500).json({ message: "Invoice failed" });
   }
 };
+

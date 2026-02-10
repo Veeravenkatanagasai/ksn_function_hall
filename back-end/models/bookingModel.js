@@ -3,10 +3,10 @@ import db from "../config/db.js";
 export const insertCustomer = async (conn, data) => {
   const sql = `
     INSERT INTO ksn_function_hall_customer_details
-    (customer_name, phone, alternate_phone, email, address,
+    (customer_name, phone, alternate_phone, email, address,bride_name, groom_name,
      aadhar_customer_path, aadhar_bride_path, aadhar_groom_path, wedding_card_path,
      no_of_guests, furniture_details)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?)
   `;
 
   const [result] = await conn.execute(sql, [
@@ -15,6 +15,8 @@ export const insertCustomer = async (conn, data) => {
     data.alternatePhone ?? null,
     data.email ?? null,
     data.address ?? null,
+    data.brideName ?? null,
+    data.groomName ?? null,
     data.aadharCustomer ?? null,
     data.aadharBride ?? null,
     data.aadharGroom ?? null,
@@ -117,6 +119,8 @@ export const updateCustomer = async (conn, customerId, data) => {
       alternate_phone = ?,
       email = ?,
       address = ?,
+      bride_name = ?,
+      groom_name = ?,
       aadhar_customer_path = COALESCE(?, aadhar_customer_path),
       aadhar_bride_path = COALESCE(?, aadhar_bride_path),
       aadhar_groom_path = COALESCE(?, aadhar_groom_path),
@@ -132,6 +136,8 @@ export const updateCustomer = async (conn, customerId, data) => {
     data.alternatePhone,
     data.email,
     data.address,
+    data.brideName ?? null,
+    data.groomName ?? null,
     data.aadharCustomer,
     data.aadharBride,
     data.aadharGroom,

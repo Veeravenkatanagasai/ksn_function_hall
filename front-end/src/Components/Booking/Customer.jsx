@@ -35,6 +35,16 @@ const Customer = ({ data, setData, onNext }) => {
         data.furnitureRequired && !data.furnitureDetails
           ? "Enter furniture details"
           : "",
+          brideName:
+  data.category === "Marriage" && !data.brideName
+    ? "Bride name is required"
+    : "",
+
+groomName:
+  data.category === "Marriage" && !data.groomName
+    ? "Groom name is required"
+    : "",
+
     });
   }, [data]);
 
@@ -62,6 +72,11 @@ const Customer = ({ data, setData, onNext }) => {
         "furnitureDetails",
         data.furnitureRequired ? data.furnitureDetails : ""
       );
+      if (data.category === "Marriage") {
+  formData.append("brideName", data.brideName);
+  formData.append("groomName", data.groomName);
+}
+
 
       if (data.aadharCustomer) formData.append("aadharCustomer", data.aadharCustomer);
       if (data.category === "Marriage") {
@@ -69,6 +84,7 @@ const Customer = ({ data, setData, onNext }) => {
         if (data.aadharGroom) formData.append("aadharGroom", data.aadharGroom);
         if (data.weddingCard) formData.append("weddingCard", data.weddingCard);
       }
+
 
       await api.post("/customers", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -194,6 +210,34 @@ const Customer = ({ data, setData, onNext }) => {
             {errors.category && (
               <span className="error-text">{errors.category}</span>
             )}
+            {data.category === "Marriage" && (
+  <>
+    <div className="input-group">
+      <label>Bride Name *</label>
+      <input
+        value={data.brideName || ""}
+        onChange={(e) => handleChange("brideName", e.target.value)}
+        className={errors.brideName ? "error" : ""}
+      />
+      {errors.brideName && (
+        <span className="error-text">{errors.brideName}</span>
+      )}
+    </div>
+
+    <div className="input-group">
+      <label>Groom Name *</label>
+      <input
+        value={data.groomName || ""}
+        onChange={(e) => handleChange("groomName", e.target.value)}
+        className={errors.groomName ? "error" : ""}
+      />
+      {errors.groomName && (
+        <span className="error-text">{errors.groomName}</span>
+      )}
+    </div>
+  </>
+)}
+
           </div>{/* No. of Guests */}
         <div className="input-group">
           <label>No. of Guests *</label>

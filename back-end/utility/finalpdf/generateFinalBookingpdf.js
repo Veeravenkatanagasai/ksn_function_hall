@@ -9,7 +9,7 @@ export const generateFinalBookingPDF = async (bookingId) => {
     const [[booking]] = await db.query(`
       SELECT 
         b.*, 
-        c.customer_name, c.phone, c.email, c.address,c.no_of_guests,c.furniture_details,
+        c.customer_name, c.phone, c.email, c.address,c.no_of_guests,c.furniture_details,c.bride_name,c.groom_name,
         r.referral_name, r.referral_mobileno, referral_email,
         p.payment_type, p.payment_method, p.paid_amount,
         p.balance_amount, p.transaction_status, p.created_at AS payment_date
@@ -22,10 +22,7 @@ export const generateFinalBookingPDF = async (bookingId) => {
       LIMIT 1
     `, [bookingId]);
 
-    if (!booking) {
-      return;
-  
-    }
+    if (!booking) throw new Error("Booking not found");
 
     // ================= FETCH FIXED CHARGES =================
     const [fixedCharges] = await db.query(`
@@ -59,14 +56,21 @@ export const generateFinalBookingPDF = async (bookingId) => {
 
 
     // ================= PDF SETUP =================
-    const receiptsDir = path.join(process.cwd(),"utility", "finalpdf");
+    const receiptsDir = path.join("utility", "finalpdf");
     if (!fs.existsSync(receiptsDir)) {
       fs.mkdirSync(receiptsDir, { recursive: true });
     }
 
     const filePath = path.join(receiptsDir, `invoice_${bookingId}.pdf`);
-    const doc = new PDFDocument({ size: "A4", margin: 50 });
-    doc.pipe(fs.createWriteStream(filePath));
+    const logoPath = path.join("utility","assets","ksn.jpg");
+    const stampPath = path.join("utility","assets","KSN_Function_Hall-Stamp.png");
+
+    return new Promise((resolve, reject) => {
+      const doc = new PDFDocument({ size: "A4", margin: 50 });
+      const stream=fs.createWriteStream(filePath);
+      doc.pipe(stream);
+      stream.on("finish", () => resolve(filePath));
+      stream.on("error", reject);
 
     // ================= FONTS =================
     const fontsDir = path.join("utility", "fonts");
@@ -79,12 +83,37 @@ export const generateFinalBookingPDF = async (bookingId) => {
     [fontEnglish, fontEnglishBold, fontTelugu, fontTeluguBold].forEach(f => {
     });
 
-    // ================= HEADER =================
-    const invoiceNo = `KSN-INVOICE-${booking.booking_id}`;
+    // ================= PAGE BORDER HELPER =================
+      const drawPageBorder = (doc) => {
+        const pageWidth = doc.page.width;
+        const pageHeight = doc.page.height;
+        doc.rect(20, 20, pageWidth - 40, pageHeight - 40)
+           .strokeColor('#aaaaaa')
+           .lineWidth(1)
+           .stroke();
+      };
 
-    doc.font(fontEnglishBold).fontSize(24).fillColor("#0b3b68").text("KSN FUNCTION HALL", { align: "center" });
+      // Automatically add border on new pages
+      doc.on('pageAdded', () => drawPageBorder(doc));
+
+      // Draw border for the first page
+      drawPageBorder(doc);
+
+    // ================= HEADER =================
+      // logo 
+      const headerY = 50; 
+      const logoWidth = 110; 
+      const logoHeight = 120;
+      if(fs.existsSync(logoPath)) {
+        doc.image(logoPath, 420, headerY, { width: logoWidth, height: logoHeight });
+      }
+
+    doc.font(fontEnglishBold).fontSize(22).fillColor("#000910").text("KSN FUNCTION HALL",1,50,{align:"center"});
+    doc.font(fontEnglish).fontSize(10).fillColor("#444").text("KSN Plaza, Opp. Rangaraju Rice Mills,\nPalakollu–Bhimavaram Main Road, Poolapalli,\nAndhra Pradesh – 534250\n  9845804760", { align: "center" } );
     doc.font(fontEnglish).fontSize(16).fillColor("#555").text("Invoice/Payment Receipt", { align: "center" });
-    doc.moveDown(0.5);
+    doc.moveDown(1.5);
+
+    const invoiceNo = `KSN-INVOICE-${booking.booking_id}`;
     doc.fontSize(10).fillColor("#000");
     doc.text(`Invoice No: ${invoiceNo}`, 50, doc.y, {align: "left"});
     doc.text(`Invoice Date: ${new Date().toLocaleDateString("en-IN")}`,50,doc.y,{align: "right"});
@@ -127,6 +156,10 @@ export const generateFinalBookingPDF = async (bookingId) => {
       twoCol("Address", booking.address);
       twoCol("Number of Guests", booking.no_of_guests || "N/A");
       twoCol("Furniture Details", booking.furniture_details || "N/A");
+      if (booking.category.toLowerCase() === "marriage") {
+        twoCol("Bride Name", booking.bride_name || "N/A");
+        twoCol("Groom Name", booking.groom_name || "N/A");
+      }
     });
 
     sectionBox("Event Details", () => {
@@ -319,11 +352,149 @@ if (refund) {
     }
 
     // ================= FOOTER =================
-    doc.moveDown(2);
-    doc.font(fontEnglish).fontSize(10).fillColor("#777").text("Thank you for choosing KSN Function Hall.", { align: "center" });
+            const leftX = 50;
+            const rightX = 350;
+            const lineWidth = 150; // width of signature lines
+            const lineHeight = 15; // space from text to line
+            const nameOffset = 20; // space from line to name
+            const stampOffset = 10; // space between date and stamp
+            
+            // --------- Left: Customer Signature ---------
+            doc.font(fontEnglish)
+               .text("Customer Signature", leftX, doc.y + nameOffset);
+            
+            doc.moveTo(leftX, doc.y + lineHeight)
+               .lineTo(leftX + lineWidth, doc.y + lineHeight)
+               .stroke();
+            
+            doc.font(fontEnglishBold)
+               .text(booking.customer_name, leftX, doc.y + nameOffset);
+            
+            // --------- Right: Authorized Signatory ---------
+            doc.font(fontEnglish)
+               .text("For KSN Function Hall", rightX, doc.y - (lineHeight + 5));
+            
+            doc.moveTo(rightX, doc.y + lineHeight)
+               .lineTo(rightX + lineWidth, doc.y + lineHeight)
+               .stroke();
+            
+            const authSignY = doc.y + nameOffset - 5;
+            doc.font(fontEnglishBold)
+               .text(`Authorized Signatory\n${new Date().toLocaleDateString("en-IN")}`, rightX, authSignY, { lineGap: 5 });
+            
+            // --------- Stamp below the signatory ---------
+            if (fs.existsSync(stampPath)) {
+              const stampWidth = 100;   // slightly larger for visibility
+              const stampHeight = 100;  // maintain aspect ratio
+              const stampX = rightX + (lineWidth - stampWidth) / 2; // center under line
+              const stampY = authSignY + 50 + stampOffset; // below date
+              doc.image(stampPath, stampX, stampY, { width: stampWidth, height: stampHeight });
+            }
 
-    doc.end();
 
-  } catch (err) {
+            if (booking.category.toLowerCase() === "marriage") {
+  // Add a new page
+  doc.addPage();
+
+  // Header
+  const headerY = 50; 
+      const logoWidth = 110; 
+      const logoHeight = 90;
+      if(fs.existsSync(logoPath)) {
+        doc.image(logoPath, 420, headerY, { width: logoWidth, height: logoHeight });
+      }
+  doc.font(fontEnglishBold).fontSize(22).fillColor("#000910").text("KSN FUNCTION HALL", { align: "center" });
+  doc.font(fontEnglish).fontSize(10).fillColor("#444").text(
+    "KSN Plaza, Opp. Rangaraju Rice Mills,\nPalakollu–Bhimavaram Main Road, Poolapalli,\nAndhra Pradesh – 534250\n  9845804760",
+    { align: "center" }
+  );
+
+  doc.moveDown(1);
+
+  // Date & Booking ID
+  doc.font(fontEnglish).fontSize(11).fillColor("#000");
+  doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, 50, doc.y, { continued: true });
+  doc.text(`Booking ID: ${booking.booking_id}`, { align: "right" });
+
+  doc.moveDown(1);
+
+  // Certificate body
+  doc.font(fontEnglishBold).fontSize(14).text("TO WHOMSOEVER IT MAY CONCERN", {
+  align: "center",
+  underline: true
+});
+
+doc.moveDown(1);
+
+doc.font(fontEnglish).fontSize(12).text(
+  "This is to certify that the marriage ceremony of the following individuals was solemnized at KSN Function Hall:",
+  { align: "justify", lineGap: 5 }
+);
+
+doc.moveDown(0.5);
+
+// Table-like structure for details
+const details = [
+  { label: "Groom Name", value: booking.groom_name || "________________" },
+  { label: "Bride Name", value: booking.bride_name || "________________" },
+  { label: "Date of Marriage", value: booking.event_date || "___ / ___ / ______" },
+  { label: "Time", value: `${booking.start_time || "____"} to ${booking.end_time || "____"}` },
+  { label: "Hall Booked By", value: booking.customer_name || "________________" },
+];
+
+details.forEach(detail => {
+  doc.font(fontEnglishBold).text(`${detail.label}: `, { continued: true });
+  doc.font(fontEnglish).text(detail.value);
+});
+
+doc.moveDown(1);
+
+// Closing statement
+doc.font(fontEnglish).text(
+  "The function hall was officially booked for the above-mentioned date, and the marriage ceremony was conducted as per the booking details. " , 
+  { align: "justify", lineGap: 5 }
+);
+doc.moveDown(0.5);
+doc.font(fontEnglish).text(
+  "This certificate is issued at the request of the above individuals for official and personal records.",
+  { align: "justify", lineGap: 5 }
+);
+
+doc.moveDown(3);
+
+  // Footer / Signature
+  const leftX = 50;
+  const rightX = 350;
+  const lineWidth = 150;
+  const lineHeight = 15;
+  const nameOffset = 20;
+
+  // Customer signature
+  doc.text("Customer Signature", leftX, doc.y + nameOffset);
+  doc.moveTo(leftX, doc.y + lineHeight).lineTo(leftX + lineWidth, doc.y + lineHeight).stroke();
+  doc.font(fontEnglishBold).text(booking.customer_name || "________________", leftX, doc.y + nameOffset);
+
+  // Authorized signatory
+  doc.text("For KSN Function Hall", rightX, doc.y - (lineHeight + 5));
+  doc.moveTo(rightX, doc.y + lineHeight).lineTo(rightX + lineWidth, doc.y + lineHeight).stroke();
+  doc.font(fontEnglishBold).text(`Authorized Signatory\n${new Date().toLocaleDateString("en-IN")}`, rightX, doc.y + nameOffset, { lineGap: 5 });
+
+  // Optional: add stamp if exists
+  if (fs.existsSync(stampPath)) {
+    const stampWidth = 100;
+    const stampHeight = 100;
+    const stampX = rightX + (lineWidth - stampWidth) / 2;
+    const stampY = doc.y + 50;
+    doc.image(stampPath, stampX, stampY, { width: stampWidth, height: stampHeight });
   }
-};
+}
+            
+            // ================= FINALIZE =================
+            doc.end();
+        
+           });
+          } catch (err) {
+            console.error("Receipt PDF error:", err);
+            throw err;
+          }
+        };

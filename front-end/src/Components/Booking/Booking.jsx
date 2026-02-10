@@ -5,12 +5,11 @@ import {
   fetchTimeSlots,
 } from "../../services/dropdown";
 import { fetchPriceRule } from "../../services/priceRule";
-import "./Booking.css";
 import { fetchBlockedDates } from "../../services/booking";
-import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import { jwtDecode } from "jwt-decode";
-
+import "react-datepicker/dist/react-datepicker.css";
+import "./Booking.css";
 
 const BookingStep = ({ data, setData, onBack, onNext }) => {
   const [categories, setCategories] = useState([]);
@@ -18,165 +17,166 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
   const [errors, setErrors] = useState({});
-  const [usePricingRule, setUsePricingRule] = useState(true);
-  const [customBasePrice, setCustomBasePrice] = useState("");
 
-  const adminToken = localStorage.getItem("adminToken");
-const employeeToken = localStorage.getItem("employeeToken");
+  /* ---------- Role ---------- */
+  const token =
+    localStorage.getItem("adminToken") ||
+    localStorage.getItem("employeeToken");
 
-const token = adminToken || employeeToken;
+  const userRole = (() => {
+    try {
+      return token ? jwtDecode(token)?.role?.toLowerCase() : "employee";
+    } catch {
+      return "employee";
+    }
+  })();
 
-let userRole = "employee";
-
-if (token) {
-  try {
-    const decoded = jwtDecode(token);
-    userRole = decoded?.role?.toLowerCase() || "employee";
-  } catch (err) {
-    console.error("❌ Invalid token:", err);
-  }
-}
   /* ---------- Load dropdowns ---------- */
   useEffect(() => {
-    const loadDropdowns = async () => {
+    (async () => {
       setCategories(await fetchCategories());
       setHalls(await fetchHalls());
       setTimeSlots(await fetchTimeSlots());
-    };
-    loadDropdowns();
+    })();
   }, []);
 
-  /* Fetch price rule from DB if using default pricing */
+  /* ---------- Fetch price rule (ONLY YES) ---------- */
   useEffect(() => {
-    if (usePricingRule && data.category && data.hall && data.timeSlot && data.eventDate) {
+    if (
+      data.pricingRule === "YES" &&
+      data.category &&
+      data.hall &&
+      data.timeSlot &&
+      data.eventDate
+    ) {
       fetchPriceRule({
         category: data.category,
         hall: data.hall,
         timeSlot: data.timeSlot,
         date: data.eventDate,
       })
-        .then((rule) => {
+        .then((rule) =>
           setData((p) => ({
             ...p,
             startTime: rule.start_time || "",
             endTime: rule.end_time || "",
-            basePricePerHour: rule.base_price_per_hour || 0,
-          }));
-        })
+          }))
+        )
         .catch(() => {
-          alert("No price rule found for this selection");
+          alert("No price rule found");
           setData((p) => ({
             ...p,
             startTime: "",
             endTime: "",
             duration: "",
-            basePricePerHour: 0,
           }));
         });
     }
-  }, [data.category, data.hall, data.timeSlot, data.eventDate, usePricingRule]);
+  }, [data.pricingRule, data.category, data.hall, data.timeSlot, data.eventDate]);
 
-
-  /* ---------- Duration calculation ---------- */
+  /* ---------- Duration ---------- */
   useEffect(() => {
-    if (data.startTime && data.endTime) {
-      const start = new Date(`2025-01-01T${data.startTime}`);
-      let end = new Date(`2025-01-01T${data.endTime}`);
-
-      // Handle overnight booking
-      if (end < start) end.setDate(end.getDate() + 1);
-
-      const hours = ((end - start) / 36e5).toFixed(2);
-      setData((p) => ({ ...p, duration: hours }));
-    } else {
+    if (!data.startTime || !data.endTime) {
       setData((p) => ({ ...p, duration: "" }));
+      return;
     }
+
+    const start = new Date(`2025-01-01T${data.startTime}`);
+    let end = new Date(`2025-01-01T${data.endTime}`);
+    if (end < start) end.setDate(end.getDate() + 1);
+
+    setData((p) => ({
+      ...p,
+      duration: ((end - start) / 36e5).toFixed(2),
+    }));
   }, [data.startTime, data.endTime]);
 
+  /* ---------- Blocked dates ---------- */
   useEffect(() => {
-  if (data.hall && data.timeSlot) {
-    fetchBlockedDates({
-      hall: data.hall,
-      timeSlot: data.timeSlot,
-    }).then((dates) => {
-      setBlockedDates(
-        dates.map(d => {
-          const [y, m, day] = d.split("-");
-          return new Date(y, m - 1, day);
-        })
+    if (data.hall && data.timeSlot) {
+      fetchBlockedDates({ hall: data.hall, timeSlot: data.timeSlot }).then(
+        (dates) =>
+          setBlockedDates(
+            dates.map((d) => {
+              const [y, m, day] = d.split("-");
+              return new Date(y, m - 1, day);
+            })
+          )
       );
-    });
-  }
-}, [data.hall, data.timeSlot]);
-
-  const validate = () => {
-  const e = {};
-
-  if (!data.category) e.category = "Category is required";
-  if (!data.timeSlot) e.timeSlot = "Time slot is required";
-  if (!data.hall) e.hall = "Hall is required";
-  if (!data.eventDate) e.eventDate = "Event date is required";
-  if (!data.startTime) e.startTime = "Start time is required";
-  if (!data.endTime) e.endTime = "End time is required";
-  if (!data.duration) e.duration = "Duration is required";
-
-  if (data.discount === "" || data.discount == null) {
-    e.discount = "Discount is required";
-  }
-
-  if (userRole === "employee" && data.discount > 10) {
-    e.discount = "Employees can give max 10% discount";
-  }
-if (!usePricingRule && (!customBasePrice || customBasePrice <= 0)) {
-      e.basePricePerHour = "Enter base price per hour";
     }
-  setErrors(e);
-  return Object.keys(e).length === 0;
-};
+  }, [data.hall, data.timeSlot]);
 
+  /* ---------- Validation ---------- */
+  const validate = () => {
+    const e = {};
 
+    if (!data.pricingRule) e.pricingRule = "Pricing rule required";
+    if (!data.eventDate) e.eventDate = "Event date required";
+    if (!data.startTime) e.startTime = "Start time required";
+    if (!data.endTime) e.endTime = "End time required";
+    if (!data.duration) e.duration = "Duration required";
 
-const handleNext = () => {
-  if (!validate()) return;
+    if (!data.category) e.category = "Category required";
+    if (!data.hall) e.hall = "Hall required";
+    if (!data.timeSlot) e.timeSlot = "Time slot required";
 
-  const updatedData = {
-    ...data,
-    basePricePerHour: usePricingRule ? data.basePricePerHour : Number(customBasePrice),
-    usePricingRule,
+    if (data.pricingRule === "NO" && !data.totalAmount) {
+      e.totalAmount = "Total amount required";
+    }
+
+    if (data.discount === "" || data.discount == null) {
+      e.discount = "Discount required";
+    }
+
+    if (userRole === "employee" && data.discount > 10) {
+      e.discount = "Max 10% allowed";
+    }
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  setData(updatedData);  
-  onNext(updatedData);   
-};
+  const handleNext = () => validate() && onNext();
+  const req = () => <span className="text-danger">*</span>;
 
-const isFormComplete =
-  data.category &&
-  data.timeSlot &&
-  data.hall &&
-  data.eventDate &&
-  data.startTime &&
-  data.endTime &&
-  data.duration &&
-  data.discount !== "" &&
-  data.discount !== null &&
-  data.discount !== undefined&&
-  (usePricingRule || customBasePrice);
-
-
-
-const req = (msg) => <span className="text-danger ms-1">*</span>;
-    
-
+  /* ---------- UI ---------- */
   return (
     <div className="container p-4 bg-white rounded shadow">
       <div className="row g-4">
 
-        {/* Category */}
+        {/* Pricing Rule */}
+        <div className="col-md-4">
+          <label>Pricing Rule {req()}</label>
+          <select
+            className="form-control"
+            value={data.pricingRule || ""}
+            onChange={(e) =>
+  setData(prev => ({
+    ...prev,
+    pricingRule: e.target.value,
+    hall: "",
+    timeSlot: "",
+    startTime: "",
+    endTime: "",
+    duration: "",
+    totalAmount: "",
+    discount: 0,
+  }))
+}
+
+          >
+            <option value="">-- Select --</option>
+            <option value="YES">Pricing Rule (Auto)</option>
+            <option value="NO">Custom Price</option>
+          </select>
+        </div>
+
+        {/* Category / Slot / Hall */}
         <div className="col-md-4">
           <label>Category {req()}</label>
           <select
-            className={`form-control ${errors.category ? "is-invalid" : ""}`}
-            value={data.category}
+            className="form-control"
+            value={data.category || ""}
             onChange={(e) =>
               setData({ ...data, category: e.target.value })
             }
@@ -188,15 +188,13 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
               </option>
             ))}
           </select>
-          <div className="invalid-feedback">{errors.category}</div>
         </div>
 
-        {/* Time Slot */}
         <div className="col-md-4">
           <label>Time Slot {req()}</label>
           <select
-            className={`form-control ${errors.timeSlot ? "is-invalid" : ""}`}
-            value={data.timeSlot}
+            className="form-control"
+            value={data.timeSlot || ""}
             onChange={(e) =>
               setData({ ...data, timeSlot: e.target.value })
             }
@@ -208,16 +206,13 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
               </option>
             ))}
           </select>
-          <div className="invalid-feedback">{errors.timeSlot}</div>
         </div>
 
-        {/* Hall */}
         <div className="col-md-4">
           <label>Hall {req()}</label>
           <select
-            className={`form-control ${errors.hall ? "is-invalid" : ""}`}
-            value={data.hall}
-            disabled={!data.category}
+            className="form-control"
+            value={data.hall || ""}
             onChange={(e) =>
               setData({ ...data, hall: e.target.value })
             }
@@ -229,147 +224,101 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
               </option>
             ))}
           </select>
-          <div className="invalid-feedback">{errors.hall}</div>
         </div>
 
-        {/* Event Date */}
+        {/* Date */}
         <div className="col-md-4">
-  <label>Event Date {req()}</label>
-  <DatePicker
-    className={`form-control ${errors.eventDate ? "is-invalid" : ""}`}
-    selected={data.eventDate ? new Date(data.eventDate) : null}
-    disabled={!data.hall || !data.timeSlot}
-    onChange={(date) =>
-      setData({
-        ...data,
-        eventDate: date.toLocaleDateString("en-CA"),
-      })
-    }
-    excludeDates={blockedDates}   // ✅ DISABLED DATES
-    minDate={new Date()}          // optional: no past dates
-    placeholderText="Select event date"
-    dateFormat="yyyy-MM-dd"
-  />
-  <div className="invalid-feedback d-block">{errors.eventDate}</div>
-</div>
+          <label>Event Date {req()}</label>
+          <DatePicker
+            className="form-control"
+            selected={data.eventDate ? new Date(data.eventDate) : null}
+            onChange={(d) =>
+              setData({ ...data, eventDate: d.toLocaleDateString("en-CA") })
+            }
+            excludeDates={blockedDates}
+            minDate={new Date()}
+          />
+        </div>
 
-        {/* Start Time (Fixed from DB) */}
+        {/* Time */}
         <div className="col-md-4">
           <label>Start Time {req()}</label>
           <input
             type="time"
-            className={`form-control ${errors.startTime ? "is-invalid" : ""}`}
+            className="form-control"
             value={data.startTime || ""}
-            readOnly
+            readOnly={data.pricingRule === "YES"}
+            onChange={(e) =>
+              setData({ ...data, startTime: e.target.value })
+            }
           />
-          <div className="invalid-feedback">{errors.startTime}</div>
         </div>
 
-        {/* End Time (Adjustable) */}
         <div className="col-md-4">
           <label>End Time {req()}</label>
           <input
             type="time"
-           className={`form-control ${errors.endTime ? "is-invalid" : ""}`}
+            className="form-control"
             value={data.endTime || ""}
             onChange={(e) =>
               setData({ ...data, endTime: e.target.value })
             }
           />
-          <div className="invalid-feedback">{errors.endTime}</div>
         </div>
 
-        {/* Duration */}
         <div className="col-md-4">
-          <label>Duration (hrs) {req()}</label>
-          <input
-            type="text"
-            className={`form-control ${errors.duration ? "is-invalid" : ""}`}
-            value={data.duration || ""}
-            readOnly
-          />
-          <div className="invalid-feedback">{errors.duration}</div>
+          <label>Duration (hrs)</label>
+          <input className="form-control" readOnly value={data.duration || ""} />
         </div>
+
+        {/* Custom Amount */}
+        {data.pricingRule === "NO" && (
+          <div className="col-md-4">
+            <label>Total Amount {req()}</label>
+            <input
+              type="number"
+              className="form-control"
+              value={data.totalAmount || ""}
+              onChange={(e) =>
+                setData({ ...data, totalAmount: e.target.value })
+              }
+            />
+          </div>
+        )}
 
         {/* Discount */}
         <div className="col-md-4">
           <label>
-                Discount (%) {req()}
-                {userRole === "employee" && (
-                  <small className="text-muted ms-2">(Max 10%)</small>
-                )}
-              </label>
-
-              <input
-              type="number"
-              min="0"
-              max={userRole === "admin" ? 100 : 10}
-              className={`form-control ${errors.discount ? "is-invalid" : ""}`}
-              value={data.discount}
-              onChange={(e) => {
-                const value = Number(e.target.value) || 0;
-                const max = userRole === "admin" ? 100 : 10;
-
-                setData({
-                  ...data,
-                  discount: Math.min(value, max),
-                });
-              }}
-            />
-
-          <div className="invalid-feedback">{errors.discount}</div>
+            Discount (%) {req()}
+            {userRole === "employee" && (
+              <small className="text-muted ms-2">(Max 10%)</small>
+            )}
+          </label>
+          <input
+            type="number"
+            className="form-control"
+            max={userRole === "admin" ? 100 : 10}
+            value={data.discount}
+            onChange={(e) =>
+              setData({
+                ...data,
+                discount: Math.min(
+                  Number(e.target.value) || 0,
+                  userRole === "admin" ? 100 : 10
+                ),
+              })
+            }
+          />
         </div>
-         {/* Pricing Rule Radio */}
-        <div className="col-12 mt-3">
-          <label>Use Default Pricing Rule?</label>
-          <div>
-            <input
-              type="radio"
-              id="pricing-yes"
-              name="pricingRule"
-              checked={usePricingRule}
-              onChange={() => setUsePricingRule(true)}
-            />
-            <label htmlFor="pricing-yes" className="ms-2 me-3">Yes</label>
-
-            <input
-              type="radio"
-              id="pricing-no"
-              name="pricingRule"
-              checked={!usePricingRule}
-              onChange={() => setUsePricingRule(false)}
-            />
-            <label htmlFor="pricing-no" className="ms-2">No (Custom Price)</label>
-          </div>
-        </div>
-
-        {/* Custom Base Price Input */}
-        {!usePricingRule && (
-          <div className="col-md-4 mt-3">
-            <label>Base Price Per Hour {req()}</label>
-            <input
-              type="number"
-              className={`form-control ${errors.basePricePerHour ? "is-invalid" : ""}`}
-              value={customBasePrice}
-              onChange={(e) => setCustomBasePrice(e.target.value)}
-            />
-            <div className="invalid-feedback">{errors.basePricePerHour}</div>
-          </div>
-        )}
       </div>
 
       <div className="d-flex justify-content-between mt-5">
         <button className="btn btn-outline-secondary" onClick={onBack}>
           ← Back
         </button>
-        <button
-          className="btn btn-warning fw-bold"
-          onClick={handleNext}
-          disabled={!isFormComplete}
-        >
+        <button className="btn btn-warning fw-bold" onClick={handleNext}>
           Generate Order →
         </button>
-
       </div>
     </div>
   );

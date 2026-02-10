@@ -6,25 +6,26 @@ import "./Invoice.css";
 const InvoiceStep = ({ data, onBack, onConfirmed }) => {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
-  const invoiceData = {
-    ...data,
-    base_price_per_hour: data.basePricePerHour, // custom or DB
-    usePricingRule: data.usePricingRule,        // true/false
-  };
-console.log("Invoice Data:", data);
+  setLoading(true);
 
-  generateInvoice(invoiceData)
+  generateInvoice(data)
     .then((res) => {
-      setInvoice(res);
+      setInvoice({
+        ...res,
+        isCustom: data.pricingRule === "NO",
+      });
       setLoading(false);
     })
     .catch((err) => {
-      console.error(err);
+      console.error("Invoice error:", err);
       setLoading(false);
     });
+
 }, [data]);
+
 
   if (loading) {
     return (
@@ -42,6 +43,10 @@ console.log("Invoice Data:", data);
     });
 
   const confirmBooking = async () => {
+    if (confirmLoading) return; // safety guard
+
+    setConfirmLoading(true);
+
     const fd = new FormData();
     // Customer details
     fd.append("name", data.customerName);
@@ -51,6 +56,10 @@ console.log("Invoice Data:", data);
     fd.append("address", data.address || "");
     fd.append("noofGuests", data.noofGuests ?? 0);
     fd.append("furnitureDetails", data.furnitureRequired ? data.furnitureDetails || "Yes" : "No");
+    if (data.category === "Marriage") {
+    fd.append("brideName", data.brideName);
+    fd.append("groomName", data.groomName);
+    }
 
     // Files
     if (data.aadharCustomer) fd.append("aadharCustomer", data.aadharCustomer);
@@ -67,13 +76,14 @@ console.log("Invoice Data:", data);
     fd.append(
       "booking",
       JSON.stringify({
-        category: data.category,
-        hall: data.hall,
-        timeSlot: data.timeSlot,
-        eventDate: data.eventDate,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        discount: data.discount,
+       pricingRule: data.pricingRule,
+    category: data.category,
+    hall: data.hall,
+    timeSlot: data.timeSlot,
+    eventDate: data.eventDate,
+    startTime: data.startTime,
+    endTime: data.endTime,
+    discount: data.discount,
       })
     );
     fd.append("invoice", JSON.stringify(invoice));
@@ -86,6 +96,7 @@ console.log("Invoice Data:", data);
     } catch (error) {
       console.error(error);
       alert("Error confirming booking");
+      setConfirmLoading(false);
     }
   };
 
@@ -104,6 +115,16 @@ console.log("Invoice Data:", data);
             <div className="col-md-6 border-end">
               <h6 className="section-title">Customer Details</h6>
               <div className="detail-item"><span>Name:</span> {data.customerName || "N/A"}</div>
+              {data.category === "Marriage" && (
+                  <>
+                    <div className="detail-item">
+                      <span>Bride Name:</span> {data.brideName || "N/A"}
+                    </div>
+                    <div className="detail-item">
+                      <span>Groom Name:</span> {data.groomName || "N/A"}
+                    </div>
+                  </>
+                )}
               <div className="detail-item"><span>Phone:</span> {data.phone || "N/A"}</div>
               <div className="detail-item"><span>Email:</span> {data.email || "N/A"}</div>
               <div className="detail-item"><span>Address:</span> {data.address || "N/A"}</div>
@@ -146,9 +167,15 @@ console.log("Invoice Data:", data);
               </thead>
               <tbody>
                 <tr>
-                  <td>Base Rent ({invoice.hours} hours @ ₹{safe(invoice.base_price_per_hour)}/hr)</td>
-                  <td className="text-end">₹ {safe(invoice.baseAmount)}</td>
-                </tr>
+  <td>
+    {invoice.isCustom
+      ? "Custom Booking Amount"
+      : `Base Rent (${invoice.hours} hours @ ₹${safe(invoice.base_price_per_hour)}/hr)`
+    }
+  </td>
+  <td className="text-end">₹ {safe(invoice.baseAmount)}</td>
+</tr>
+
 
                 {invoice.fixedCharges.length > 0 && (
                   <>
@@ -192,9 +219,14 @@ console.log("Invoice Data:", data);
             <button className="btn btn-link text-decoration-none text-muted" onClick={onBack}>
               ← Modify Details
             </button>
-            <button className="btn btn-primary btn-lg px-5 shadow-sm confirm-btn" onClick={confirmBooking}>
-              Confirm & Book Now
-            </button>
+            <button
+            className="btn btn-primary btn-lg px-5 shadow-sm confirm-btn"
+            onClick={confirmBooking}
+            disabled={confirmLoading}
+          >
+            {confirmLoading ? "Processing..." : "Confirm & Book Now"}
+          </button>
+
           </div>
         </div>
       </div>

@@ -9,17 +9,6 @@ import { generatePDFReceipt } from "../utility/receipts/pdf.js";
 
 const router = express.Router();
 
-/* ---------- helper: wait until file exists ---------- */
-const waitForFile = async (filePath, timeout = 5000) => {
-  const start = Date.now();
-
-  while (!fs.existsSync(filePath)) {
-    if (Date.now() - start > timeout) {
-      throw new Error("PDF generation timeout");
-    }
-    await new Promise(res => setTimeout(res, 100));
-  }
-};
 
 /* ================= FINAL BOOKING PDF ================= */
 router.get("/final/:bookingId", async (req, res) => {
@@ -33,12 +22,11 @@ router.get("/final/:bookingId", async (req, res) => {
     );
 
     await generateFinalBookingPDF(bookingId);
-    await waitForFile(filePath);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "inline");
 
-    res.sendFile(filePath);
+    res.sendFile(path.resolve(filePath));
   } catch (err) {
     console.error("Final PDF error:", err);
     res.status(500).send("Failed to generate PDF");
@@ -57,8 +45,6 @@ router.get("/cancellation/:bookingId", async (req, res) => {
     );
 
     await generateCancellationPDF(bookingId);
-    await waitForFile(filePath);
-
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "inline");
 
@@ -81,12 +67,11 @@ router.get("/referral/:bookingId", async (req, res) => {
     );
 
     await generateReferralPDF(bookingId);
-    await waitForFile(filePath);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "inline");
 
-    res.sendFile(filePath);
+    res.sendFile(path.resolve(filePath));
   } catch (err) {
     console.error("Referral PDF error:", err);
     res.status(500).send("Failed to generate PDF");
@@ -105,12 +90,11 @@ router.get("/booking/:bookingId", async (req, res) => {
     );
 
     await generatePDFReceipt(bookingId);
-    await waitForFile(filePath);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "inline");
 
-    res.sendFile(filePath);
+    res.sendFile(path.resolve(filePath));
   } catch (err) {
     console.error("Receipt PDF error:", err);
     res.status(500).send("Failed to generate PDF");

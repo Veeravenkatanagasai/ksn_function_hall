@@ -23,7 +23,9 @@ const [editCustomerForm, setEditCustomerForm] = useState({
   address: "",
   no_of_guests: 0,
   furniture_required: false,
-  furniture_details: ""
+  furniture_details: "",
+  bride_name: "",
+  groom_name: ""
 });
 
 const [editDocs, setEditDocs] = useState({
@@ -497,7 +499,9 @@ const hasGallery =
     address: selectedBooking.address || "",
     no_of_guests: selectedBooking.no_of_guests || 0,
     furniture_required: selectedBooking.furniture_required || false,
-    furniture_details: selectedBooking.furniture_details || ""
+    furniture_details: selectedBooking.furniture_details || "",
+    bride_name: selectedBooking.bride_name || "",
+  groom_name: selectedBooking.groom_name || ""
   });
   setEditDocs({
     aadharCustomer: null,
@@ -523,6 +527,8 @@ const updateCustomer = async () => {
     formData.append("alternate_phone", editCustomerForm.alternatePhone ?? "");
     formData.append("noofGuests", editCustomerForm.no_of_guests);
     formData.append("furnitureDetails", editCustomerForm.furniture_details);
+    formData.append("bride_name", editCustomerForm.bride_name);
+    formData.append("groom_name", editCustomerForm.groom_name);
 
 
     Object.entries(editDocs).forEach(([key, file]) => {
@@ -543,6 +549,8 @@ const updateCustomer = async () => {
       no_of_guests: editCustomerForm.no_of_guests,
       furniture_required: editCustomerForm.furniture_required,
       furniture_details: editCustomerForm.furniture_details,
+      bride_name: editCustomerForm.bride_name,
+      groom_name: editCustomerForm.groom_name,
       aadhar_customer_path: editDocs.aadharCustomer ? URL.createObjectURL(editDocs.aadharCustomer) : prev.aadhar_customer_path,
       aadhar_bride_path: editDocs.aadharBride ? URL.createObjectURL(editDocs.aadharBride) : prev.aadhar_bride_path,
       aadhar_groom_path: editDocs.aadharGroom ? URL.createObjectURL(editDocs.aadharGroom) : prev.aadhar_groom_path,
@@ -751,6 +759,18 @@ const updateCustomer = async () => {
     <span>Name</span>
     <strong>{selectedBooking.customer_name}</strong>
   </div>
+{selectedBooking.category === "Marriage" && (
+  <>
+    <div className="data-row">
+      <span>Bride Name</span>
+      <strong>{selectedBooking.bride_name || "-"}</strong>
+    </div>
+    <div className="data-row">
+      <span>Groom Name</span>
+      <strong>{selectedBooking.groom_name || "-"}</strong>
+    </div>
+  </>
+)}
   <div className="data-row">
     <span>Phone</span>
     <strong>{selectedBooking.phone}</strong>
@@ -800,6 +820,38 @@ const updateCustomer = async () => {
             }
           />
         </div>
+
+        {selectedBooking.category === "Marriage" && (
+  <>
+    <div className="form-group">
+      <label>Bride Name</label>
+      <input
+        className="form-control"
+        value={editCustomerForm.bride_name}
+        onChange={(e) =>
+          setEditCustomerForm({
+            ...editCustomerForm,
+            bride_name: e.target.value
+          })
+        }
+      />
+    </div>
+
+    <div className="form-group">
+      <label>Groom Name</label>
+      <input
+        className="form-control"
+        value={editCustomerForm.groom_name}
+        onChange={(e) =>
+          setEditCustomerForm({
+            ...editCustomerForm,
+            groom_name: e.target.value
+          })
+        }
+      />
+    </div>
+  </>
+)}
 
         <div className="form-group">
           <label>Phone</label>
