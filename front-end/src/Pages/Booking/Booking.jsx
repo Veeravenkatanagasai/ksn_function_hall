@@ -24,6 +24,11 @@ const Booking = () => {
     email: "",
     address: "",
 
+    noofGuests: 0,
+    furnitureRequired: false,
+    furnitureDetails: "",
+    
+
     // Documents
     weddingCard: null,
     aadharCustomer: null,
@@ -67,7 +72,7 @@ const Booking = () => {
           <div className="booking-header-row">
             <button
               className="booking-back-btn"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => window.history.back()}
             >
               ← Back to Dashboard
             </button>

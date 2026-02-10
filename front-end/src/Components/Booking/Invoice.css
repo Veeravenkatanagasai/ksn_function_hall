@@ -1,11 +1,12 @@
-
-
+/* ================== Invoice Card ================== */
 .invoice-card {
     border-radius: 12px;
     border: none;
     overflow: hidden;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ================== Section Titles ================== */
 .section-title {
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -15,19 +16,23 @@
     margin-bottom: 12px;
 }
 
+/* ================== Customer & Booking Details ================== */
 .detail-item {
     font-size: 0.95rem;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     color: #333;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .detail-item span {
     font-weight: 600;
     color: #666;
-    width: 80px;
+    width: 130px; /* Make all labels same width for alignment */
     display: inline-block;
 }
 
+/* ================== Invoice Table ================== */
 .invoice-table {
     margin-top: 20px;
     font-size: 0.95rem;
@@ -48,6 +53,7 @@
     font-size: 1.1rem;
 }
 
+/* ================== Buttons ================== */
 .confirm-btn {
     border-radius: 8px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -58,14 +64,32 @@
     box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
 }
 
+/* ================== Referral Box ================== */
 .referral-box {
     border-left: 4px solid #0d6efd;
 }
 
+/* ================== Responsive Adjustments ================== */
 @media (max-width: 768px) {
     .col-md-6.border-end {
         border-bottom: 1px solid #dee2e6;
         margin-bottom: 20px;
         padding-bottom: 20px;
+    }
+
+    .detail-item span {
+        width: 100px; /* slightly narrower on mobile */
+    }
+}
+
+@media (max-width: 576px) {
+    .detail-item {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .detail-item span {
+        width: 100%;
+        margin-bottom: 2px;
     }
 }

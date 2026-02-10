@@ -4,8 +4,9 @@ export const insertCustomer = async (conn, data) => {
   const sql = `
     INSERT INTO ksn_function_hall_customer_details
     (customer_name, phone, alternate_phone, email, address,
-     aadhar_customer_path, aadhar_bride_path, aadhar_groom_path, wedding_card_path)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     aadhar_customer_path, aadhar_bride_path, aadhar_groom_path, wedding_card_path,
+     no_of_guests, furniture_details)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const [result] = await conn.execute(sql, [
@@ -18,6 +19,8 @@ export const insertCustomer = async (conn, data) => {
     data.aadharBride ?? null,
     data.aadharGroom ?? null,
     data.weddingCard ?? null,
+    data.noofGuests ?? 0,
+    data.furnitureDetails ?? null,
   ]);
 
   return result.insertId;
@@ -102,5 +105,40 @@ export const updateBookingStatus = async (bookingId, status) => {
         `UPDATE ksn_function_hall_bookings SET booking_status = ? WHERE booking_id = ?`,
         [status, bookingId]
     );
+};
+
+// ---------- UPDATE CUSTOMER ----------
+export const updateCustomer = async (conn, customerId, data) => {
+  const sql = `
+    UPDATE ksn_function_hall_customer_details
+    SET
+      customer_name = ?,
+      phone = ?,
+      alternate_phone = ?,
+      email = ?,
+      address = ?,
+      aadhar_customer_path = COALESCE(?, aadhar_customer_path),
+      aadhar_bride_path = COALESCE(?, aadhar_bride_path),
+      aadhar_groom_path = COALESCE(?, aadhar_groom_path),
+      wedding_card_path = COALESCE(?, wedding_card_path),
+      no_of_guests = ?,
+      furniture_details = ?
+    WHERE customer_id = ?
+  `;
+
+  await conn.execute(sql, [
+    data.name,                 
+    data.phone,
+    data.alternatePhone,
+    data.email,
+    data.address,
+    data.aadharCustomer,
+    data.aadharBride,
+    data.aadharGroom,
+    data.weddingCard,
+    data.noofGuests ?? 0,
+    data.furnitureDetails ?? null,
+    customerId,
+  ]);
 };
 

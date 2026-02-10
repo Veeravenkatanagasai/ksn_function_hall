@@ -28,6 +28,7 @@ import PaymentAnalytics from "./Pages/Dashboard/Booking/PaymentAnalytics";
 import MaintenanceBill from "./Pages/Employee/EmployeeDashboard/MaintenceBill";
 import MaintenanceBills from "./Pages/Dashboard/MaintenanceBill/MaintenanceBills";
 import EmployeeBill from "./Pages/Employee/EmployeeDashboard/EmployeeBill";
+import EmployeeShowBookings from "./Pages/Employee/EmployeeDashboard/EmployeeShowBookings";
 
 /* ================= ADMIN PROTECTED ROUTE ================= */
 const AdminProtectedRoute = ({ children }) => {
@@ -82,6 +83,7 @@ function App() {
         <Route path="/employeemaintenancebill" element={<MaintenanceBill/>} />
         <Route path="/maintenancebill" element={<MaintenanceBills/>}/>
         <Route path="/employeebill" element={<EmployeeBill/>}/>
+        <Route path="/employeeshowbookings" element={<EmployeeShowBookings/>} />
 
       </Routes>
   );

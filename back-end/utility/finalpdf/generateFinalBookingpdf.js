@@ -9,7 +9,7 @@ export const generateFinalBookingPDF = async (bookingId) => {
     const [[booking]] = await db.query(`
       SELECT 
         b.*, 
-        c.customer_name, c.phone, c.email, c.address,
+        c.customer_name, c.phone, c.email, c.address,c.no_of_guests,c.furniture_details,
         r.referral_name, r.referral_mobileno, referral_email,
         p.payment_type, p.payment_method, p.paid_amount,
         p.balance_amount, p.transaction_status, p.created_at AS payment_date
@@ -125,6 +125,8 @@ export const generateFinalBookingPDF = async (bookingId) => {
       twoCol("Phone", booking.phone);
       twoCol("Email", booking.email);
       twoCol("Address", booking.address);
+      twoCol("Number of Guests", booking.no_of_guests || "N/A");
+      twoCol("Furniture Details", booking.furniture_details || "N/A");
     });
 
     sectionBox("Event Details", () => {
@@ -159,13 +161,14 @@ export const generateFinalBookingPDF = async (bookingId) => {
   const fixedCharges = Number(booking.fixed_charges_total || 0);
   const utilityCharges = Number(booking.utility_costs_total || 0);
   const hallCharge = Number(booking.hall_charge || 0);
-  const discount = Number(booking.discount_amount || 0);
-
+  const discountAmount = Number(booking.discount_amount || 0);
+  const discountPercent = Number(booking.discount_percent || 0);
+  
   const gross = fixedCharges + utilityCharges + hallCharge;
-  const netPayable = gross - discount;
+  const netPayable = gross - discountAmount;
 
   twoCol("Gross Total", `₹ ${gross.toFixed(2)}`);
-  twoCol("Discount", `₹ ${discount.toFixed(2)}`);
+  twoCol(`Discount (${discountPercent}%)`, `₹ ${discountAmount.toFixed(2)}`);
   twoCol("NET PAYABLE", `₹ ${netPayable.toFixed(2)}`);
 });
 

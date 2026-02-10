@@ -35,14 +35,14 @@ export const loginAdmin = async (req, res) => {
 
     // JWT token
     const token = jwt.sign(
-      { id: admin.id, email: admin.email },
+      { id: admin.id, email: admin.email, role: "admin" },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     res.json({
       token,
-      admin: { id: admin.id, name: admin.name, email: admin.email, last_login: admin.last_login},
+      admin: { id: admin.id, name: admin.name, email: admin.email, last_login: admin.last_login,role: "admin" },
     });
   } catch (err) {
     console.error(err);

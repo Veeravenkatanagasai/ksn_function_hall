@@ -32,7 +32,8 @@ export const login = async (req, res) => {
       emp_id: employee.emp_id,
       emp_role: employee.emp_role,
       emp_email: employee.emp_email,
-      emp_name: employee.emp_name
+      emp_name: employee.emp_name,
+      role: "employee"
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN }
@@ -43,7 +44,7 @@ export const login = async (req, res) => {
     employee: {
       emp_id: employee.emp_id,
       emp_name: employee.emp_name,
-      emp_role: employee.emp_role,
+      emp_role: "employee",
       emp_email: employee.emp_email
     }
   });

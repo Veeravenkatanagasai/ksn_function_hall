@@ -9,7 +9,7 @@ import "./Booking.css";
 import { fetchBlockedDates } from "../../services/booking";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-
+import { jwtDecode } from "jwt-decode";
 
 
 const BookingStep = ({ data, setData, onBack, onNext }) => {
@@ -18,8 +18,24 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
   const [errors, setErrors] = useState({});
+  const [usePricingRule, setUsePricingRule] = useState(true);
+  const [customBasePrice, setCustomBasePrice] = useState("");
 
+  const adminToken = localStorage.getItem("adminToken");
+const employeeToken = localStorage.getItem("employeeToken");
 
+const token = adminToken || employeeToken;
+
+let userRole = "employee";
+
+if (token) {
+  try {
+    const decoded = jwtDecode(token);
+    userRole = decoded?.role?.toLowerCase() || "employee";
+  } catch (err) {
+    console.error("❌ Invalid token:", err);
+  }
+}
   /* ---------- Load dropdowns ---------- */
   useEffect(() => {
     const loadDropdowns = async () => {
@@ -30,14 +46,9 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
     loadDropdowns();
   }, []);
 
-  /* ---------- Fetch price rule from DB ---------- */
+  /* Fetch price rule from DB if using default pricing */
   useEffect(() => {
-    if (
-      data.category &&
-      data.hall &&
-      data.timeSlot &&
-      data.eventDate
-    ) {
+    if (usePricingRule && data.category && data.hall && data.timeSlot && data.eventDate) {
       fetchPriceRule({
         category: data.category,
         hall: data.hall,
@@ -49,19 +60,22 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
             ...p,
             startTime: rule.start_time || "",
             endTime: rule.end_time || "",
+            basePricePerHour: rule.base_price_per_hour || 0,
           }));
         })
         .catch(() => {
+          alert("No price rule found for this selection");
           setData((p) => ({
             ...p,
             startTime: "",
             endTime: "",
             duration: "",
+            basePricePerHour: 0,
           }));
-          alert("No price rule found for this selection");
         });
     }
-  }, [data.category, data.hall, data.timeSlot, data.eventDate]);
+  }, [data.category, data.hall, data.timeSlot, data.eventDate, usePricingRule]);
+
 
   /* ---------- Duration calculation ---------- */
   useEffect(() => {
@@ -96,25 +110,43 @@ const BookingStep = ({ data, setData, onBack, onNext }) => {
 }, [data.hall, data.timeSlot]);
 
   const validate = () => {
-const e = {};
-if (!data.category) e.category = "Category is required";
-if (!data.timeSlot) e.timeSlot = "Time slot is required";
-if (!data.hall) e.hall = "Hall is required";
-if (!data.eventDate) e.eventDate = "Event date is required";
-if (!data.startTime) e.startTime = "Start time is required";
-if (!data.endTime) e.endTime = "End time is required";
-if (!data.duration) e.duration = "Duration is required";
-if (data.discount === "" || data.discount === null || data.discount === undefined)
-e.discount = "Discount is required";
+  const e = {};
 
+  if (!data.category) e.category = "Category is required";
+  if (!data.timeSlot) e.timeSlot = "Time slot is required";
+  if (!data.hall) e.hall = "Hall is required";
+  if (!data.eventDate) e.eventDate = "Event date is required";
+  if (!data.startTime) e.startTime = "Start time is required";
+  if (!data.endTime) e.endTime = "End time is required";
+  if (!data.duration) e.duration = "Duration is required";
 
-setErrors(e);
-return Object.keys(e).length === 0;
+  if (data.discount === "" || data.discount == null) {
+    e.discount = "Discount is required";
+  }
+
+  if (userRole === "employee" && data.discount > 10) {
+    e.discount = "Employees can give max 10% discount";
+  }
+if (!usePricingRule && (!customBasePrice || customBasePrice <= 0)) {
+      e.basePricePerHour = "Enter base price per hour";
+    }
+  setErrors(e);
+  return Object.keys(e).length === 0;
 };
 
 
+
 const handleNext = () => {
-if (validate()) onNext();
+  if (!validate()) return;
+
+  const updatedData = {
+    ...data,
+    basePricePerHour: usePricingRule ? data.basePricePerHour : Number(customBasePrice),
+    usePricingRule,
+  };
+
+  setData(updatedData);  
+  onNext(updatedData);   
 };
 
 const isFormComplete =
@@ -127,7 +159,8 @@ const isFormComplete =
   data.duration &&
   data.discount !== "" &&
   data.discount !== null &&
-  data.discount !== undefined;
+  data.discount !== undefined&&
+  (usePricingRule || customBasePrice);
 
 
 
@@ -260,22 +293,69 @@ const req = (msg) => <span className="text-danger ms-1">*</span>;
 
         {/* Discount */}
         <div className="col-md-4">
-          <label>Discount (%) {req()}</label>
-          <input
-            type=""
-            min="0"
-            max="10"
-            className={`form-control ${errors.discount ? "is-invalid" : ""}`}
-            value={data.discount}
-            onChange={(e) =>
-              setData({
-                ...data,
-                discount: Math.min(10, Number(e.target.value) || 0),
-              })
-            }
-          />
+          <label>
+                Discount (%) {req()}
+                {userRole === "employee" && (
+                  <small className="text-muted ms-2">(Max 10%)</small>
+                )}
+              </label>
+
+              <input
+              type="number"
+              min="0"
+              max={userRole === "admin" ? 100 : 10}
+              className={`form-control ${errors.discount ? "is-invalid" : ""}`}
+              value={data.discount}
+              onChange={(e) => {
+                const value = Number(e.target.value) || 0;
+                const max = userRole === "admin" ? 100 : 10;
+
+                setData({
+                  ...data,
+                  discount: Math.min(value, max),
+                });
+              }}
+            />
+
           <div className="invalid-feedback">{errors.discount}</div>
         </div>
+         {/* Pricing Rule Radio */}
+        <div className="col-12 mt-3">
+          <label>Use Default Pricing Rule?</label>
+          <div>
+            <input
+              type="radio"
+              id="pricing-yes"
+              name="pricingRule"
+              checked={usePricingRule}
+              onChange={() => setUsePricingRule(true)}
+            />
+            <label htmlFor="pricing-yes" className="ms-2 me-3">Yes</label>
+
+            <input
+              type="radio"
+              id="pricing-no"
+              name="pricingRule"
+              checked={!usePricingRule}
+              onChange={() => setUsePricingRule(false)}
+            />
+            <label htmlFor="pricing-no" className="ms-2">No (Custom Price)</label>
+          </div>
+        </div>
+
+        {/* Custom Base Price Input */}
+        {!usePricingRule && (
+          <div className="col-md-4 mt-3">
+            <label>Base Price Per Hour {req()}</label>
+            <input
+              type="number"
+              className={`form-control ${errors.basePricePerHour ? "is-invalid" : ""}`}
+              value={customBasePrice}
+              onChange={(e) => setCustomBasePrice(e.target.value)}
+            />
+            <div className="invalid-feedback">{errors.basePricePerHour}</div>
+          </div>
+        )}
       </div>
 
       <div className="d-flex justify-content-between mt-5">

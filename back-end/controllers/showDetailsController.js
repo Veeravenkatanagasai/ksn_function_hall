@@ -34,6 +34,7 @@ export const getAllBookingDetails = async (req, res) => {
     const [bookings] = await db.execute(`
       SELECT 
         b.booking_id,
+        b.customer_id AS customer_id,
         b.category,
         b.hall,
         b.time_slot,
@@ -59,6 +60,8 @@ export const getAllBookingDetails = async (req, res) => {
         c.aadhar_bride_path,
         c.aadhar_groom_path,
         c.wedding_card_path,
+        c.no_of_guests,
+        c.furniture_details,
 
         r.referral_id,
         r.referral_name,

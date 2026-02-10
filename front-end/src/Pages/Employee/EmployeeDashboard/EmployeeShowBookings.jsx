@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchBookings } from "../../../services/showDetails";
 import { useNavigate } from "react-router-dom";
-import "./ShowBooking.css";
 import api from "../../../services/api";
 import ElectricityBill from "../../Employee/EmployeeDashboard/Electricity";
 
@@ -13,28 +12,6 @@ const AdminShowDetails = () => {
   const [statusFilter, setStatusFilter] = useState("INPROGRESS");
   const [searchBookingId, setSearchBookingId] = useState("");
   const [inputBookingId, setInputBookingId] = useState("");
-// ===== EDIT CUSTOMER =====
-const [showEditCustomer, setShowEditCustomer] = useState(false);
-
-const [editCustomerForm, setEditCustomerForm] = useState({
-  customer_name: "",
-  phone: "",
-  email: "",
-  address: "",
-  no_of_guests: 0,
-  furniture_required: false,
-  furniture_details: ""
-});
-
-const [editDocs, setEditDocs] = useState({
-  aadharCustomer: null,
-  aadharBride: null,
-  aadharGroom: null,
-  weddingCard: null,
-});
-
-const [editLoading, setEditLoading] = useState(false);
-
 
   // ===== Cancellation =====
   const [cancellationDetails, setCancellationDetails] = useState(null);
@@ -398,20 +375,6 @@ const fetchGallery = async (bookingId) => {
   }
 };
 
-const deleteGalleryImage = async (galleryId) => {
-  if (!window.confirm("Delete this image?")) return;
-
-  try {
-    await api.delete(
-      `/gallery/image/${galleryId}`
-    );
-
-    // Refresh gallery after delete
-    fetchGallery(selectedBooking.booking_id);
-  } catch (err) {
-    alert("Failed to delete image");
-  }
-};
 
 useEffect(() => {
   if (!selectedBooking) return;
@@ -488,76 +451,6 @@ const hasGallery =
     (galleryData.FUNCTION?.length ?? 0) > 0 ||
     (galleryData.POSTFUNCTION?.length ?? 0) > 0
   );
-
-  const openEditCustomerPopup = () => {
-  setEditCustomerForm({
-    customer_name: selectedBooking.customer_name || "",
-    phone: selectedBooking.phone || "",
-    email: selectedBooking.email || "",
-    address: selectedBooking.address || "",
-    no_of_guests: selectedBooking.no_of_guests || 0,
-    furniture_required: selectedBooking.furniture_required || false,
-    furniture_details: selectedBooking.furniture_details || ""
-  });
-  setEditDocs({
-    aadharCustomer: null,
-    aadharBride: null,
-    aadharGroom: null,
-    weddingCard: null,
-  });
-  setShowEditCustomer(true);
-};
-
-
-const updateCustomer = async () => {
-  try {
-    setEditLoading(true);
-    const customerId = selectedBooking.customer_id;
-    if (!customerId) return alert("Customer ID not found");
-
-    const formData = new FormData();
-    formData.append("customer_name", editCustomerForm.customer_name); // must match backend
-    formData.append("phone", editCustomerForm.phone);
-    formData.append("email", editCustomerForm.email);
-    formData.append("address", editCustomerForm.address);
-    formData.append("alternate_phone", editCustomerForm.alternatePhone ?? "");
-    formData.append("noofGuests", editCustomerForm.no_of_guests);
-    formData.append("furnitureDetails", editCustomerForm.furniture_details);
-
-
-    Object.entries(editDocs).forEach(([key, file]) => {
-      if (file) formData.append(key, file);
-    });
-
-    await api.put(`/bookings/customer/${customerId}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    // ✅ Update frontend
-    setSelectedBooking(prev => ({
-      ...prev,
-      customer_name: editCustomerForm.customer_name,
-      phone: editCustomerForm.phone,
-      email: editCustomerForm.email,
-      address: editCustomerForm.address,
-      no_of_guests: editCustomerForm.no_of_guests,
-      furniture_required: editCustomerForm.furniture_required,
-      furniture_details: editCustomerForm.furniture_details,
-      aadhar_customer_path: editDocs.aadharCustomer ? URL.createObjectURL(editDocs.aadharCustomer) : prev.aadhar_customer_path,
-      aadhar_bride_path: editDocs.aadharBride ? URL.createObjectURL(editDocs.aadharBride) : prev.aadhar_bride_path,
-      aadhar_groom_path: editDocs.aadharGroom ? URL.createObjectURL(editDocs.aadharGroom) : prev.aadhar_groom_path,
-      wedding_card_path: editDocs.weddingCard ? URL.createObjectURL(editDocs.weddingCard) : prev.wedding_card_path
-    }));
-
-    alert("Customer updated successfully");
-    setShowEditCustomer(false);
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Failed to update customer");
-  } finally {
-    setEditLoading(false);
-  }
-};
 
   return (
     <div className="admin-wrapper py-4">
@@ -737,218 +630,14 @@ const updateCustomer = async () => {
 
                   {/* CUSTOMER INFO */}
                   <div className="info-block">
-  <div className="d-flex justify-content-between align-items-center mb-2">
-    <h6 className="section-title mb-0">Customer Info</h6>
-    <button
-      className="btn btn-sm btn-outline-primary"
-      onClick={openEditCustomerPopup}
-    >
-      Edit
-    </button>
-  </div>
-
-  <div className="data-row">
-    <span>Name</span>
-    <strong>{selectedBooking.customer_name}</strong>
-  </div>
-  <div className="data-row">
-    <span>Phone</span>
-    <strong>{selectedBooking.phone}</strong>
-  </div>
-  <div className="data-row">
-    <span>Email</span>
-    <strong>{selectedBooking.email}</strong>
-  </div>
-  <div className="data-row">
-    <span>Address</span>
-    <strong>{selectedBooking.address}</strong>
-  </div>
-  <div className="data-row">
-  <span>No. of Guests</span>
-  <strong>{selectedBooking.no_of_guests || 0}</strong>
-</div>
-<div className="data-row">
-  <span>Furniture</span>
-<strong>{selectedBooking.furniture_details || "No"}</strong>
-</div>
-
-</div>
-
-{showEditCustomer && selectedBooking && (
-  <div className="edit-modal-overlay">
-    <div className="edit-modal">
-
-      {/* HEADER */}
-      <div className="edit-modal-header">
-        <h5>Edit Customer Details</h5>
-        <button
-          className="btn-close"
-          onClick={() => setShowEditCustomer(false)}
-        />
-      </div>
-
-      {/* BODY (SCROLLABLE) */}
-      <div className="edit-modal-body">
-
-        <div className="form-group">
-          <label>Customer Name</label>
-          <input
-            className="form-control"
-            value={editCustomerForm.customer_name}
-            onChange={(e) =>
-              setEditCustomerForm({ ...editCustomerForm, customer_name: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Phone</label>
-          <input
-            className="form-control"
-            value={editCustomerForm.phone}
-            onChange={(e) =>
-              setEditCustomerForm({ ...editCustomerForm, phone: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            className="form-control"
-            value={editCustomerForm.email}
-            onChange={(e) =>
-              setEditCustomerForm({ ...editCustomerForm, email: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Address</label>
-          <textarea
-            className="form-control"
-            rows={3}
-            value={editCustomerForm.address}
-            onChange={(e) =>
-              setEditCustomerForm({ ...editCustomerForm, address: e.target.value })
-            }
-          />
-        </div>
-        <div className="form-group">
-  <label>No. of Guests</label>
-  <input
-    type="number"
-    className="form-control"
-    value={editCustomerForm.no_of_guests}
-    onChange={(e) =>
-      setEditCustomerForm({ ...editCustomerForm, no_of_guests: e.target.value })
-    }
-  />
-</div>
-
-<div className="form-group">
-  <label>Furniture Required?</label>
-  <select
-    className="form-control"
-    value={editCustomerForm.furniture_required ? "YES" : "NO"}
-    onChange={(e) =>
-      setEditCustomerForm({
-        ...editCustomerForm,
-        furniture_required: e.target.value === "YES"
-      })
-    }
-  >
-    <option value="NO">No</option>
-    <option value="YES">Yes</option>
-  </select>
-</div>
-
-{editCustomerForm.furniture_required && (
-  <div className="form-group">
-    <label>Furniture Details</label>
-    <input
-      type="text"
-      className="form-control"
-      value={editCustomerForm.furniture_details}
-      onChange={(e) =>
-        setEditCustomerForm({ ...editCustomerForm, furniture_details: e.target.value })
-      }
-    />
-  </div>
-)}
-
-
-        <hr />
-
-        {/* EXISTING DOCUMENTS */}
-        <h6 className="fw-semibold mb-2">Existing Documents</h6>
-        <div className="doc-preview-grid">
-          {[
-            { key: "aadhar_customer_path", label: "Customer Aadhar" },
-            { key: "aadhar_bride_path", label: "Bride Aadhar" },
-            { key: "aadhar_groom_path", label: "Groom Aadhar" },
-            { key: "wedding_card_path", label: "Wedding Card" },
-          ].map(
-            (doc) =>
-              selectedBooking[doc.key] && (
-                <div key={doc.key} className="doc-thumb">
-                  <img
-                    src={selectedBooking[doc.key]}
-                    alt={doc.label}
-                    onClick={() =>
-                      window.open(selectedBooking[doc.key], "_blank")
-                    }
-                  />
-                  <small>{doc.label}</small>
-                </div>
-              )
-          )}
-        </div>
-
-        <hr />
-
-        {/* UPLOAD NEW */}
-        <h6 className="fw-semibold mb-2">Upload New Documents</h6>
-
-        {[
-          { label: "Customer Aadhar", key: "aadharCustomer" },
-          { label: "Bride Aadhar", key: "aadharBride" },
-          { label: "Groom Aadhar", key: "aadharGroom" },
-          { label: "Wedding Card", key: "weddingCard" },
-        ].map((doc) => (
-          <div className="form-group" key={doc.key}>
-            <label>{doc.label}</label>
-            <input
-              type="file"
-              className="form-control"
-              onChange={(e) =>
-                setEditDocs({ ...editDocs, [doc.key]: e.target.files[0] })
-              }
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* FOOTER */}
-      <div className="edit-modal-footer">
-        <button
-          className="btn btn-secondary"
-          onClick={() => setShowEditCustomer(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="btn btn-success"
-          disabled={editLoading}
-          onClick={updateCustomer}
-        >
-          {editLoading ? "Saving..." : "Save Changes"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+                    <h6 className="section-title">Customer Info</h6>
+                    <div className="data-row"><span>Name</span><strong>{selectedBooking.customer_name}</strong></div>
+                    <div className="data-row"><span>Phone</span><strong>{selectedBooking.phone}</strong></div>
+                    <div className="data-row"><span>Email</span><strong>{selectedBooking.email}</strong></div>
+                    <div className="data-row"><span>Address</span><strong>{selectedBooking.address}</strong></div>
+                    <div className="data-row"><span>Number of Guests</span><strong>{selectedBooking.no_of_guests}</strong></div>
+                    <div className="data-row"><span>Furniture Details</span><strong>{selectedBooking.furniture_details || "N/A"}</strong></div>
+                  </div>
 
                   {/* EVENT INFO */}
                   <div className="info-block mt-4">
@@ -1948,12 +1637,6 @@ const updateCustomer = async () => {
       style={{ cursor: "pointer" }}
        onClick={() => window.open(img.image_path, "_blank")}
     />
-    <span
-      className="gallery-delete-icon"
-      onClick={() => deleteGalleryImage(img.gallery_id)}
-    >
-      ×
-    </span>
   </div>
                 ))
               )}

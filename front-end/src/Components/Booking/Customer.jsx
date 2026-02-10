@@ -27,6 +27,14 @@ const Customer = ({ data, setData, onNext }) => {
       address: data.address?.trim() ? "" : "Address is required",
       category: data.category ? "" : "Category is required",
       aadharCustomer: data.aadharCustomer ? "" : "Customer Aadhar is required",
+      noofGuests:
+        data.noofGuests && data.noofGuests > 0
+          ? ""
+          : "Number of guests must be greater than 0",
+      furnitureDetails:
+        data.furnitureRequired && !data.furnitureDetails
+          ? "Enter furniture details"
+          : "",
     });
   }, [data]);
 
@@ -49,6 +57,11 @@ const Customer = ({ data, setData, onNext }) => {
       formData.append("email", data.email || "");
       formData.append("address", data.address);
       formData.append("category", data.category);
+      formData.append("noofGuests", data.noofGuests || 0);
+      formData.append(
+        "furnitureDetails",
+        data.furnitureRequired ? data.furnitureDetails : ""
+      );
 
       if (data.aadharCustomer) formData.append("aadharCustomer", data.aadharCustomer);
       if (data.category === "Marriage") {
@@ -181,7 +194,63 @@ const Customer = ({ data, setData, onNext }) => {
             {errors.category && (
               <span className="error-text">{errors.category}</span>
             )}
+          </div>{/* No. of Guests */}
+        <div className="input-group">
+          <label>No. of Guests *</label>
+          <input
+            type="number"
+            min="1"
+            value={data.noofGuests || ""}
+            onChange={(e) =>
+              handleChange("noofGuests", parseInt(e.target.value))
+            }
+            className={errors.noofGuests ? "error" : ""}
+          />
+          {errors.noofGuests && (
+            <span className="error-text">{errors.noofGuests}</span>
+          )}
+        </div>
+
+        {/* Furniture Section (Integrated with Address) */}
+        <div className="input-group full furniture-section">
+          <label>Furniture Required?</label>
+          <div className="radio-group">
+            <label>
+              <input
+                type="radio"
+                name="furniture"
+                checked={data.furnitureRequired === true}
+                onChange={() => handleChange("furnitureRequired", true)}
+              />
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="furniture"
+                checked={data.furnitureRequired === false}
+                onChange={() => handleChange("furnitureRequired", false)}
+              />
+              No
+            </label>
           </div>
+          {data.furnitureRequired && (
+            <div className="input-group full">
+              <label>Furniture Details *</label>
+              <textarea
+                rows="3"
+                value={data.furnitureDetails || ""}
+                onChange={(e) =>
+                  handleChange("furnitureDetails", e.target.value)
+                }
+                className={errors.furnitureDetails ? "error" : ""}
+              />
+              {errors.furnitureDetails && (
+                <span className="error-text">{errors.furnitureDetails}</span>
+              )}
+            </div>
+          )}
+        </div>
 
 
         {/* Conditional File Uploads */}

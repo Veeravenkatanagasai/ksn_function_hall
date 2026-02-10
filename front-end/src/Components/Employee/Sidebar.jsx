@@ -16,7 +16,7 @@ const Sidebar = () => {
   const menuItems = [
     { path: "/employee-dashboard", name: "Overview", icon: <LayoutDashboard size={20} /> },
     { path: "/booking", name: "Bookings", icon: <FileText size={20} /> },
-    { path: "/bookings", name: "View Bookings", icon: <FileText size={20} /> },
+    { path: "/employeeshowbookings", name: "View Bookings", icon: <FileText size={20} /> },
     { path: "/employee-vendors", name: "Vendors", icon: <Users size={20} /> },
     { path: "/employee-services", name: "Services", icon: <UserCircle size={20} /> },
     { path: "/employee-contacts", name: "Contacts", icon: <UserCircle size={20} /> },

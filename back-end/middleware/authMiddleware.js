@@ -1,19 +1,20 @@
+// middleware/authAny.js
 import jwt from "jsonwebtoken";
 
-export const adminprotect = (req, res, next) => {
+export const authAny = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer "))
+  if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Not authorized" });
+  }
 
   const token = authHeader.split(" ")[1];
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // { id, role }
     next();
   } catch {
-    res.status(401).json({ message: "Token invalid" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
-
-

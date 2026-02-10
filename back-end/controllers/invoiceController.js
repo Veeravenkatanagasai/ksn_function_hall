@@ -9,22 +9,26 @@ export const generateInvoice = async (req, res) => {
       eventDate,
       duration,
       discount = 0,
+      base_price_per_hour,
+      usePricingRule,
     } = req.body;
 
     if (!category || !hall || !timeSlot || !eventDate || !duration) {
       return res.status(400).json({ message: "Missing invoice fields" });
     }
 
-    const pricing = await getPriceRuleForInvoice({
-      category,
-      hall,
-      timeSlot,
-      eventDate,
-    });
+    // Fetch DB price rule for fixed charges and utilities
+    const dbPricing = await getPriceRuleForInvoice({ category, hall, timeSlot, eventDate });
+    if (!dbPricing) return res.status(404).json({ message: "Price rule not found" });
 
-    if (!pricing) {
-      return res.status(404).json({ message: "Price rule not found" });
-    }
+    // Determine final pricing
+    const pricing = {
+      base_price_per_hour: usePricingRule
+        ? dbPricing.base_price_per_hour
+        : Number(base_price_per_hour) || 0,   // use custom base price if needed
+      fixedCharges: dbPricing.fixedCharges || [],
+      utilities: dbPricing.utilities || [],
+    };
 
     const hours = Number(duration);
 

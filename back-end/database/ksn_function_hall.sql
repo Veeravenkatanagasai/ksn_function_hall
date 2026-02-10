@@ -19,7 +19,7 @@ VALUES
 );
 CREATE TABLE ksn_function_hall_customer_details (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_name VARCHAR(255) NOT NULL,
+    customer_name VARCHAR(255),
     phone VARCHAR(15) ,
     alternate_phone VARCHAR(15),
     email VARCHAR(255),
