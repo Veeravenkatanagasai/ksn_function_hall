@@ -1,167 +1,284 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import API from "../../../services/cancellationRules";
-import "./Cancellation.css";
 
-const CancellationRules = () => {
+/* ---------- PORTAL MODAL ---------- */
+const Modal = ({ children }) =>
+  ReactDOM.createPortal(children, document.body);
+
+export default function CancellationRules() {
   const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [days, setDays] = useState("");
-  const [penalty, setPenalty] = useState("");
-  const [isActive, setIsActive] = useState(1);
+  const [form, setForm] = useState({
+    days: "",
+    penalty_percent: "",
+    is_active: 1,
+  });
 
-  const [editingId, setEditingId] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-
+  const [editId, setEditId] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmId, setConfirmId] = useState(null);
 
-  /** 🔒 Lock body scroll when modal opens */
+  /* ---------- LOAD DATA ---------- */
   useEffect(() => {
-    fetchRules();
+    loadRules();
   }, []);
 
-  const fetchRules = async () => {
-    const res = await API.getAll();
-    setRules(res.data || []);
+  const loadRules = async () => {
+    setLoading(true);
+    try {
+      const res = await API.getAll();
+      setRules(res.data || []);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const resetForm = () => {
-    setDays("");
-    setPenalty("");
-    setIsActive(1);
-    setEditingId(null);
+  /* ---------- FORM ---------- */
+  const openForm = (row = null) => {
+    if (row) {
+      setEditId(row.rule_id);
+      setForm({
+        days: row.days,
+        penalty_percent: row.penalty_percent,
+        is_active: row.is_active,
+      });
+    } else {
+      setEditId(null);
+      setForm({
+        days: "",
+        penalty_percent: "",
+        is_active: 1,
+      });
+    }
+    setShowFormModal(true);
   };
 
-  const handleSave = async () => {
+  const submitForm = async (e) => {
+    e.preventDefault();
+
     const payload = {
-      days: Number(days),
-      penalty_percent: Number(penalty),
-      is_active: isActive,
+      days: Number(form.days),
+      penalty_percent: Number(form.penalty_percent),
+      is_active: form.is_active,
     };
 
-    editingId
-      ? await API.update(editingId, payload)
+    editId
+      ? await API.update(editId, payload)
       : await API.create(payload);
 
-    resetForm();
     setShowFormModal(false);
-    fetchRules();
+    loadRules();
   };
 
   const handleDelete = async () => {
-    await API.remove(deleteId);
-    setDeleteId(null);
+    await API.remove(confirmId);
     setShowDeleteModal(false);
-    fetchRules();
+    loadRules();
   };
+
   return (
-    <div className="container mt-4">
-
-      {/* HEADER */}
-      <div className="header-row">
-        <div>
-          <h3>Cancellation Rules</h3>
-          <p className="text-muted">Manage cancellation penalties</p>
+    <>
+      {/* ================= PAGE ================= */}
+      <div className="container py-5">
+        {/* HEADER */}
+        <div className="row mb-4 align-items-center">
+          <div className="col">
+            <h2 className="fw-bold">Cancellation Rules</h2>
+            <p className="text-muted small">
+              Manage cancellation penalties
+            </p>
+          </div>
+          <div className="col-auto">
+            <button
+              className="btn btn-primary rounded-pill px-4"
+              onClick={() => openForm()}
+            >
+              + Add Rule
+            </button>
+          </div>
         </div>
-        <button
-          className="btn btn-warning"
-          onClick={() => {
-            resetForm();
-            setShowFormModal(true);
-          }}
-        >
-          + Add Rule
-        </button>
-      </div>
 
-      {/* TABLE */}
-      <div className="card shadow-sm">
-        <table className="table table-hover mb-0">
-          <thead className="table-light">
-            <tr>
-            
-              <th>Days</th>
-              <th>Penalty %</th>
-              <th>Status</th>
-              <th className="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rules.length ? rules.map((r) => (
-              <tr key={r.rule_id}>
-                <td>{r.days}</td>
-                <td>{r.penalty_percent}%</td>
-                <td>
-                  <span className={`badge ${r.is_active ? "active" : "inactive"}`}>
-                    {r.is_active ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="text-center">
-                  <button className="icon-btn edit" onClick={() => startEdit(r)}>✏️</button>
-                  <button className="icon-btn delete" onClick={() => {
-                    setDeleteId(r.rule_id);
-                    setShowDeleteModal(true);
-                  }}>🗑️</button>
-                </td>
-              </tr>
-            )) : (
+        {/* TABLE */}
+        <div className="card shadow-sm border-0">
+          <table className="table table-hover align-middle mb-0">
+            <thead className="table-light">
               <tr>
-                <td colSpan="5" className="text-center">No rules found</td>
+                <th>#</th>
+                <th>Days</th>
+                <th>Penalty %</th>
+                <th>Status</th>
+                <th className="text-end">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="text-center py-5">
+                    <div className="spinner-border text-primary" />
+                  </td>
+                </tr>
+              ) : rules.length ? (
+                rules.map((r, i) => (
+                  <tr key={r.rule_id}>
+                    <td>{i + 1}</td>
+                    <td>{r.days}</td>
+                    <td>{r.penalty_percent}%</td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          r.is_active ? "bg-success" : "bg-secondary"
+                        }`}
+                      >
+                        {r.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="text-end">
+                      <button
+                        className="btn btn-light btn-sm me-2"
+                        onClick={() => openForm(r)}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn btn-light btn-sm"
+                        onClick={() => {
+                          setConfirmId(r.rule_id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="text-center py-5 text-muted"
+                  >
+                    No rules found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* ADD / EDIT MODAL */}
+      {/* ================= FORM MODAL ================= */}
       {showFormModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <div className="modal-header">
-              <h5>{editingId ? "Edit Rule" : "Add Rule"}</h5>
-              <button className="close-btn" onClick={() => setShowFormModal(false)}>✖</button>
-            </div>
+        <Modal>
+          <div
+            className="modal show d-block"
+            style={{ background: "rgba(0,0,0,.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5>{editId ? "Edit Rule" : "New Rule"}</h5>
+                  <button
+                    className="btn-close"
+                    onClick={() => setShowFormModal(false)}
+                  />
+                </div>
 
-            <div className="modal-body">
-              <label>Days Before Event</label>
-              <input type="number" value={days} onChange={e => setDays(e.target.value)} />
+                <form onSubmit={submitForm}>
+                  <div className="modal-body">
+                    <input
+                      type="number"
+                      className="form-control mb-3"
+                      placeholder="Days before event"
+                      value={form.days}
+                      onChange={(e) =>
+                        setForm({ ...form, days: e.target.value })
+                      }
+                      required
+                    />
 
-              <label>Penalty %</label>
-              <input type="number" value={penalty} onChange={e => setPenalty(e.target.value)} />
+                    <input
+                      type="number"
+                      className="form-control mb-3"
+                      placeholder="Penalty %"
+                      value={form.penalty_percent}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          penalty_percent: e.target.value,
+                        })
+                      }
+                      required
+                    />
 
-              <label>Status</label>
-              <select value={isActive} onChange={e => setIsActive(Number(e.target.value))}>
-                <option value={1}>Active</option>
-                <option value={0}>Inactive</option>
-              </select>
-            </div>
+                    <select
+                      className="form-select"
+                      value={form.is_active}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          is_active: Number(e.target.value),
+                        })
+                      }
+                    >
+                      <option value={1}>Active</option>
+                      <option value={0}>Inactive</option>
+                    </select>
+                  </div>
 
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setShowFormModal(false)}>Cancel</button>
-              <button className="btn btn-success" onClick={handleSave}>
-                {editingId ? "Update" : "Save"}
-              </button>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowFormModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button className="btn btn-success">
+                      {editId ? "Update" : "Save"}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
-      {/* DELETE MODAL */}
+      {/* ================= DELETE MODAL ================= */}
       {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-box small">
-            <h5 className="text-danger">Delete Rule</h5>
-            <p>Are you sure?</p>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+        <Modal>
+          <div
+            className="modal show d-block"
+            style={{ background: "rgba(0,0,0,.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content text-center p-4">
+                <h4 className="text-danger">Delete Rule?</h4>
+                <p className="text-muted">
+                  This action cannot be undone.
+                </p>
+                <div className="d-flex justify-content-center gap-2">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={handleDelete}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
-
-    </div>
+    </>
   );
-};
-
-export default CancellationRules;
+}

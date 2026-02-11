@@ -14,7 +14,7 @@ import "./PaymentAnalytics.css";
 /* ================= COLORS ================= */
 
 // Inflow colors
-const COLORS_INFLOW = ["#4CAF50", "#FFC107"];
+const COLORS_INFLOW = ["#4CAF50", "#2312db"];
 
 // Net revenue colors
 const COLORS_NET = ["#2E7D32", "#C62828"];

@@ -1,7 +1,7 @@
 /* ================= ROOT ================= */
 .vendors-page {
   min-height: 100vh;
-  background: #f4f6fb;
+  background: #7f96d1;
   font-family: system-ui, sans-serif;
   overflow: auto;
 }
@@ -12,7 +12,7 @@
   top: 0;
   width: 100%;
   height: 100px;
-  background: linear-gradient(135deg, #8b0000, #b91c1c);
+  background: linear-gradient(150deg, #7f96d1,rgb(70, 2, 241), #770303);
   color: #fff;
   padding: 0 40px;
   display: flex;

@@ -1,7 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import api from "../../../services/api";
 import { fetchCategories, fetchHalls, fetchTimeSlots } from "../../../services/dropdown";
+import ReactDOM from "react-dom";
+import { motion } from "framer-motion";
+
+const Modal = ({ children }) =>
+  ReactDOM.createPortal(children, document.body);
 
 const EMPTY_FORM = {
   category_name: "",
@@ -110,23 +114,28 @@ export default function PricingRules() {
   };
 
   return (
-    <div className="container-fluid py-5 px-4">
-      {/* Header Section */}
-      <div className="row mb-4 align-items-center">
-        <div className="col">
-          <h2 className="fw-bold m-0 text-dark">Pricing Rules</h2>
-          <p className="text-muted small m-0">Dynamic pricing configurations for halls and time slots</p>
+    <>
+      <div className="container-fluid py-5 px-4">
+        {/* HEADER */}
+        <div className="row mb-4 align-items-center">
+          <div className="col">
+            <h2 className="fw-bold">Pricing Rules</h2>
+            <p className="text-muted small">
+              Dynamic pricing configurations
+            </p>
+          </div>
+          <div className="col-auto">
+            <button
+              className="btn btn-primary rounded-pill px-4"
+              onClick={() => openForm()}
+            >
+              <i className="bi bi-plus-lg me-2"></i>New Rule
+            </button>
+          </div>
         </div>
-        <div className="col-auto">
-          <button className="btn btn-primary rounded-pill px-4 shadow-sm" onClick={() => openForm()}>
-            <i className="bi bi-plus-lg me-2"></i>New Rule
-          </button>
-        </div>
-      </div>
 
-      {/* Table Card */}
-      <div className="card border-0 shadow-sm overflow-hidden">
-        <div className="table-responsive">
+        {/* TABLE */}
+        <div className="card shadow-sm border-0">
           <table className="table table-hover align-middle mb-0">
             <thead className="table-light">
               <tr className="small text-uppercase text-muted">
@@ -169,22 +178,24 @@ export default function PricingRules() {
         </div>
       </div>
 
-      {/* MODALS */}
-      <AnimatePresence>
-        {(showFormModal || showDeleteModal) && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setShowFormModal(false); setShowDeleteModal(false); }} className="modal-backdrop fade show" style={{ zIndex: 1050 }} />
-            <div className="modal d-block" style={{ zIndex: 1060 }}>
-              <div className={`modal-dialog modal-dialog-centered ${showFormModal ? 'modal-lg' : ''}`}>
-                
-                {/* 1. ADD/EDIT RULE MODAL */}
-                {showFormModal && (
-                  <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className="modal-content border-0 shadow-lg">
-                    <div className="modal-header border-0 pb-0">
-                      <h5 className="fw-bold m-0">{editId ? "Edit Pricing Rule" : "Create Pricing Rule"}</h5>
-                      <button type="button" className="btn-close" onClick={() => setShowFormModal(false)}></button>
-                    </div>
-                    <form onSubmit={submitForm}>
+      {/* ========== FORM MODAL ========== */}
+      {showFormModal && (
+        <Modal>
+          <div
+            className="modal show d-block"
+            style={{ background: "rgba(0,0,0,.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5>{editId ? "Edit Rule" : "Create Rule"}</h5>
+                  <button
+                    className="btn-close"
+                    onClick={() => setShowFormModal(false)}
+                  />
+                </div>
+
+                <form onSubmit={submitForm}>
                       <div className="modal-body py-4">
                         <div className="row g-3">
                           {/* Dropdowns */}
@@ -242,26 +253,39 @@ export default function PricingRules() {
                         <button type="submit" className="btn btn-primary px-5 rounded-pill shadow-sm">{editId ? "Update Rule" : "Create Rule"}</button>
                       </div>
                     </form>
-                  </motion.div>
-                )}
-
-                {/* 2. DELETE MODAL */}
-                {showDeleteModal && (
-                  <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="modal-content border-0 shadow-lg text-center p-4">
-                    <div className="mb-3"><i className="bi bi-exclamation-triangle-fill text-warning" style={{ fontSize: "3rem" }}></i></div>
-                    <h4 className="fw-bold">Remove Rule?</h4>
-                    <p className="text-muted">Deleting this pricing rule will revert bookings for this hall to default prices. Continue?</p>
-                    <div className="d-flex justify-content-center gap-2 mt-3">
-                      <button className="btn btn-light px-4 rounded-pill" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                      <button className="btn btn-danger px-4 rounded-pill shadow-sm" onClick={removeRule}>Confirm Delete</button>
-                    </div>
-                  </motion.div>
-                )}
               </div>
             </div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* ========== DELETE MODAL ========== */}
+      {showDeleteModal && (
+        <Modal>
+          <div
+            className="modal show d-block"
+            style={{ background: "rgba(0,0,0,.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content text-center p-4">
+                <h4>Delete Pricing Rule?</h4>
+                <p className="text-muted">This action cannot be undone.</p>
+                <div className="d-flex justify-content-center gap-2">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button className="btn btn-danger" onClick={removeRule}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }

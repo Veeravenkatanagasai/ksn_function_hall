@@ -3,7 +3,7 @@
 ========================= */
 .gallery-wrapper {
   min-height: 100vh;
-  background: #f4f6fb;
+  background: #7f96d1;
   font-family: system-ui, sans-serif;
   overflow: auto;
 }
@@ -16,8 +16,8 @@
   top: 0;
   width: 100%;
   height: 100px;
-  background: linear-gradient(135deg, #8b0000, #b91c1c);
-  color: #fff;
+  background: linear-gradient(150deg,#7f96d1, rgb(70, 2, 241), #770303);
+ color: #fff;
   padding: 0 40px;
   display: flex;
   align-items: center;
@@ -144,8 +144,8 @@
   margin-bottom: 25px;
   color: #080000;
   font-weight: 900;
-  border-left: 150px solid #a2030d;
-  border-right: 150px solid #a2030d;
+  border-left: 150px solid #5757e8;
+  border-right: 150px solid #5757e8;
   padding-left: 25px;
 }
 

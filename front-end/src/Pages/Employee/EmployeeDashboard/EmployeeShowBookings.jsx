@@ -402,32 +402,7 @@ const fetchBills = async (bookingId) => {
   }
 };
 
-const openPayPopup = (bill) => {
-  setSelectedBill(bill);
-  setPaymentAmount(bill.bill_amount); // default
-  setPaymentType("CASH");
-  setPayPopup(true);
-};
 
-const confirmPayment = async () => {
-  if (!paymentType) {
-    alert("Please select payment method");
-    return;
-  }
-  try {
-    await api.post(`/bills/pay/${selectedBill.bill_id}`, {
-      payment_amount: paymentAmount,
-      payment_method: paymentType
-    });
-    alert("Payment successful");
-    setPayPopup(false);
-    fetchBills(selectedBill.booking_id); 
-    await refreshFinalSettlement(selectedBill.booking_id);
-  } catch (err) {
-    console.error(err);
-    alert("Payment failed");
-  }
-};
 
 const BookingPDFButton = ({ bookingId }) => (
   <button
@@ -1666,7 +1641,6 @@ const hasGallery =
               <th>Photo</th>
               <th>Amount</th>
               <th>Status</th>
-              <th>Pay</th>
             </tr>
           </thead>
           <tbody>
@@ -1701,18 +1675,6 @@ const hasGallery =
               ₹ {bill.payment_amount} • {bill.payment_method}
             </div>
           )}</td>
-                <td>
-          {bill.payment_status === "UNPAID" ? (
-            <button
-              className="btn btn-sm btn-success"
-              onClick={() => openPayPopup(bill)}
-            >
-              Pay
-            </button>
-          ) : (
-            <span className="text-success fw-semibold">Paid</span>
-          )}
-        </td>
               </tr>
             ))}
           </tbody>
@@ -1727,80 +1689,6 @@ const hasGallery =
           Close
         </button>
       </div>
-    </div>
-  </div>
-)}
-
-{payPopup && selectedBill && (
-  <div className="custom-modal-overlay">
-    <div className="custom-modal-container small">
-
-      <h5 className="fw-bold mb-3">Pay Bill</h5>
-
-      {/* Bill Category */}
-      <div className="mb-2">
-        <label className="form-label">Bill Category</label>
-        <input
-          type="text"
-          className="form-control"
-          value={selectedBill.bill_category}
-          disabled
-        />
-      </div>
-
-      {/* Bill Amount */}
-      <div className="mb-2">
-        <label className="form-label">Bill Amount</label>
-        <input
-          type="number"
-          className="form-control"
-          value={selectedBill.bill_amount}
-          disabled
-        />
-      </div>
-
-      {/* Payment Amount */}
-      <div className="mb-2">
-        <label className="form-label">Payment Amount</label>
-        <input
-          type="number"
-          className="form-control"
-          value={paymentAmount}
-          min="1"
-          max={selectedBill.bill_amount}
-          onChange={(e) => setPaymentAmount(e.target.value)}
-        />
-      </div>
-
-      {/* Payment Method */}
-      <div className="mb-2">
-              <label>Payment Method:</label>
-              <select
-                className="form-control"
-                value={paymentType}
-                onChange={(e) => setPaymentType(e.target.value)}
-              >
-                <option value="CASH">CASH</option>
-                <option value="UPI">UPI</option>
-              </select>
-            </div>
-
-      {/* Buttons */}
-      <div className="d-flex justify-content-end">
-        <button
-          className="btn btn-primary me-2"
-          onClick={confirmPayment}
-        >
-          Confirm
-        </button>
-        <button
-          className="btn btn-secondary"
-          onClick={() => setPayPopup(false)}
-        >
-          Cancel
-        </button>
-      </div>
-
     </div>
   </div>
 )}

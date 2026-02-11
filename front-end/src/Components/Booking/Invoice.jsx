@@ -83,6 +83,7 @@ const InvoiceStep = ({ data, onBack, onConfirmed }) => {
     eventDate: data.eventDate,
     startTime: data.startTime,
     endTime: data.endTime,
+    duration: data.duration,
     discount: data.discount,
       })
     );

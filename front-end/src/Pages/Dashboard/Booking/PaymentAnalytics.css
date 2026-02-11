@@ -1,6 +1,6 @@
 .payment-analytics-page {
   min-height: 100vh;
-  background: #f4f6fb;
+  background: #bdcffa;
   font-family: system-ui, sans-serif;
 }
 
@@ -11,7 +11,7 @@
   left: 0;
   height: 100px;
   width: 100%;
-  background: linear-gradient(135deg, #8b0000, #b91c1c);
+  background: linear-gradient(150deg,#7f96d1, rgb(70, 2, 241), #770303);
   color: #fff;
   display: flex;
   align-items: center;

@@ -80,7 +80,7 @@ export const insertBooking = async (conn, payload) => {
   booking.startTime ?? null,
   booking.endTime ?? null,
 
-  invoice.hours ?? 0,
+  booking.duration?? 0,
   booking.discount ?? 0,
 
   invoice.grossTotal ?? invoice.grandTotal ?? 0,
